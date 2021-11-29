@@ -8,7 +8,7 @@ BQGraphicsView::BQGraphicsView(QWidget *parent) : QGraphicsView(parent)
 
     // 设置场景范围
     //setSceneRect(INT_MIN / 2, INT_MIN / 2, INT_MAX, INT_MAX);
-	setSceneRect(0, 0, 2000, 2000);
+	setSceneRect(0, 0, 2000, 2000); 
     // 反锯齿
     setRenderHints(QPainter::Antialiasing);
 }
