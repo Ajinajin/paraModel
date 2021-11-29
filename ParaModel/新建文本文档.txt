@@ -1,0 +1,1 @@
+GLWidget.cpp GLWidget.h ParaModel.cpp ParaModel.h  ParaModel.ui bpointitem.cpp bpointitem.h bqgraphicsitem.cpp bqgraphicsitem.h bqgraphicsscene.cpp bqgraphicsscene.h bqgraphicsview.cpp bqgraphicsview.h main.cpp mainwindow.ui resource.h

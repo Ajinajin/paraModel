@@ -1,0 +1,236 @@
+<RCC>
+    <qresource prefix="/shaders">
+        <file>res/shaders/coordinate.frag</file>
+        <file>res/shaders/coordinate.vert</file>
+        <file>res/shaders/cube.frag</file>
+        <file>res/shaders/cube.vert</file>
+        <file>res/shaders/plane.frag</file>
+        <file>res/shaders/plane.vert</file>
+        <file>res/shaders/pointsize.frag</file>
+        <file>res/shaders/pointsize.vert</file>
+        <file>res/shaders/fragcoord.frag</file>
+        <file>res/shaders/fragcoord.vert</file>
+        <file>res/shaders/frontfacing.frag</file>
+        <file>res/shaders/frontfacing.vert</file>
+        <file>res/shaders/GLSL_RED.frag</file>
+        <file>res/shaders/GLSL_RED.vert</file>
+        <file>res/shaders/GLSL_BLUE.frag</file>
+        <file>res/shaders/GLSL_BLUE.vert</file>
+        <file>res/shaders/GLSL_GREEN.frag</file>
+        <file>res/shaders/GLSL_GREEN.vert</file>
+        <file>res/shaders/GLSL_YELLOW.frag</file>
+        <file>res/shaders/GLSL_YELLOW.vert</file>
+        <file>res/shaders/sphere.frag</file>
+        <file>res/shaders/sphere.vert</file>
+        <file>res/shaders/target.frag</file>
+        <file>res/shaders/target.vert</file>
+        <file>res/shaders/simfragment.frag</file>
+        <file>res/shaders/simfragment.vert</file>
+        <file>res/shaders/skybox.frag</file>
+        <file>res/shaders/skybox.vert</file>
+        <file>res/shaders/missile.frag</file>
+        <file>res/shaders/missile.vert</file>
+        <file>res/shaders/colorstrip.frag</file>
+        <file>res/shaders/colorstrip.vert</file>
+        <file>res/shaders/targetBlow.frag</file>
+        <file>res/shaders/targetBlow.vert</file>
+        <file>res/shaders/BoundsBox.frag</file>
+        <file>res/shaders/BoundsBox.vert</file>
+    </qresource>
+    <qresource prefix="/qss">
+        <file>res/qss/black.css</file>
+        <file>res/qss/white.css</file>
+        <file>res/qss/Black/arrowBottom.png</file>
+        <file>res/qss/Black/arrowLeft.png</file>
+        <file>res/qss/Black/arrowRight.png</file>
+        <file>res/qss/Black/arrowTop.png</file>
+        <file>res/qss/Black/bottomArrow.png</file>
+        <file>res/qss/Black/bottomArrowHover.png</file>
+        <file>res/qss/Black/checkBox.png</file>
+        <file>res/qss/Black/checkBoxChecked.png</file>
+        <file>res/qss/Black/checkBoxCheckedHover.png</file>
+        <file>res/qss/Black/checkBoxCheckedPressed.png</file>
+        <file>res/qss/Black/checkBoxHover.png</file>
+        <file>res/qss/Black/checkBoxIndeterminate.png</file>
+        <file>res/qss/Black/checkBoxIndeterminateHover.png</file>
+        <file>res/qss/Black/checkBoxIndeterminatePressed.png</file>
+        <file>res/qss/Black/checkBoxPressed.png</file>
+        <file>res/qss/Black/close.png</file>
+        <file>res/qss/Black/closeHover.png</file>
+        <file>res/qss/Black/closePressed.png</file>
+        <file>res/qss/Black/delete.png</file>
+        <file>res/qss/Black/deleteHover.png</file>
+        <file>res/qss/Black/deletePressed.png</file>
+        <file>res/qss/Black/downButton.png</file>
+        <file>res/qss/Black/error.png</file>
+        <file>res/qss/Black/feedback.png</file>
+        <file>res/qss/Black/feedbackHover.png</file>
+        <file>res/qss/Black/feedbackPressed.png</file>
+        <file>res/qss/Black/information.png</file>
+        <file>res/qss/Black/left.png</file>
+        <file>res/qss/Black/maximize.png</file>
+        <file>res/qss/Black/maximizeHover.png</file>
+        <file>res/qss/Black/maximizePressed.png</file>
+        <file>res/qss/Black/minimize.png</file>
+        <file>res/qss/Black/minimizeHover.png</file>
+        <file>res/qss/Black/minimizePressed.png</file>
+        <file>res/qss/Black/nscc.png</file>
+        <file>res/qss/Black/open.png</file>
+        <file>res/qss/Black/openHover.png</file>
+        <file>res/qss/Black/openPressed.png</file>
+        <file>res/qss/Black/progressBar.png</file>
+        <file>res/qss/Black/progressBarChunk.png</file>
+        <file>res/qss/Black/question.png</file>
+        <file>res/qss/Black/radioButton.png</file>
+        <file>res/qss/Black/radioButtonChecked.png</file>
+        <file>res/qss/Black/radioButtonCheckedHover.png</file>
+        <file>res/qss/Black/radioButtonCheckedPressed.png</file>
+        <file>res/qss/Black/radioButtonHover.png</file>
+        <file>res/qss/Black/radioButtonPressed.png</file>
+        <file>res/qss/Black/restore.png</file>
+        <file>res/qss/Black/restoreHover.png</file>
+        <file>res/qss/Black/restorePressed.png</file>
+        <file>res/qss/Black/right.png</file>
+        <file>res/qss/Black/scan.png</file>
+        <file>res/qss/Black/skin.png</file>
+        <file>res/qss/Black/skinHover.png</file>
+        <file>res/qss/Black/skinPressed.png</file>
+        <file>res/qss/Black/success.png</file>
+        <file>res/qss/Black/topArrow.png</file>
+        <file>res/qss/Black/topArrowHover.png</file>
+        <file>res/qss/Black/transfer.png</file>
+        <file>res/qss/Black/upButton.png</file>
+        <file>res/qss/Black/warning.png</file>
+<file>res/qss/White/506353.png</file>
+<file>res/qss/White/506354.png</file>
+<file>res/qss/White/506355.png</file>
+<file>res/qss/White/506356.png</file>
+<file>res/qss/White/506357.png</file>
+<file>res/qss/White/506358.png</file>
+<file>res/qss/White/506359.png</file>
+<file>res/qss/White/506362.png</file>
+<file>res/qss/White/506363.png</file>
+<file>res/qss/White/506405.png</file>
+<file>res/qss/White/506406.png</file>
+<file>res/qss/White/506407.png</file>
+<file>res/qss/White/506460.png</file>
+<file>res/qss/White/506461.png</file>
+<file>res/qss/White/506462.png</file>
+<file>res/qss/White/506463.png</file>
+<file>res/qss/White/506464.png</file>
+<file>res/qss/White/506466.png</file>
+<file>res/qss/White/506467.png</file>
+<file>res/qss/White/506468.png</file>
+<file>res/qss/White/506469.png</file>
+<file>res/qss/White/506471.png</file>
+<file>res/qss/White/506501.png</file>
+<file>res/qss/White/506502.png</file>
+<file>res/qss/White/506503.png</file>
+<file>res/qss/White/506504.png</file>
+<file>res/qss/White/506505.png</file>
+<file>res/qss/White/506506.png</file>
+<file>res/qss/White/506507.png</file>
+<file>res/qss/White/506508.png</file>
+<file>res/qss/White/506509.png</file>
+<file>res/qss/White/506510.png</file>
+<file>res/qss/White/506511.png</file>
+<file>res/qss/White/506512.png</file>
+<file>res/qss/White/506513.png</file>
+<file>res/qss/White/506514.png</file>
+<file>res/qss/White/506515.png</file>
+<file>res/qss/White/506516.png</file>
+<file>res/qss/White/506517.png</file>
+<file>res/qss/White/506518.png</file>
+<file>res/qss/White/506519.png</file>
+<file>res/qss/White/529398.png</file>
+<file>res/qss/White/530120.png</file>
+<file>res/qss/White/530150.png</file>
+<file>res/qss/White/530767.png</file>
+<file>res/qss/White/arror.png</file>
+<file>res/qss/White/arrowBottom.png</file>
+<file>res/qss/White/arrowLeft.png</file>
+<file>res/qss/White/arrowRight.png</file>
+<file>res/qss/White/arrowTop.png</file>
+<file>res/qss/White/bottomArrow.png</file>
+<file>res/qss/White/bottomArrowHover.png</file>
+<file>res/qss/White/chartDataManager.png</file>
+<file>res/qss/White/checkBox.png</file>
+<file>res/qss/White/checkBoxChecked.png</file>
+<file>res/qss/White/checkBoxCheckedHover.png</file>
+<file>res/qss/White/checkBoxCheckedPressed.png</file>
+<file>res/qss/White/checkBoxHover.png</file>
+<file>res/qss/White/checkBoxIndeterminate.png</file>
+<file>res/qss/White/checkBoxIndeterminateHover.png</file>
+<file>res/qss/White/checkBoxIndeterminatePressed.png</file>
+<file>res/qss/White/checkBoxPressed.png</file>
+<file>res/qss/White/close.png</file>
+<file>res/qss/White/closeHover.png</file>
+<file>res/qss/White/closePressed.png</file>
+<file>res/qss/White/delete.png</file>
+<file>res/qss/White/deleteHover.png</file>
+<file>res/qss/White/deletePressed.png</file>
+<file>res/qss/White/downButton.png</file>
+<file>res/qss/White/error.png</file>
+<file>res/qss/White/feedback.png</file>
+<file>res/qss/White/feedbackHover.png</file>
+<file>res/qss/White/feedbackPressed.png</file>
+<file>res/qss/White/figureIcon.png</file>
+<file>res/qss/White/filter.png</file>
+<file>res/qss/White/folder.png</file>
+<file>res/qss/White/Graph-add.png</file>
+<file>res/qss/White/help.png</file>
+<file>res/qss/White/icon2.png</file>
+<file>res/qss/White/information.png</file>
+<file>res/qss/White/inRangDataRemove.png</file>
+<file>res/qss/White/layerBarChart.png</file>
+<file>res/qss/White/left.png</file>
+<file>res/qss/White/maximize.png</file>
+<file>res/qss/White/maximizeHover.png</file>
+<file>res/qss/White/maximizePressed.png</file>
+<file>res/qss/White/minimize.png</file>
+<file>res/qss/White/minimizeHover.png</file>
+<file>res/qss/White/minimizePressed.png</file>
+<file>res/qss/White/nscc.png</file>
+<file>res/qss/White/open.png</file>
+<file>res/qss/White/openHover.png</file>
+<file>res/qss/White/openPressed.png</file>
+<file>res/qss/White/openProject.png</file>
+<file>res/qss/White/progressBar.png</file>
+<file>res/qss/White/progressBarChunk.png</file>
+<file>res/qss/White/question.png</file>
+<file>res/qss/White/radioButton.png</file>
+<file>res/qss/White/radioButtonChecked.png</file>
+<file>res/qss/White/radioButtonCheckedHover.png</file>
+<file>res/qss/White/radioButtonCheckedPressed.png</file>
+<file>res/qss/White/radioButtonHover.png</file>
+<file>res/qss/White/radioButtonPressed.png</file>
+<file>res/qss/White/restore.png</file>
+<file>res/qss/White/restoreHover.png</file>
+<file>res/qss/White/restorePressed.png</file>
+<file>res/qss/White/right.png</file>
+<file>res/qss/White/save.png</file>
+<file>res/qss/White/scan.png</file>
+<file>res/qss/White/skin.png</file>
+<file>res/qss/White/skinHover.png</file>
+<file>res/qss/White/skinPressed.png</file>
+<file>res/qss/White/success.png</file>
+<file>res/qss/White/topArrow.png</file>
+<file>res/qss/White/topArrowHover.png</file>
+<file>res/qss/White/transfer.png</file>
+<file>res/qss/White/upButton.png</file>
+<file>res/qss/White/warning.png</file>
+
+    </qresource>
+    <qresource prefix="/textures">
+        <file>res/textures/brickwall.jpg</file>
+        <file>res/textures/cementwall.jpg</file>
+        <file>res/textures/back.jpg</file>
+        <file>res/textures/bottom.jpg</file>
+        <file>res/textures/front.jpg</file>
+        <file>res/textures/left.jpg</file>
+        <file>res/textures/right.jpg</file>
+        <file>res/textures/top.jpg</file>
+        <file>res/textures/floor.jpg</file>
+        <file>res/textures/target.jpg</file>
+    </qresource>
+</RCC>
