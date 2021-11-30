@@ -1,3 +1,5 @@
+#include <QTextCodec>
+
 #include "ParaModel.h"
 #include <qtreeview.h>
 #include<qtreewidget.h>
@@ -971,7 +973,105 @@ void ParaModel::on_loadBtn_clicked()
 
 }
 
+
 //ParaModel::~ParaModel()
 //{
 //	delete ui;
 //}
+
+int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
+{
+	// 0-5 柱梁板墙门窗
+	QString sType = "柱梁板墙门窗";
+	oUnit.nUnitIdx = listInfo[0].toInt();
+	int nType = sType.indexOf(listInfo[1]);
+	if (nType < 0)
+		return 1;
+	oUnit.nUnitType = nType;
+	// 柱和梁类型   截面形状 0-2 矩形 圆形 多边形
+	QString sShapeType = "矩形圆形多边形";
+	int i = 0;
+	if (nType < 2)
+	{
+		nType = sShapeType.indexOf(listInfo[2]);
+		if (nType < 0)
+			return 1;
+		oUnit.oShape.nShapeType = nType / 2;
+		switch (oUnit.oShape.nShapeType)
+		{
+		case 0:
+			for (i = 0; i < 4; i++)
+			{
+				oUnit.oShape.vPolyPt.push_back(listInfo[3 + i].toInt());
+			}
+			break;
+		case 1:
+			oUnit.oShape.nCen[0] = listInfo[3].toInt();
+			oUnit.oShape.nCen[1] = listInfo[4].toInt();
+			oUnit.oShape.nNumOrRadius = listInfo[5].toInt();
+			break;
+		case 2:
+			oUnit.oShape.nNumOrRadius = listInfo[3].toInt();
+			for (i = 0; i < oUnit.oShape.nNumOrRadius; i++)
+			{
+				oUnit.oShape.vPolyPt.push_back(listInfo[4 + i].toInt());
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	// 墙和板类型
+	if (nType == 2 || nType == 3)
+		oUnit.oShape.nThickNess = listInfo[2].toInt();
+	// 门和窗
+	else
+	{
+		oUnit.oShape.nShapeType = 0;
+		oUnit.oShape.vPolyPt.push_back(listInfo[3].toInt());
+		oUnit.oShape.vPolyPt.push_back(listInfo[4].toInt());
+	}
+	return 0;
+}
+// 初始化基本构件库 
+int ParaModel::InitUnitLib()
+{
+	QString sUnitFile("d:/基本构件库");
+	QFile fileScn(sUnitFile);
+	if (!fileScn.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		return 1;
+	}
+	QTextStream inScn(&fileScn);
+
+	QTextCodec* pCode = QTextCodec::codecForName("UTF-8");
+
+	// 按行读入文件内容
+	QString sScnLine;
+	QStringList listWord;
+	BasicUnit oUnit;
+
+	vBaseUnit.clear();
+	while (!fileScn.atEnd())
+	{
+		sScnLine = pCode->toUnicode(fileScn.readLine());
+		listWord = sScnLine.split(" ");
+		InitUnitPara(listWord, oUnit);
+		vBaseUnit.push_back(oUnit);
+	}
+	QTextCodec::setCodecForLocale(QTextCodec::codecForName("GBK"));
+	fileScn.close();
+
+	return 0;
+}
+// 初始化平面图库
+int ParaModel::InitPlaneDrawLib()
+{
+	return 0;
+}
+// 初始化参数化生成模板
+int ParaModel::InitParaTmpl()
+{
+	return 0;
+}
+

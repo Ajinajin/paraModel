@@ -21,6 +21,9 @@
 
 #include "paraoglmanager.h"
 #include "SARibbonMainWindow.h"
+#include <ParaType.h>
+
+
 class QMenu;
 class QListWidget;
 
@@ -66,7 +69,14 @@ private:
     QAction * action_Replace_ListWidget_;/*菜单上的Action*/
     //QGraphicsScene* m_scene = nullptr;
 
-
+	// 初始化系统库
+public:
+	VUNITTABLE vBaseUnit;					// 系统基本构件库
+	VTOPOTABLE vModelTmpl;					// 系统平面图库
+	int InitPath();							// 初始化路径
+	int InitUnitLib();						// 初始化基本构件库 
+	int InitPlaneDrawLib();					// 初始化平面图库
+	int InitParaTmpl();						// 初始化参数化生成模板
 private:
 	//初始化窗口
 	void InitWindow();
