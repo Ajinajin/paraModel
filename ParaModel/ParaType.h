@@ -25,7 +25,7 @@ typedef vector<V3DPT> VV3DPT;
 
 typedef struct GeoShape
 {
-	int nShapeType;				// 形状类型 方 圆 多边形
+	int nShapeType;				// 形状类型 矩形 1 圆 2 多边形3
 	int nThickNess;				// 墙和板的厚度
 	int nShapeRange[4];			// 外框的左下右上 从小到大
 	int nCen[2];				// 中心点 圆心点
@@ -44,7 +44,7 @@ typedef struct MatInfo
 typedef struct BasicUnit
 {
 	int nUnitIdx;				// 基本构件单元Idx
-	int nUnitType;				// 基本单元类型 柱梁板墙门窗
+	int nUnitType;				// 基本单元类型 柱1  梁2 板3 墙4 门5 窗6
 	GeoShape oShape;			// 外形轮廓描述
 	MatInfo  oMaterial;			// 组成材质描述
 }BasicUnit;
@@ -55,7 +55,7 @@ typedef struct TopoUnit
 {
 	int nTopoType;				// 中心构件单元类型 柱梁板墙门窗
 	int nCenUnitIdx;			// 中心构件单元Id
-	int nAdjUnitIdx[6];			// 前后上下左右 邻接单元Id 无邻接-1
+	int nAdjUnitIdx[12];			// 前后上下左右 邻接单元Id 无邻接-1
 	int nEdgeType;				// 边界类型 前后上下左右
 	Ver3D oUnitSE[2];			// 基本构件单元的起始点和终止点 Y值表示高度范围 有可能为半高墙 或者悬空梁
 }TopoUnit;

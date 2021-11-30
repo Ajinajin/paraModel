@@ -38,8 +38,7 @@ public:
     ParaModel(QWidget* parent = 0);
 
 private:
-	//状态栏
-	QStatusBar* winStatus;
+	QStatusBar* winStatus;							//状态栏
 	QLabel* pTipBar;								// 状态栏中文字显示
 	QLineEdit* pModelEdit[7];						// 战斗部属性编辑框 当量 弹片数量 弹片质量 分布角度1 分布角度2
 	QLineEdit* pArmHeadEdit[5];						// 算法信息
@@ -58,6 +57,8 @@ private:
 
 	ParaOGLManager* oglmanager;							// 三维显示窗口类
 	ParaOGLManager* oglmanagerMain;							// 三维显示窗口大屏幕主类
+	 
+	int if_data;									//0是未加载数据。1是有数据
 
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
     // 图像的宽长
@@ -105,6 +106,10 @@ private:
 	//初始化弹出窗口
 	void InitTipWindow(); 
 
+
+	//初始化构建
+	void InitBaseUnit();
+
 public slots:
 	void MyLogOutput(const char* myLogout);         //输出日志
 	void ApplyDataAction();		//保存属性输入的数据
@@ -127,4 +132,7 @@ private slots:
 	void on_clearBtn_clicked();
 	void my_save();
 	void on_loadBtn_clicked();
+	void NewFileAction();
+	void OpenFileAction();
+	void CloseFileAction();
 };
