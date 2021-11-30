@@ -315,6 +315,7 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 	 
 	graphicsViewMain = new BQGraphicsView();
 	graphicsViewMain->setScene(&pSceneMain);
+	pSceneMain.setBackgroundBrush(Qt::darkGray);
 
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");
 	/*oglManager = new OGLManager;*/
@@ -536,7 +537,7 @@ void ParaModel::GraphicsViewXFocus(bool b)
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");
 	MainDockState = 0;
 	MainDockWidget->setWidget(graphicsViewMain);
-
+	pSceneMain.setBackgroundBrush(Qt::darkGray);
 	return;
 }
 
@@ -545,6 +546,7 @@ void ParaModel::GraphicsViewYFocus(bool b)
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维Y）");
 	MainDockState = 1;
 	MainDockWidget->setWidget(graphicsViewMain);
+	pSceneMain.setBackgroundBrush(Qt::lightGray);
 
 	return;
 }
@@ -554,6 +556,7 @@ void ParaModel::GraphicsViewZFocus(bool b)
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维Z）");
 	MainDockState = 2;
 	MainDockWidget->setWidget(graphicsViewMain);
+	pSceneMain.setBackgroundBrush(Qt::gray);
 	return;
 }
 
