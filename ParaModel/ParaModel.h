@@ -21,6 +21,9 @@
 
 #include "paraoglmanager.h"
 #include "SARibbonMainWindow.h"
+#include <ParaType.h>
+
+
 class QMenu;
 class QListWidget;
 
@@ -35,8 +38,7 @@ public:
     ParaModel(QWidget* parent = 0);
 
 private:
-	//状态栏
-	QStatusBar* winStatus;
+	QStatusBar* winStatus;							//状态栏
 	QLabel* pTipBar;								// 状态栏中文字显示
 	QLineEdit* pModelEdit[7];						// 战斗部属性编辑框 当量 弹片数量 弹片质量 分布角度1 分布角度2
 	QLineEdit* pArmHeadEdit[5];						// 算法信息
@@ -45,28 +47,37 @@ private:
 	BQGraphicsView* graphicsViewX;					// 二维模型X视图
 	BQGraphicsView* graphicsViewY;					// 二维模型Y视图
 	BQGraphicsView* graphicsViewZ;					// 二维模型Z视图
-	BQGraphicsView* graphicsViewMain;				// 二维模型Z视图
-	BQGraphicsView* graphicsViewOgl;				//三位模型展示视图
+	BQGraphicsView* graphicsViewMain;				// 二维模型 三维视图
+	BQGraphicsView* graphicsViewOgl;				// 三位模型展示视图
 
 	BQGraphicsScene pSceneX;						// 二维模型X视图画布
 	BQGraphicsScene pSceneY;						// 二维模型Y视图画布
 	BQGraphicsScene pSceneZ;						// 二维模型Z视图画布
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布
 
+
 	ParaOGLManager* paraOglmanager;							// 三维显示窗口类
 	ParaOGLManager* paraOglmanagerMain;						// 三维显示窗口大屏幕主类
 
+	 
+	int if_data;									//0是未加载数据。1是有数据
+
+
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
-    // 图像的宽长
-    int mainLableWidth, mainLableHeight; 
 	int MainDockState;								// 0是X视图 1是Y视图 2是Z视图 3是三维视图
     // mainLabel显示的图像
-    QImage* img = nullptr;
     QMenu* popMenu_In_ListWidget_; /*弹出菜单*/
     QAction * action_Replace_ListWidget_;/*菜单上的Action*/
     //QGraphicsScene* m_scene = nullptr;
 
-
+	// 初始化系统库
+public:
+	VUNITTABLE vBaseUnit;					// 系统基本构件库
+	VTOPOTABLE vModelTmpl;					// 系统平面图库
+	int InitPath();							// 初始化路径
+	int InitUnitLib();						// 初始化基本构件库 
+	int InitPlaneDrawLib();					// 初始化平面图库
+	int InitParaTmpl();						// 初始化参数化生成模板
 private:
 	//初始化窗口
 	void InitWindow();
@@ -95,6 +106,10 @@ private:
 	//初始化弹出窗口
 	void InitTipWindow(); 
 
+
+	//初始化构建
+	void InitBaseUnit();
+
 public slots:
 	void MyLogOutput(const char* myLogout);         //输出日志
 	void ApplyDataAction();		//保存属性输入的数据
@@ -116,8 +131,8 @@ public slots:
 
 private slots:
 	void onCustomContextMenuRequested(const QPoint& pos);
-	void on_polygonBtn_clicked();
-	void on_clearBtn_clicked();
-	void my_save();
-	void on_loadBtn_clicked();
+	void on_polygonBtn_clicked(); 
+	void NewFileAction();
+	void OpenFileAction();
+	void CloseFileAction();
 };

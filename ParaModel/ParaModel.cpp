@@ -1,6 +1,8 @@
+#include <QTextCodec>
+
 #include "ParaModel.h"
 #include <qtreeview.h>
-#include<qtreewidget.h>
+#include <qtreewidget.h>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QGraphicsView>
@@ -194,61 +196,144 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 	from->setFixedWidth(300);
 	from->setWindowTitle("模型组件/属性列表");
 
-	// 添加树形菜单
-	QTreeWidgetItem* rootItem1 = new QTreeWidgetItem(pModelTreeWidget);
-	// 设置菜单内容
-	rootItem1->setText(0, "菜单1");
-	// 添加子树形菜单
-	QTreeWidgetItem* childItem1_1 = new QTreeWidgetItem(rootItem1);
-	childItem1_1->setText(0, "圆");
-	QTreeWidgetItem* childItem1_2 = new QTreeWidgetItem(rootItem1);
-	childItem1_2->setText(0, "椭圆");
-	QTreeWidgetItem* childItem1_3 = new QTreeWidgetItem(rootItem1);
-	childItem1_3->setText(0, "正方形");
-	QTreeWidgetItem* childItem1_4 = new QTreeWidgetItem(rootItem1);
-	childItem1_4->setText(0, "120厚墙");
-	/*QTreeWidgetItem* rootItem2 = new QTreeWidgetItem(treeWidget);
-	rootItem2->setText(0, "菜单2");
-	rootItem2->setText(1, "第二个菜单");
-	QTreeWidgetItem* childItem2_1 = new QTreeWidgetItem(rootItem2);
-	childItem2_1->setText(0, "开发");
-	childItem2_1->setText(1, "测试Demo");*/
+
+	QTreeWidgetItem* rootItemPillar = new QTreeWidgetItem(pModelTreeWidget);
+	rootItemPillar->setText(0, "柱");
+	QTreeWidgetItem* rootItemBeam = new QTreeWidgetItem(pModelTreeWidget);
+	rootItemBeam->setText(0, "梁");
+	QTreeWidgetItem* rootItemBoard = new QTreeWidgetItem(pModelTreeWidget);
+	rootItemBoard->setText(0, "板");
+	QTreeWidgetItem* rootItemWall = new QTreeWidgetItem(pModelTreeWidget);
+	rootItemWall->setText(0, "墙");
+	QTreeWidgetItem* rootItemDoor = new QTreeWidgetItem(pModelTreeWidget);
+	rootItemDoor->setText(0, "门");
+	QTreeWidgetItem* rootItemWindow = new QTreeWidgetItem(pModelTreeWidget);
+	rootItemWindow->setText(0, "窗");
+
+	for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
+	{
+
+		QTreeWidgetItem* childItem;
+#pragma region nUnitType赋值
+		if (iter->nUnitType == 1)
+		{
+			childItem = new QTreeWidgetItem(rootItemPillar);
+		}
+		else if (iter->nUnitType == 2)
+		{
+			childItem = new QTreeWidgetItem(rootItemBeam);
+		}
+		else if (iter->nUnitType == 3)
+		{
+			childItem = new QTreeWidgetItem(rootItemBoard);
+		}
+		else if (iter->nUnitType == 4)
+		{
+			childItem = new QTreeWidgetItem(rootItemWall);
+		}
+		else if (iter->nUnitType == 5)
+		{
+			childItem = new QTreeWidgetItem(rootItemDoor);
+		}
+		else if (iter->nUnitType == 6)
+		{
+			childItem = new QTreeWidgetItem(rootItemWindow);
+		}
+#pragma endregion
+		//矩形 1 圆 2 多边形3
+
+		childItem->setText(0, iter->oShape.nShapeName);
+
+		childItem->setData(0, Qt::UserRole, iter->nUnitIdx);
+	}
+
 	//树按钮响应
 	connect(pModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column) {
 		QTreeWidgetItem* parent = item->parent();
 		if (NULL == parent) //注意：最顶端项是没有父节点的，双击这些项时注意(陷阱)
 			return;
-		int col = parent->indexOfChild(item); //item在父项中的节点行号(从0开始)
-		//1圆 2椭圆 3正方形 4矩形
+
+		QVariant variant = item->data(0, Qt::UserRole);
+		int nUnitIdx = variant.value<int>();
+
 		char* msg = "";
-		if (0 == col) {
-			//pSceneMain.clear();
-
-			/*foreach(QGraphicsItem * item, pSceneMain.items())
+		for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
+		{
+			if (iter->nUnitIdx != nUnitIdx)
+				continue;
+			if (iter->oShape.nShapeType == 1)
 			{
-				pSceneMain.removeItem(item);
-			} */
+				msg = "矩形构件加载完成";
+				BRectangle* m_rectangle = new BRectangle(
+					iter->oShape.nShapeRange[0], iter->oShape.nShapeRange[1],
+					iter->oShape.nShapeRange[2], iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
+				m_rectangle->wallwidth = 120;
+				pSceneMain.addItem(m_rectangle);
+			}
+			else if (iter->oShape.nShapeType == 2)
+			{
+				msg = "圆形构件加载完成";
 
-			msg = "圆模型加载完成";
-			BCircle* m_circle = new BCircle(1000, 1000, 50, BGraphicsItem::ItemType::Circle);
-			pSceneMain.addItem(m_circle);
+				BCircle* m_ellipse = new BCircle(iter->oShape.nCen[0], iter->oShape.nCen[1],
+					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
+				pSceneMain.addItem(m_ellipse);
+			}
+			else if (iter->oShape.nShapeType == 3)
+			{
+				msg = "多边形构件加载完成";
+
+				//setBtnEnabled(false);
+				BPolygon* m_polygon = new BPolygon(BGraphicsItem::ItemType::Polygon);
+				m_polygon->is_create_finished = true;
+
+				//m_polygon->paint();
+
+				pSceneMain.addItem(m_polygon);
+
+			}
+			else if (iter->oShape.nShapeType == 0)
+			{
+				msg = "构件加载完成";
+				BRectangle* m_rectangle = new BRectangle(
+					iter->oShape.nShapeRange[0], iter->oShape.nShapeRange[1],
+					iter->oShape.nShapeRange[2], iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
+				m_rectangle->wallwidth = 120;
+				pSceneMain.addItem(m_rectangle);
+			}
 		}
-		else if (1 == col) {
-			msg = "椭圆模型加载完成";
-			BEllipse* m_ellipse = new BEllipse(1000, 1000, 120, 80, BGraphicsItem::ItemType::Ellipse);
-			pSceneMain.addItem(m_ellipse);
-		}
-		else if (2 == col) {
-			msg = "正方形模型加载完成";
-			BSquare* m_square = new BSquare(1000, 1000, 60, BGraphicsItem::ItemType::Square);
-			pSceneMain.addItem(m_square);
-		}
-		else if (3 == col) {
-			msg = "矩形模型加载完成";
-			BRectangle* m_rectangle = new BRectangle(1000, 1000, 240, 120, BGraphicsItem::ItemType::Rectangle);
-			m_rectangle->wallwidth = 120;
-			pSceneMain.addItem(m_rectangle);
-		}
+
+
+		//int col = parent->indexOfChild(item); //item在父项中的节点行号(从0开始)
+		////1圆 2椭圆 3正方形 4矩形
+		//char* msg = "";
+		//if (0 == col) {
+		//	//pSceneMain.clear();
+
+		//	/*foreach(QGraphicsItem * item, pSceneMain.items())
+		//	{
+		//		pSceneMain.removeItem(item);
+		//	} */
+
+		//	msg = "圆模型加载完成";
+		//	BCircle* m_circle = new BCircle(1000, 1000, 50, BGraphicsItem::ItemType::Circle);
+		//	pSceneMain.addItem(m_circle);
+		//}
+		//else if (1 == col) {
+		//	msg = "椭圆模型加载完成";
+		//	BEllipse* m_ellipse = new BEllipse(1000, 1000, 120, 80, BGraphicsItem::ItemType::Ellipse);
+		//	pSceneMain.addItem(m_ellipse);
+		//}
+		//else if (2 == col) {
+		//	msg = "正方形模型加载完成";
+		//	BSquare* m_square = new BSquare(1000, 1000, 60, BGraphicsItem::ItemType::Square);
+		//	pSceneMain.addItem(m_square);
+		//}
+		//else if (3 == col) {
+		//	msg = "矩形模型加载完成";
+		//	BRectangle* m_rectangle = new BRectangle(1000, 1000, 240, 120, BGraphicsItem::ItemType::Rectangle);
+		//	m_rectangle->wallwidth = 120;
+		//	pSceneMain.addItem(m_rectangle);
+		//}
 		MyLogOutput(msg);
 		});
 	from->setWidget(pModelTreeWidget);
@@ -261,6 +346,11 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 	graphicsViewX = new BQGraphicsView();
 	graphicsViewY = new BQGraphicsView();
 	graphicsViewZ = new BQGraphicsView();
+
+	graphicsViewOgl = new BQGraphicsView();
+	pSceneX.setBackgroundBrush(Qt::darkGray);
+	pSceneY.setBackgroundBrush(Qt::lightGray);
+	pSceneZ.setBackgroundBrush(Qt::gray);
 
 	graphicsViewX->setScene(&pSceneX);
 	graphicsViewY->setScene(&pSceneY);
@@ -277,7 +367,7 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 
 	QGridLayout* myLayout = new QGridLayout();
 	QWidget* temp = new QWidget();
-	
+
 
 	//myHBoxLayout->addWidget(graphicsViewX);
 	myLayout->addWidget(graphicsViewX, 0, 0);
@@ -310,10 +400,13 @@ void ParaModel::InitLogWidget(QDockWidget* from)
 void ParaModel::InitOglManagerWidget(QDockWidget* from)
 {
 	MainDockWidget = from;
-	 
+
 	/*graphicsViewMain = new BQGraphicsView();
 
+	graphicsViewMain = new BQGraphicsView();
+
 	graphicsViewMain->setScene(&pSceneMain);
+	pSceneMain.setBackgroundBrush(Qt::darkGray);
 
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");*/
 
@@ -414,15 +507,15 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+N")));
 	act->setCheckable(true);
 	pannel->addLargeAction(act);
-	/*connect(act, &QAction::toggled, this, [act](bool b) {
+	connect(act, &QAction::toggled, this, [act](bool b) {
 		if (b) {
 			act->setIcon(QIcon(":/qss/res/qss/White/success.png"));
 		}
 		else {
 			act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
 		}
-		});*/
-		//connect(act, &QAction::triggered, this, &ParaModel::NewFileAction);
+		});
+	connect(act, &QAction::triggered, this, &ParaModel::NewFileAction);
 
 	act = new QAction(this);
 	act->setObjectName(("打开"));
@@ -430,7 +523,7 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setText(("打开"));
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+O")));
 	pannel->addLargeAction(act);
-	//connect(act, &QAction::triggered, this, &ParaModel::OpenFileAction);
+	connect(act, &QAction::triggered, this, &ParaModel::OpenFileAction);
 
 	act = new QAction(this);
 	act->setObjectName(("保存"));
@@ -446,7 +539,7 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
 	act->setText(("另存为"));
 	pannel->addLargeAction(act);
-	//connect(act, &QAction::triggered, this, &MainWindow::SaveasFileAction);
+	//connect(act, &QAction::triggered, this, &ParaModel::SaveasFileAction);
 
 
 	act = new QAction(this);
@@ -454,7 +547,7 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
 	act->setText(("关闭"));
 	pannel->addLargeAction(act);
-	//connect(act, &QAction::triggered, this, &MainWindow::CloseFileAction);
+	connect(act, &QAction::triggered, this, &ParaModel::CloseFileAction);
 }
 //初始化Ribbon
 void ParaModel::InitSARibbon()
@@ -513,54 +606,154 @@ void ParaModel::InitTipWindow()
 ParaModel::ParaModel(QWidget* parent)
 	: SARibbonMainWindow(parent)
 {
-	//设置背景颜色
-	//pSceneMain.setBackgroundBrush(Qt::gray);
-	//graphicsView->setScene(&pSceneMain);
+	//初始化系统数据
+	InitUnitLib();
 
-
+	//初始化界面
 	InitWindow();
 	InitTipWindow();
-
-
-
-	//// menu 窗口的一些控件
-	//menu->addAction("打开", this, &ParaModel::openAndLoadPic);
-	//menu->addAction("打开三维图", this, &ParaModel::loadViews);
-	//menu->addAction("保存", this, &ParaModel::my_save);
-
-	//// 右侧图像列表
-	//QSize ICON_SIZE = QSize(200, 250);
-	//// 设置使用自定义槽函数，为了实现右击事件
-	//imageList->setProperty("contextMenuPolicy", Qt::CustomContextMenu);
-	//imageList->setIconSize(ICON_SIZE);
-	//// 设置适应内容缩放
-	//imageList->setResizeMode(QListView::Fixed);
-	//imageList->setViewMode(QListView::ListMode); // 1列n行
-	//imageList->setMovement(QListView::Static);   // 设置单元项不可拖动
-	//// 设置每个子单元之间的间隔
-	//imageList->setSpacing(2);
-
-	//// 右键菜单
-	//popMenu_In_ListWidget_ = new QMenu(this);
-	//// 菜单项
-	//action_Replace_ListWidget_ = new QAction(tr("替换"), this);
-	//// 添加菜单项
-	//popMenu_In_ListWidget_->addAction(action_Replace_ListWidget_);
-
-	//// 槽函数绑定
-	//QObject::connect(paraInputCfm, SIGNAL(clicked()), this, SLOT(getPara()));
-	//QObject::connect(paraInputRmv, SIGNAL(clicked()), this, SLOT(resetPara()));
-	//QObject::connect(this->action_Replace_ListWidget_, SIGNAL(triggered()), this, SLOT(replaceSlot()));
-	//QObject::connect(imageList, SIGNAL(customContextMenuRequested(const QPoint&)), this,
-	//	SLOT(onCustomContextMenuRequested(const QPoint&)));
-
 }
 
+void ParaModel::NewFileAction()
+{
+	if_data = 1;
+	MyLogOutput("新建场景文件成功");
+}
+void ParaModel::CloseFileAction()
+{
+	if_data = 0;
+	MyLogOutput("清除数据成功");
+}
+void ParaModel::OpenFileAction()
+{
+	if (if_data == 1)
+	{
+		QMessageBox::information(NULL, "信息提示", "当前已有加载数据，请关闭后在打开");
+		MyLogOutput("当前已有加载数据，请关闭后在打开");
+	}
+
+	QFileDialog* f = new QFileDialog(this);
+	f->setWindowTitle("选择数据文件*.txt");
+	f->setNameFilter("*.txt");
+	f->setViewMode(QFileDialog::Detail);
+	QString filePath;
+	if (f->exec() == QDialog::Accepted) {
+		filePath = f->selectedFiles()[0];
+	}
+	// 获取文件内容
+	QFile file(filePath);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		QMessageBox::information(NULL, "信息提示", "数据加载失败,请检查文件。");
+		MyLogOutput("数据加载失败,请检查文件。");
+		return;
+	}
+	QTextStream readStream(&file);
+
+	int parsingState = 0;
+	while (!readStream.atEnd()) {
+		QString content = readStream.readLine();
+		QStringList list = content.split(' ');
+		bool verify;
+		QString str = list[0];
+		if (list[0] == "*Topo")
+		{
+			parsingState = 1;
+			continue;
+		}
+		float  locationX = str.toInt(&verify);
+		if (!verify)
+			continue;
+		TopoUnit Topo;
+		Topo.nUnitType = 0;
+		Topo.nCenUnitIdx = 0;
+		Topo.nAdjUnitIdx[0] = -1;
+		Topo.nAdjUnitIdx[1] = -1;
+		Topo.nAdjUnitIdx[2] = -1;
+		Topo.nAdjUnitIdx[3] = -1;
+		Topo.nAdjUnitIdx[4] = -1;
+		Topo.nAdjUnitIdx[5] = -1;
+		Topo.nAdjUnitIdx[6] = -1;
+		Topo.nAdjUnitIdx[7] = -1;
+		Topo.nEdgeType = 0;
+		Topo.nStatusFlag = 0;
+		Topo.nUnitAngle = 0;
+		Topo.nCenPos[0] = 0;
+		Topo.nCenPos[1] = 0;
+		Topo.nCenPos[2] = 0;
+		Topo.nCenPos[3] = 0;
+
+		if (parsingState == 0)
+		{
+			if (list[1] == "柱")
+			{
+				Topo.nUnitType = 1;
+			}
+			else if (list[1] == "梁")
+			{
+				Topo.nUnitType = 2;
+			}
+			else if (list[1] == "楼板")
+			{
+				Topo.nUnitType = 3;
+			}
+			else if (list[1] == "墙")
+			{
+				Topo.nUnitType = 4;
+			}
+			else if (list[1] == "门")
+			{
+				Topo.nUnitType = 5;
+			}
+			else if (list[1] == "窗")
+			{
+				Topo.nUnitType = 6;
+			}
+
+			Topo.nCenUnitIdx = list[2].toInt();
+			Topo.nTopoIdx = list[0].toInt();
+			if (list.size() == 4)
+			{ 
+				Topo.nCenPos[0] = list[3].toInt();
+			}
+			if (list.size() == 5)
+			{
+				Topo.nCenPos[1] = list[4].toInt();
+			}
+			if (list.size() == 6)
+			{
+				Topo.nCenPos[1] = list[5].toInt();
+			}
+			if (list.size() == 7)
+			{
+				Topo.nCenPos[1] = list[6].toInt();
+			}
+			vModelTmpl.push_back(Topo);
+		}
+		else
+		{
+			for (size_t i = 0; i < vModelTmpl.size(); i++)
+			{
+				if (vModelTmpl[i].nTopoIdx == list[1].toInt())
+				{
+					for (size_t j = 0; j < list.size() - 2; j++)
+					{
+						vModelTmpl[i].nAdjUnitIdx[j] = list[j + 2].toInt();
+					} 
+				}
+			}
+		}
+	}
+
+	//vModelTmpl
+	if_data = 1;
+}
 void ParaModel::GraphicsViewXFocus(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");
 	MainDockState = 0;
-
+	MainDockWidget->setWidget(graphicsViewMain);
+	pSceneMain.setBackgroundBrush(Qt::darkGray);
 	return;
 }
 
@@ -568,6 +761,8 @@ void ParaModel::GraphicsViewYFocus(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维Y）");
 	MainDockState = 1;
+	MainDockWidget->setWidget(graphicsViewMain);
+	pSceneMain.setBackgroundBrush(Qt::lightGray);
 
 	return;
 }
@@ -576,13 +771,15 @@ void ParaModel::GraphicsViewZFocus(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维Z）");
 	MainDockState = 2;
-
+	MainDockWidget->setWidget(graphicsViewMain);
+	pSceneMain.setBackgroundBrush(Qt::gray);
 	return;
 }
 
 void ParaModel::GraphicsViewOgl(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （三维模型）");
+
 	
 	MainDockWidget->setWidget(paraOglmanagerMain);
 
@@ -959,40 +1156,184 @@ void ParaModel::on_polygonBtn_clicked()
 		});
 }
 
-void ParaModel::on_clearBtn_clicked()
-{
-	pSceneMain.clear();
-}
 
-//存储view画面
-
-void ParaModel::my_save()
-{
-	//QFile file("D:\\csol\\untitled4\\DataFile\\test.txt");
-	//if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
-	//{
-	//	QMessageBox::warning(this, "sdf", "can't open", QMessageBox::Yes);
-	//}
-	//QTextStream stream(&file);
-	//QList<QGraphicsItem*> items = graphicsView->scene()->items();
-	//foreach(QGraphicsItem * item, items) {
-	//	BGraphicsItem* i = dynamic_cast<BGraphicsItem*>(item);
-	//	if (!i) continue;
-	//	stream << i->m_type << " ";
-	//	stream << int(i->m_center.rx()) << " " << int(i->m_center.ry()) << " " << int(i->m_edge.rx()) << " " << int(i->m_edge.ry()) << endl;
-	//	//
-	//}
-	//graphicsView_2->setScene(&pSceneMain);
-	//graphicsView_3->setScene(&pSceneMain);
-	//file.close();
-}
-
-void ParaModel::on_loadBtn_clicked()
-{
-
-}
 
 //ParaModel::~ParaModel()
 //{
 //	delete ui;
 //}
+
+int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
+{
+	// 0-5 柱梁板墙门窗
+	QString sType = "柱梁板墙门窗";
+	oUnit.nUnitIdx = listInfo[0].toInt();
+	int nType = sType.indexOf(listInfo[1]);
+	if (nType < 0)
+		return 1;
+	oUnit.nUnitType = nType;
+	// 柱和梁类型   截面形状 0-2 矩形 圆形 多边形
+	QString sShapeType = "矩形圆形多边形";
+	int i = 0;
+	if (nType < 2)
+	{
+		nType = sShapeType.indexOf(listInfo[2]);
+		if (nType < 0)
+			return 1;
+		oUnit.oShape.nShapeType = nType / 2;
+		switch (oUnit.oShape.nShapeType)
+		{
+		case 0:
+			for (i = 0; i < 4; i++)
+			{
+				oUnit.oShape.vPolyPt.push_back(listInfo[3 + i].toInt());
+			}
+			break;
+		case 1:
+			oUnit.oShape.nCen[0] = listInfo[3].toInt();
+			oUnit.oShape.nCen[1] = listInfo[4].toInt();
+			oUnit.oShape.nNumOrRadius = listInfo[5].toInt();
+			break;
+		case 2:
+			oUnit.oShape.nNumOrRadius = listInfo[3].toInt();
+			for (i = 0; i < oUnit.oShape.nNumOrRadius; i++)
+			{
+				oUnit.oShape.vPolyPt.push_back(listInfo[4 + i].toInt());
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	// 墙和板类型
+	if (nType == 2 || nType == 3)
+		oUnit.oShape.nThickNess = listInfo[2].toInt();
+	// 门和窗
+	else
+	{
+		oUnit.oShape.nShapeType = 0;
+		oUnit.oShape.vPolyPt.push_back(listInfo[3].toInt());
+		oUnit.oShape.vPolyPt.push_back(listInfo[4].toInt());
+	}
+	return 0;
+}
+// 初始化基本构件库 
+int ParaModel::InitUnitLib()
+{
+	QString Path = "D:/Works/paramodel/x64/Debug/buildinglib.txt";
+	QFile file(Path);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		QMessageBox::information(NULL, "信息提示", "文件解析失败！");
+		MyLogOutput("文件解析失败！");
+		return 0;
+	}
+
+	QTextStream readStream(&file);
+	while (!readStream.atEnd()) {
+		QString content = readStream.readLine();
+		QStringList list = content.split(' ');
+		BasicUnit basic;
+		GeoShape shape;
+		shape.nShapeType = 0;
+		shape.nThickNess = 0;
+		shape.nNumOrRadius = 0;
+		shape.nShapeRange[0] = 0;
+		shape.nShapeRange[1] = 0;
+		shape.nCen[0] = 0;
+		shape.nCen[1] = 0;
+		shape.nShapeRange[2] = 0;
+		shape.nShapeRange[3] = 0;
+		vector<int> v;
+		shape.vPolyPt = v;
+		basic.nUnitIdx = list[0].toInt();
+		QString shapeName = list[1];
+
+#pragma region UnitType识别
+
+		if (list[1] == "柱")
+		{
+			basic.nUnitType = 1;
+		}
+		else if (list[1] == "梁")
+		{
+			basic.nUnitType = 2;
+		}
+		else if (list[1] == "楼板")
+		{
+			shapeName = list[2] + shapeName;
+			shape.nThickNess = list[2].toInt();
+			basic.nUnitType = 3;
+		}
+		else if (list[1] == "墙")
+		{
+			shapeName = list[2] + shapeName;
+			shape.nThickNess = list[2].toInt();
+			basic.nUnitType = 4;
+		}
+		else if (list[1] == "门")
+		{
+			basic.nUnitType = 5;
+		}
+		else if (list[1] == "窗")
+		{
+			basic.nUnitType = 6;
+		}
+#pragma endregion
+
+#pragma region 形状识别
+		if (list[2] == "矩形")
+		{
+			shape.nShapeType = 1;
+			if (list[1] == "门" || list[1] == "窗")
+			{
+				shapeName = list[3] + "-" + list[4] + " " + shapeName;
+				shape.nShapeRange[0] = list[3].toInt();
+				shape.nShapeRange[3] = list[4].toInt();
+			}
+			else
+			{
+				shapeName = list[2] + " " + shapeName;
+				shape.nShapeRange[0] = list[3].toInt();
+				shape.nShapeRange[1] = list[4].toInt();
+				shape.nShapeRange[2] = list[5].toInt();
+				shape.nShapeRange[3] = list[6].toInt();
+			}
+		}
+		else if (list[2] == "圆形")
+		{
+			shapeName = list[2] + " " + shapeName;
+			shape.nShapeType = 2;
+			shape.nCen[0] = list[3].toInt();
+			shape.nCen[1] = list[4].toInt();
+			shape.nNumOrRadius = list[5].toInt();
+		}
+		else if (list[2] == "多边形")
+		{
+			shapeName = list[2] + " " + shapeName;
+			shape.nShapeType = 3;
+			shape.nNumOrRadius = list[3].toInt();
+			for (size_t i = 0; i < shape.nNumOrRadius; i++)
+			{
+				v.push_back(list[4 + i].toInt());
+			}
+			shape.vPolyPt = v;
+		}
+#pragma endregion
+
+		shape.nShapeName = shapeName;
+		basic.oShape = shape;
+		vBaseUnit.push_back(basic);
+	}
+}
+// 初始化平面图库
+int ParaModel::InitPlaneDrawLib()
+{
+	return 0;
+}
+// 初始化参数化生成模板
+int ParaModel::InitParaTmpl()
+{
+	return 0;
+}
+

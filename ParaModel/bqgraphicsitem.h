@@ -7,45 +7,46 @@
 #define PI 3.1415926
 
 // 自定义图元 - 基础类
-class BGraphicsItem :  public QObject,public QAbstractGraphicsShapeItem
+class BGraphicsItem : public QObject, public QAbstractGraphicsShapeItem
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    enum ItemType {
-        Circle = 0,         // 圆
-        Ellipse,            // 椭圆
-        Rectangle,          // 矩形
-        Square,             // 正方形
-        Polygon,            // 多边形
-    };
+	enum ItemType {
+		Circle = 0,         // 圆
+		Ellipse,            // 椭圆
+		Rectangle,          // 矩形
+		Square,             // 正方形
+		Polygon,            // 多边形
+	};
 	QPointF m_center;          //中心点，拖动图形
 	QPointF m_edge;            //右下角点，拉动大小
 	QPointF m_leftup;          //左上角点
+	BPointItemList m_pointList;//绘图形的各个点
 
 	ItemType m_type;
-    QPointF getCenter() { return m_center; }
-    void setCenter(QPointF p) { m_center = p; }
+	QPointF getCenter() { return m_center; }
+	void setCenter(QPointF p) { m_center = p; }
 
-    QPointF getEdge() { return m_edge; }
-    void setEdge(QPointF p) { m_edge = p; }
+	QPointF getEdge() { return m_edge; }
+	void setEdge(QPointF p) { m_edge = p; }
 
-    ItemType getType() { return m_type; }
+	ItemType getType() { return m_type; }
 
-protected:
-    BGraphicsItem(QPointF center, QPointF edge, ItemType type);
-
-    virtual void focusInEvent(QFocusEvent *event) override;
-    virtual void focusOutEvent(QFocusEvent *event) override;
-    virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 
 protected:
-    
-    
-    BPointItemList m_pointList;
+	BGraphicsItem(QPointF center, QPointF edge, ItemType type);
 
-    QPen m_pen_isSelected;
-    QPen m_pen_noSelected;
+	virtual void focusInEvent(QFocusEvent* event) override;
+	virtual void focusOutEvent(QFocusEvent* event) override;
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+
+protected:
+
+
+
+	QPen m_pen_isSelected;
+	QPen m_pen_noSelected;
 };
 
 //------------------------------------------------------------------------------
@@ -53,19 +54,19 @@ protected:
 // 椭圆
 class BEllipse : public BGraphicsItem
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    BEllipse(qreal x, qreal y, qreal width, qreal height, ItemType type);
+	BEllipse(qreal x, qreal y, qreal width, qreal height, ItemType type);
 
 protected:
-    virtual QRectF boundingRect() const override;
+	virtual QRectF boundingRect() const override;
 
-    virtual void paint(QPainter *painter,
-                       const QStyleOptionGraphicsItem *option,
-                       QWidget *widget) override;
+	virtual void paint(QPainter* painter,
+		const QStyleOptionGraphicsItem* option,
+		QWidget* widget) override;
 
-    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 };
 
 //------------------------------------------------------------------------------
@@ -74,20 +75,20 @@ protected:
 class BCircle : public BEllipse
 {
 public:
-    BCircle(qreal x, qreal y, qreal radius, ItemType type);
-    void updateRadius();
+	BCircle(qreal x, qreal y, qreal radius, ItemType type);
+	void updateRadius();
 
 protected:
-    virtual QRectF boundingRect() const override;
+	virtual QRectF boundingRect() const override;
 
-    virtual void paint(QPainter *painter,
-                       const QStyleOptionGraphicsItem *option,
-                       QWidget *widget) override;
+	virtual void paint(QPainter* painter,
+		const QStyleOptionGraphicsItem* option,
+		QWidget* widget) override;
 
-    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 
 protected:
-    qreal m_radius;
+	qreal m_radius;
 };
 
 
@@ -98,17 +99,17 @@ protected:
 class BRectangle : public BGraphicsItem
 {
 public:
-    BRectangle(qreal x, qreal y, qreal width, qreal height, ItemType type);
+	BRectangle(qreal x, qreal y, qreal width, qreal height, ItemType type);
 	qreal wallwidth;
 protected:
-    virtual QRectF boundingRect() const override;
+	virtual QRectF boundingRect() const override;
 
-    virtual void paint(QPainter *painter,
-                       const QStyleOptionGraphicsItem *option,
-                       QWidget *widget) override;
+	virtual void paint(QPainter* painter,
+		const QStyleOptionGraphicsItem* option,
+		QWidget* widget) override;
 
-    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
-	
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
+
 };
 
 //------------------------------------------------------------------------------
@@ -117,10 +118,10 @@ protected:
 class BSquare : public BRectangle
 {
 public:
-    BSquare(qreal x, qreal y, qreal width, ItemType type);
+	BSquare(qreal x, qreal y, qreal width, ItemType type);
 
 protected:
-    virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 };
 
 //------------------------------------------------------------------------------
@@ -128,28 +129,28 @@ protected:
 // 多边形
 class BPolygon : public BGraphicsItem
 {
-    Q_OBJECT
-
+	Q_OBJECT
 public:
-    BPolygon(ItemType type);
+	bool is_create_finished;
+public:
+	BPolygon(ItemType type);
 
-    QPointF getCentroid(QList<QPointF> list);
-    void getMaxLength();
-    void updatePolygon(QPointF origin, QPointF end);
+	QPointF getCentroid(QList<QPointF> list);
+	void getMaxLength();
+	void updatePolygon(QPointF origin, QPointF end);
 
 public slots:
-    void pushPoint(QPointF p, QList<QPointF> list, bool isCenter);
+	void pushPoint(QPointF p, QList<QPointF> list, bool isCenter);
 
 protected:
-    virtual QRectF boundingRect() const override;
+	virtual QRectF boundingRect() const override;
 
-    virtual void paint(QPainter *painter,
-                       const QStyleOptionGraphicsItem *option,
-                       QWidget *widget) override;
+	virtual void paint(QPainter* painter,
+		const QStyleOptionGraphicsItem* option,
+		QWidget* widget) override;
 
 protected:
-    qreal m_radius;
-    bool is_create_finished;
+	qreal m_radius;
 };
 
 //------------------------------------------------------------------------------
