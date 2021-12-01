@@ -263,21 +263,26 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 				continue;
 			if (iter->oShape.nShapeType == 1)
 			{
+				//板墙门窗 宽度为1
+				int wThickNess = 0;
+				int hThickNess = 0;
+				if (iter->nUnitType > 2)
+				{
+					wThickNess = 1;
+					hThickNess = 20;
+				}
 				BRectangle* m_rectangle = new BRectangle(
 					100 + iter->oShape.nShapeRange[0], 100 + iter->oShape.nShapeRange[1],
-					 iter->oShape.nShapeRange[2],  iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
-				//
-				if (iter->nUnitType == 3 || iter->nUnitType == 4)
-				{
-					m_rectangle->wallwidth =  iter->oShape.nThickNess;
-				}
+					iter->oShape.nShapeRange[2] + wThickNess, iter->oShape.nShapeRange[3] + hThickNess, BGraphicsItem::ItemType::Rectangle);
+				m_rectangle->wallwidth = iter->oShape.nThickNess;
+
+
 				pSceneMain.addItem(m_rectangle);
 			}
 			else if (iter->oShape.nShapeType == 2)
 			{
-
 				BCircle* m_ellipse = new BCircle(100 + iter->oShape.nCen[0], 100 + iter->oShape.nCen[1],
-					 iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
+					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
 				pSceneMain.addItem(m_ellipse);
 			}
 			else if (iter->oShape.nShapeType == 3)
@@ -436,7 +441,7 @@ void ParaModel::updateScene()
 				//根据构建id找到对应是构件
 				BRectangle* m_rectangle = new BRectangle(
 					coordX, coordY,
-					 unit.oShape.nShapeRange[2] , unit.oShape.nShapeRange[3] ,
+					unit.oShape.nShapeRange[2], unit.oShape.nShapeRange[3],
 					BGraphicsItem::ItemType::Rectangle);
 				pSceneMain.addItem(m_rectangle);
 			}
@@ -450,7 +455,7 @@ BasicUnit ParaModel::GetBaseUnit(int idx)
 	{
 		if (vBaseUnit[i].nUnitIdx == idx)
 			return vBaseUnit[i];
-	} 
+	}
 	BasicUnit b;
 	return b;
 }
@@ -1149,7 +1154,7 @@ int ParaModel::InitUnitLib()
 			{
 				shapeName = list[3] + "-" + list[4] + " " + shapeName;
 				shape.nShapeRange[0] = list[3].toInt();
-				shape.nShapeRange[3] = list[4].toInt();
+				shape.nShapeRange[1] = list[4].toInt();
 			}
 			else
 			{

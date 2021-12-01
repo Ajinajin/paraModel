@@ -7,12 +7,24 @@ using namespace std;
 typedef vector<int> VINT;
 typedef vector<float> VFLOAT;
 
+
+
 // 整型平面点
 typedef struct PixelPos
 {
 	int nXY[2];
 }PixelPos;
 typedef vector<PixelPos> VPIXELPOS;
+
+typedef struct SimpleShape
+{
+	int nCen[2];			// 中心点
+	int nWH[2];				// 宽高 XY范围
+	VPIXELPOS vCorner;
+}SimpleShape;
+typedef vector<SimpleShape> VSHAPE;
+
+
 
 // 空间三维点
 typedef struct Ver3D
