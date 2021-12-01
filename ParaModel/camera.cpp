@@ -45,10 +45,10 @@ void Camera::processMouseMovement(GLfloat xoffset, GLfloat yoffset, GLboolean co
 
 void Camera::processMouseScroll(GLfloat yoffset)
 {
-	if (this->zoom >= 10 && this->zoom <= 100.0f)
+	if (this->zoom >= 10 && this->zoom <= 150.0f)
 		this->zoom -= yoffset;
-	if (this->zoom > 100.0f)
-		this->zoom = 100.0f;
+	if (this->zoom > 150.0f)
+		this->zoom = 150.0f;
 	if (this->zoom < 10.0f)
 		this->zoom = 10.0f;
 }

@@ -9,10 +9,18 @@
 #include <QOpenGLFunctions_4_3_Core>
 #include <QMouseEvent>
 
+#include"ParaType.h"
 #include<resourcemanager.h>
 #include "camera.h"
 #include <ShaderProc.h>
 
+struct Point//绘制所需点结构
+{
+	float x;
+	float y;
+	float z;
+};
+typedef vector<Point> vPoint;
 
 
 class ParaOGLManager : public QOpenGLWidget
@@ -42,9 +50,28 @@ public:
 	};
 	SwitchView switchView;
 
-	void InitAndDrawColumn(float radius,float height);
 
+public:
+	//绘制
+	// 
+	//柱
+	void InitAndDrawColumn(float x,float y,float z,float radius,float height);//参数：底面圆心xz，半径，高度
+	
+	//多边形柱(竖着)
+	void InitAndDrawPolygonColumnPortrait(VINT data,float height);
 
+	//多边形柱(横着)
+	void InitAndDrawPolygonColumnHorizontal(VINT data, float length);
+																			  //长方体（墙、板等）x\y\z 为墙体最左下角的点坐标
+	void InitAndDrawCuboid(float x,float y,float z,float length,float thickness,float height);
+
+	//根据中心构件单元Id去构件库里查具体模型参数
+	BasicUnit findUnit(int idx, VUNITTABLE oglUnitTable);
+
+	VTOPOTABLE *oglTopTable;//绘制所需的拓扑结构表
+	VUNITTABLE *oglUnitTable;//绘制所需的结构单元表
+
+public:
 	//相机、鼠标键入相关参数
 	Camera* camera;
 	GLboolean isFirstMouse;

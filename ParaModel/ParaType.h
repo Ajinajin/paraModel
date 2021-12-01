@@ -57,7 +57,7 @@ typedef struct TopoUnit
 	int nTopoIdx;				// 构件序号
 	int nUnitType;				// 中心构件单元类型 柱梁板墙门窗
 	int nCenUnitIdx;			// 中心构件单元Id
-	int nAdjUnitIdx[10];			// 前后左右方向 按上下表示梁墙 每方向最多两个 邻接单元Id 无邻接-1
+	int nAdjUnitIdx[10];		// 前后左右方向 按上下表示梁墙 每方向最多两个 邻接单元Id 无邻接-1
 	int nEdgeType;				// 边界类型 前后上下左右 按向限角度划分 45度 右上为1 正下为6
 	int nStatusFlag;			// 标志0 1 2 正常 删除 其他
 	int nUnitAngle;				// 0 90度 两种
@@ -84,3 +84,14 @@ typedef vector<UnitData> VUNITDATA;
 
 // 属性之间的合规性检查
 
+// 系统路径信息
+typedef struct SysPath
+{
+	string sExePath;			// 可执行文件完整路径 含.exe
+	string sExeDir;				// 可执行文件所在目录完整路径
+	string sProcLibDir;			// 算法库路径
+	string sTmpDir;				// 临时数据路径
+	string sModelLibDir;		// 模型路径
+	string sBoomLibDir;			// 弹文件路径
+	string sParaLibDir;			// 弹及材料参数路径
+}SysPath;
