@@ -53,8 +53,8 @@ private:
 	BQGraphicsScene pSceneZ;						// 二维模型Z视图画布
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布
 
-	ParaOGLManager* oglmanager;							// 三维显示窗口类
-	ParaOGLManager* oglmanagerMain;							// 三维显示窗口大屏幕主类
+	ParaOGLManager* paraOglmanager;							// 三维显示窗口类
+	ParaOGLManager* paraOglmanagerMain;						// 三维显示窗口大屏幕主类
 
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
     // 图像的宽长
@@ -109,7 +109,10 @@ public slots:
 	void GraphicsViewXFocus(bool b); // 加载旁侧图
 	void GraphicsViewYFocus(bool b); // 加载旁侧图
 	void GraphicsViewZFocus(bool b); // 加载旁侧图
+
 	void GraphicsViewOgl(bool b);	//opengl旁侧图
+	void updateOGL();				//更新三维窗口内容
+
 
 private slots:
 	void onCustomContextMenuRequested(const QPoint& pos);

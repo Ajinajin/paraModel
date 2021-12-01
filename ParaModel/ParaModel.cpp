@@ -5,6 +5,7 @@
 #include <QDesktopWidget>
 #include <QGraphicsView>
 #include <qtreewidget.h>
+#include <QTimer>
 #include <QDateTime>
 #include <QDir>
 #include <QMessageBox>
@@ -260,17 +261,15 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 	graphicsViewX = new BQGraphicsView();
 	graphicsViewY = new BQGraphicsView();
 	graphicsViewZ = new BQGraphicsView();
-	graphicsViewOgl = new BQGraphicsView();
 
 	graphicsViewX->setScene(&pSceneX);
 	graphicsViewY->setScene(&pSceneY);
 	graphicsViewZ->setScene(&pSceneZ);
 
-	connect(graphicsViewX,&BQGraphicsView::GraphicsViewFocus,this, &ParaModel::GraphicsViewXFocus);
+	connect(graphicsViewX, &BQGraphicsView::GraphicsViewFocus, this, &ParaModel::GraphicsViewXFocus);
 	connect(graphicsViewY, &BQGraphicsView::GraphicsViewFocus, this, &ParaModel::GraphicsViewYFocus);
 	connect(graphicsViewZ, &BQGraphicsView::GraphicsViewFocus, this, &ParaModel::GraphicsViewZFocus);
 	connect(graphicsViewOgl, &BQGraphicsView::GraphicsViewFocus, this, &ParaModel::GraphicsViewOgl);
-
 
 
 	from->setWindowTitle("三视图+三维");
@@ -285,10 +284,11 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 	myLayout->addWidget(graphicsViewY, 0, 1);
 	myLayout->addWidget(graphicsViewZ, 1, 0);
 
-	//三维窗口
-	oglmanager = new ParaOGLManager;
-	graphicsViewOgl->setViewport(oglmanager);
-	myLayout->addWidget(graphicsViewOgl, 1, 1);
+
+	//右下角小三维窗口
+	
+	paraOglmanager = new ParaOGLManager();
+	myLayout->addWidget(paraOglmanager, 1, 1);
 
 
 	temp->setLayout(myLayout);
@@ -311,21 +311,46 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 {
 	MainDockWidget = from;
 	 
-	graphicsViewMain = new BQGraphicsView();
+	/*graphicsViewMain = new BQGraphicsView();
+
 	graphicsViewMain->setScene(&pSceneMain);
 
-	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");
-	/*oglManager = new OGLManager;*/
-	MainDockWidget->setWidget(graphicsViewMain);
+	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");*/
+
+
+	//中间大屏三位窗口
+	graphicsViewOgl = new BQGraphicsView();
+	paraOglmanagerMain = new ParaOGLManager();
+
+	MainDockWidget->setWidget(paraOglmanagerMain);
 	MainDockWidget->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 
-
-	//QTimer* timer = new QTimer(this);
-	//connect(timer, &QTimer::timeout, this, &ParaModel::updateOGL);
-	////每40ms刷新一次OpenGL界面 25FPS
-	//timer->start(40);
+	
+	QTimer* timer = new QTimer(this);
+	connect(timer, &QTimer::timeout, this, &ParaModel::updateOGL);
+	//每20ms刷新一次OpenGL界面 50FPS
+	timer->start(20);
 
 }
+
+
+//更新OpenGL窗口
+void ParaModel::updateOGL()
+{
+	
+	paraOglmanager->update();
+	paraOglmanagerMain->update();
+
+
+	//两个三维窗口要同步
+	paraOglmanager->camera = paraOglmanagerMain->camera;
+	paraOglmanager->isFirstMouse = paraOglmanagerMain->isFirstMouse;
+	paraOglmanager->lastX = paraOglmanagerMain->lastX;
+	paraOglmanager->lastY = paraOglmanagerMain->lastY;
+	paraOglmanager->rotateRaw = paraOglmanagerMain->rotateRaw;
+	paraOglmanager->rotatePitch = paraOglmanagerMain->rotatePitch;
+}
+
 //初始化内容区域
 void ParaModel::InitCentralWidget()
 {
@@ -339,6 +364,9 @@ void ParaModel::InitCentralWidget()
 	QDockWidget* sysWidget = new QDockWidget(this);
 	InitSysWidget(sysWidget);
 
+	QDockWidget* oglWidget = new QDockWidget(this);
+	InitOglManagerWidget(oglWidget);
+
 	QDockWidget* loadModelWidget = new QDockWidget(this);
 	InitLoadModelWidget(loadModelWidget);
 
@@ -348,8 +376,7 @@ void ParaModel::InitCentralWidget()
 	QDockWidget* logWidget = new QDockWidget(this);
 	InitLogWidget(logWidget);
 
-	QDockWidget* oglWidget = new QDockWidget(this);
-	InitOglManagerWidget(oglWidget);
+	
 
 	addDockWidget(Qt::LeftDockWidgetArea, sysWidget);
 
@@ -556,8 +583,9 @@ void ParaModel::GraphicsViewZFocus(bool b)
 void ParaModel::GraphicsViewOgl(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （三维模型）");
+	
+	MainDockWidget->setWidget(paraOglmanagerMain);
 
-	MainDockWidget->setWidget(oglmanagerMain);
 	MainDockState = 3;
 
 	return;

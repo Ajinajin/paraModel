@@ -1,14 +1,17 @@
 #pragma once
-#ifndef OGLMANAGER_H
-#define OGLMANAGER_H
+#ifndef PARAOGLMANAGER_H
+#define PARAOGLMANAGER_H
 
+#include <QDockWidget>
 #include <QOpenGLWidget>
 #include <QKeyEvent>
 #include <QTime>
 #include <QOpenGLFunctions_4_3_Core>
 #include <QMouseEvent>
-#include "camera.h"
 
+#include<resourcemanager.h>
+#include "camera.h"
+#include <ShaderProc.h>
 
 
 
@@ -17,11 +20,16 @@ class ParaOGLManager : public QOpenGLWidget
 public:
 	explicit ParaOGLManager(QWidget* parent = 0);
 	~ParaOGLManager();
-	//键盘按下事件
+	
 	void handleKeyPressEvent(QKeyEvent* event);
-	//键盘释放事件
+	//void keyPressEvent(QKeyEvent* event)override;			//键盘按下事件
+	
 	void handleKeyReleaseEvent(QKeyEvent* event);
+	//void keyReleaseEvent(QKeyEvent* event)override;		//键盘释放事件
+
+
 	GLboolean keys[1024];			// 获取键盘按键，实现多键触控
+
 	enum SwitchView //相机视角枚举，七种视图（一个默认视图加六个标准视图）
 	{
 		NONE,
@@ -34,6 +42,26 @@ public:
 	};
 	SwitchView switchView;
 
+	void InitAndDrawColumn(float radius,float height);
+
+
+	//相机、鼠标键入相关参数
+	Camera* camera;
+	GLboolean isFirstMouse;
+
+	GLboolean isLeftMousePress;
+	GLboolean isRightMousePress;
+	
+	GLint lastX;
+	GLint lastY;
+	QTime time;
+	GLfloat deltaTime;
+	GLfloat lastFrame;											//上一帧
+
+	GLfloat rotateRaw;											//每次对模型的raw旋转
+	GLfloat rotatePitch;										//每次对模型的pitch旋转
+
+
 protected:
 	void mouseMoveEvent(QMouseEvent* event);
 	void wheelEvent(QWheelEvent* event) override;			//滚轮事件
@@ -44,7 +72,7 @@ protected:
 	virtual void paintGL();
 	
 
-
+	
 private:
 	//摄像机键盘处理函数，
 	void processInput(GLfloat dt);
@@ -53,17 +81,16 @@ private:
 
 	QOpenGLFunctions_4_3_Core* pCore;
 
-	QTime time;
-	Camera* camera;
+	
+	
 
 
-	GLboolean isFirstMouse;
-	GLboolean isLeftMousePress;
-	GLint lastX;
-	GLint lastY;
+	
+
 	GLuint uboMatrices;
+	GLuint VBO,EBO;
 };
 
 
 
-#endif // OGLMANAGER_H
+#endif // PARAOGLMANAGER_H

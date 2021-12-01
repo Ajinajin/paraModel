@@ -17,6 +17,10 @@ protected:
 	void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 	// 使item可使用qgraphicsitem_cast
+
+    //键盘输入响应
+    void handleKeyPressEvent(QKeyEvent* event);
+    void handleKeyRleaseEvent(QKeyEvent* event);
     
 private:
     QColor brushColor;

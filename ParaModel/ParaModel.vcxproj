@@ -103,6 +103,8 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="paraoglmanager.cpp" />
     <ClCompile Include="ParaModel.cpp" />
+    <ClCompile Include="resourcemanager.cpp" />
+    <ClCompile Include="ShaderProc.cpp" />
     <QtRcc Include="ParaModel.qrc" />
     <QtUic Include="ParaModel.ui" />
     <QtMoc Include="ParaModel.h" />
@@ -110,6 +112,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resourcemanager.h" />
+    <ClInclude Include="ShaderProc.h" />
     <QtMoc Include="bqgraphicsscene.h" />
     <QtMoc Include="bqgraphicsitem.h" />
     <QtMoc Include="bpointitem.h" />
@@ -118,6 +122,12 @@
     <ClInclude Include="GLWidget.h" />
     <ClInclude Include="paraoglmanager.h" />
     <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shaders\coordinate.frag" />
+    <None Include="res\shaders\coordinate.vert" />
+    <None Include="res\shaders\GLSL_YELLOW.frag" />
+    <None Include="res\shaders\GLSL_YELLOW.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

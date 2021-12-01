@@ -18,3 +18,23 @@ void BQGraphicsView::mousePressEvent(QMouseEvent *event)
     QGraphicsView::mousePressEvent(event);
     emit GraphicsViewFocus(true); 
 }
+
+//void BQGraphicsView::keyPressEvent(QKeyEvent* event)
+//{
+//    QGraphicsView::keyPressEvent(event);
+//    emit GraphicsViewFocus(true);
+//}
+//
+//void BQGraphicsView::keyReleaseEvent(QKeyEvent* event)
+//{
+//    QGraphicsView::keyReleaseEvent(event);
+//    emit GraphicsViewFocus(true);
+//}
+
+void BQGraphicsView::wheelEvent(QWheelEvent* event)
+{
+    double factor = event->delta() > 0 ? 1.1 : 1 / 1.1;
+    
+    this->viewport()->update();
+
+}

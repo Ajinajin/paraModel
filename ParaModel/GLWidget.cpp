@@ -62,3 +62,11 @@ void MyItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 void MyItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 	QGraphicsItem::mouseReleaseEvent(event);
 }
+
+void MyItem::handleKeyPressEvent(QKeyEvent* event) {
+    QGraphicsItem::keyPressEvent(event);
+}
+
+void MyItem::handleKeyRleaseEvent(QKeyEvent* event) {
+    QGraphicsItem::keyPressEvent(event);
+}

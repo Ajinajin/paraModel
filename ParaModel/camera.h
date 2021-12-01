@@ -1,4 +1,3 @@
-#pragma once
 #ifndef CAMERA_H
 #define CAMERA_H
 
@@ -21,10 +20,10 @@ enum ENCameraMovement
 };
 
 //预定义状态数据
-const GLfloat YAW = -115.0f;
-const GLfloat PITCH = -15.0f;
+const GLfloat YAW = -90.0f;
+const GLfloat PITCH = 0.0f;
 const GLfloat SPEED = 0.25;
-const GLfloat SENSITIVITY = 0.1f;
+const GLfloat SENSITIVITY = 0.2f;
 const GLfloat ZOOM = 60.0f;
 
 class Camera
