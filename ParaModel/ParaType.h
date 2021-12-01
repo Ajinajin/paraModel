@@ -57,7 +57,7 @@ typedef struct TopoUnit
 	int nTopoIdx;				// 构件序号
 	int nUnitType;				// 中心构件单元类型 柱梁板墙门窗
 	int nCenUnitIdx;			// 中心构件单元Id
-	int nAdjUnitIdx[8];			// 前后左右方向 按上下表示梁墙 每方向最多两个 邻接单元Id 无邻接-1
+	int nAdjUnitIdx[10];			// 前后左右方向 按上下表示梁墙 每方向最多两个 邻接单元Id 无邻接-1
 	int nEdgeType;				// 边界类型 前后上下左右 按向限角度划分 45度 右上为1 正下为6
 	int nStatusFlag;			// 标志0 1 2 正常 删除 其他
 	int nUnitAngle;				// 0 90度 两种

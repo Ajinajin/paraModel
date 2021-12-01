@@ -378,7 +378,9 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 	//右下角小三维窗口
 	
 	paraOglmanager = new ParaOGLManager();
-	myLayout->addWidget(paraOglmanager, 1, 1);
+	graphicsViewOgl->setViewport(paraOglmanager);
+
+	myLayout->addWidget(graphicsViewOgl, 1, 1);
 
 
 	temp->setLayout(myLayout);
@@ -401,18 +403,16 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 {
 	MainDockWidget = from;
 
-	/*graphicsViewMain = new BQGraphicsView();
-
 	graphicsViewMain = new BQGraphicsView();
 
 	graphicsViewMain->setScene(&pSceneMain);
 	pSceneMain.setBackgroundBrush(Qt::darkGray);
 
-	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");*/
+	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");
 
 
 	//中间大屏三位窗口
-	graphicsViewOgl = new BQGraphicsView();
+
 	paraOglmanagerMain = new ParaOGLManager();
 
 	MainDockWidget->setWidget(paraOglmanagerMain);
@@ -752,8 +752,8 @@ void ParaModel::GraphicsViewXFocus(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");
 	MainDockState = 0;
-	MainDockWidget->setWidget(graphicsViewMain);
 	pSceneMain.setBackgroundBrush(Qt::darkGray);
+	MainDockWidget->setWidget(graphicsViewMain);
 	return;
 }
 
@@ -761,8 +761,8 @@ void ParaModel::GraphicsViewYFocus(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维Y）");
 	MainDockState = 1;
-	MainDockWidget->setWidget(graphicsViewMain);
 	pSceneMain.setBackgroundBrush(Qt::lightGray);
+	MainDockWidget->setWidget(graphicsViewMain);
 
 	return;
 }
@@ -771,8 +771,8 @@ void ParaModel::GraphicsViewZFocus(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维Z）");
 	MainDockState = 2;
-	MainDockWidget->setWidget(graphicsViewMain);
 	pSceneMain.setBackgroundBrush(Qt::gray);
+	MainDockWidget->setWidget(graphicsViewMain);
 	return;
 }
 
@@ -780,7 +780,6 @@ void ParaModel::GraphicsViewOgl(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （三维模型）");
 
-	
 	MainDockWidget->setWidget(paraOglmanagerMain);
 
 	MainDockState = 3;
@@ -1220,7 +1219,7 @@ int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 // 初始化基本构件库 
 int ParaModel::InitUnitLib()
 {
-	QString Path = "D:/Works/paramodel/x64/Debug/buildinglib.txt";
+	QString Path = "D:/Study/Work/ParaModel/paramodel/x64/Debug/buildinglib.txt";
 	QFile file(Path);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{

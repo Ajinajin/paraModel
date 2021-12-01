@@ -112,6 +112,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ParaType.h" />
     <ClInclude Include="resourcemanager.h" />
     <ClInclude Include="ShaderProc.h" />
     <QtMoc Include="bqgraphicsscene.h" />

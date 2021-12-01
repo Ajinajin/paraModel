@@ -205,6 +205,8 @@ void ParaOGLManager::updateGL()
 {
 	
 	QMatrix4x4 projection, view;
+	GLfloat a = width();
+	GLfloat b = height();
 	projection.perspective(camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 2000.f);
 
 	
