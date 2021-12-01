@@ -264,33 +264,37 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 			if (iter->oShape.nShapeType == 1)
 			{
 				BRectangle* m_rectangle = new BRectangle(
-					iter->oShape.nShapeRange[0], iter->oShape.nShapeRange[1],
-					iter->oShape.nShapeRange[2], iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
-				m_rectangle->wallwidth = 120;
+					100 + iter->oShape.nShapeRange[0], 100 + iter->oShape.nShapeRange[1],
+					100 + iter->oShape.nShapeRange[2], 100 + iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
+				//
+				if (iter->nUnitType == 3 || iter->nUnitType == 4)
+				{ 
+					m_rectangle->wallwidth = 100 + iter->oShape.nThickNess;
+				}
 				pSceneMain.addItem(m_rectangle);
 			}
 			else if (iter->oShape.nShapeType == 2)
 			{
 
-				BCircle* m_ellipse = new BCircle(iter->oShape.nCen[0], iter->oShape.nCen[1],
-					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
+				BCircle* m_ellipse = new BCircle(100+iter->oShape.nCen[0], 100 + iter->oShape.nCen[1],
+					100 + iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
 				pSceneMain.addItem(m_ellipse);
 			}
 			else if (iter->oShape.nShapeType == 3)
-			{ 
-				
-				
+			{
+
+
 				vector<float> point;
 				/*for (size_t i = 0; i < iter->oShape.vPolyPt.size(); i++)
 				{
 					point.push_back(iter->oShape.vPolyPt[i]+100);
 				}*/
 				point.push_back(100);
-				point.push_back(200);
+				point.push_back(210);
 				point.push_back(300);
-				point.push_back(400);
+				point.push_back(410);
 				point.push_back(500);
-				point.push_back(100);
+				point.push_back(300);
 				drawWall(point);
 
 
@@ -301,15 +305,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 				//m_polygon->paint();
 				//pSceneMain.addItem(m_polygon);
 
-			}
-			else if (iter->oShape.nShapeType == 0)
-			{
-				BRectangle* m_rectangle = new BRectangle(
-					iter->oShape.nShapeRange[0], iter->oShape.nShapeRange[1],
-					iter->oShape.nShapeRange[2], iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
-				m_rectangle->wallwidth = 120;
-				pSceneMain.addItem(m_rectangle);
-			}
+			} 
 		}
 		msg = item->text(0) + "构件加载完成";
 		MyLogOutput(msg);
@@ -323,7 +319,7 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 {
 	graphicsViewX = new BQGraphicsView();
 	graphicsViewY = new BQGraphicsView();
-	graphicsViewZ = new BQGraphicsView(); 
+	graphicsViewZ = new BQGraphicsView();
 
 	pSceneX.setBackgroundBrush(Qt::darkGray);
 	pSceneY.setBackgroundBrush(Qt::lightGray);
@@ -353,9 +349,9 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 
 
 	//右下角小三维窗口
-	paraOglmanager = new ParaOGLManager();
-	graphicsViewOgl->setViewport(paraOglmanager);
-	myLayout->addWidget(graphicsViewOgl, 1, 1);
+	//paraOglmanager = new ParaOGLManager();
+	//graphicsViewOgl->setViewport(paraOglmanager);
+	//myLayout->addWidget(graphicsViewOgl, 1, 1);
 
 
 	temp->setLayout(myLayout);
@@ -384,13 +380,13 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 	graphicsViewMain->setScene(&pSceneMain);
 	pSceneMain.setBackgroundBrush(Qt::darkGray);
 
-	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");
+	MainDockWidget->setWindowTitle("当前编辑视图 （三维）");
 
 
 	//中间大屏三位窗口
 
+	MainDockState = 3;
 	paraOglmanagerMain = new ParaOGLManager();
-
 	MainDockWidget->setWidget(paraOglmanagerMain);
 	MainDockWidget->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 
@@ -400,24 +396,56 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 	//每20ms刷新一次OpenGL界面 50FPS
 	timer->start(20);
 
+
+
+	//QTimer* timerSceneMain = new QTimer(this);
+	//connect(timerSceneMain, &QTimer::timeout, this, &ParaModel::updateScene);
+	//timerSceneMain->start(20);
 }
 
+//更新画布内容
+void ParaModel::updateScene()
+{
+	if (if_data == 0)
+		return;
+	if (vModelTmpl.size() == 0)
+		return;
+
+
+	if (MainDockState == 0)
+	{
+		//只绘制柱、墙、梁
+		for (size_t i = 0; i < vModelTmpl.size(); i++)
+		{
+			//柱梁板墙门窗
+			if (vModelTmpl[i].nUnitType == 1)//柱
+			{
+				BRectangle* m_rectangle = new BRectangle(
+					vModelTmpl[i].nCenPos[0], vModelTmpl[i].nCenPos[1],
+					vModelTmpl[i].nCenPos[2], vModelTmpl[i].nCenPos[3], BGraphicsItem::ItemType::Rectangle);
+				
+				pSceneMain.addItem(m_rectangle);
+
+			}
+		}
+	}
+}
 
 //更新OpenGL窗口
 void ParaModel::updateOGL()
 {
 
-	paraOglmanager->update();
+	//paraOglmanager->update();
 	paraOglmanagerMain->update();
 
 
 	//两个三维窗口要同步
-	paraOglmanager->camera = paraOglmanagerMain->camera;
-	paraOglmanager->isFirstMouse = paraOglmanagerMain->isFirstMouse;
-	paraOglmanager->lastX = paraOglmanagerMain->lastX;
-	paraOglmanager->lastY = paraOglmanagerMain->lastY;
-	paraOglmanager->rotateRaw = paraOglmanagerMain->rotateRaw;
-	paraOglmanager->rotatePitch = paraOglmanagerMain->rotatePitch;
+	//paraOglmanager->camera = paraOglmanagerMain->camera;
+	//paraOglmanager->isFirstMouse = paraOglmanagerMain->isFirstMouse;
+	//paraOglmanager->lastX = paraOglmanagerMain->lastX;
+	//paraOglmanager->lastY = paraOglmanagerMain->lastY;
+	//paraOglmanager->rotateRaw = paraOglmanagerMain->rotateRaw;
+	//paraOglmanager->rotatePitch = paraOglmanagerMain->rotatePitch;
 }
 
 //初始化内容区域
@@ -700,11 +728,11 @@ void ParaModel::OpenFileAction()
 			}
 			if (list.size() == 6)
 			{
-				Topo.nCenPos[1] = list[5].toInt();
+				Topo.nCenPos[2] = list[5].toInt();
 			}
 			if (list.size() == 7)
 			{
-				Topo.nCenPos[1] = list[6].toInt();
+				Topo.nCenPos[3] = list[6].toInt();
 			}
 			vModelTmpl.push_back(Topo);
 		}
@@ -722,27 +750,32 @@ void ParaModel::OpenFileAction()
 			}
 		}
 	}
-
-	//vModelTmpl
 	if_data = 1;
+	ParaModel::updateScene();
 }
 
 
 void ParaModel::GraphicsViewXFocus(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");
+	if (MainDockState == 3)
+	{
+		MainDockWidget->setWidget(graphicsViewMain);
+	}
 	MainDockState = 0;
 	pSceneMain.setBackgroundBrush(Qt::darkGray);
-	MainDockWidget->setWidget(graphicsViewMain);
 	return;
 }
 
 void ParaModel::GraphicsViewYFocus(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维Y）");
+	if (MainDockState == 3)
+	{
+		MainDockWidget->setWidget(graphicsViewMain);
+	}
 	MainDockState = 1;
 	pSceneMain.setBackgroundBrush(Qt::lightGray);
-	MainDockWidget->setWidget(graphicsViewMain);
 
 	return;
 }
@@ -750,20 +783,25 @@ void ParaModel::GraphicsViewYFocus(bool b)
 void ParaModel::GraphicsViewZFocus(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维Z）");
-	MainDockState = 2;
+	if (MainDockState == 3)
+	{
+		MainDockWidget->setWidget(graphicsViewMain);
+	}
 	pSceneMain.setBackgroundBrush(Qt::gray);
-	MainDockWidget->setWidget(graphicsViewMain);
+	MainDockState = 2;
+
+
 	return;
 }
 
 void ParaModel::GraphicsViewOgl(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （三维模型）");
-
-	MainDockWidget->setWidget(paraOglmanagerMain);
-
-	MainDockState = 3;
-
+	if (MainDockState != 3)
+	{
+		MainDockState = 3;
+		MainDockWidget->setWidget(paraOglmanagerMain);
+	}
 	return;
 }
 
@@ -915,35 +953,17 @@ void ParaModel::ApplyDataAction()
 	}
 	return;
 }
- 
+
 
 void ParaModel::drawWall(const std::vector<float>& points) {
 	MyItem* item = new MyItem;
 	item->points = points;
 	item->setPos(0, 0);
 	item->setColor(QColor(Qt::red));
-	pSceneMain.addItem(item); 
-}
-   
-
-// 自定义右键菜单动作
-void ParaModel::onCustomContextMenuRequested(const QPoint& pos) {
-	/*弹出右键菜单*/
-	popMenu_In_ListWidget_->exec(QCursor::pos());
+	pSceneMain.addItem(item);
 }
 
-void ParaModel::on_polygonBtn_clicked()
-{
-	pSceneMain.startCreate();
-	//setBtnEnabled(false);
-	BPolygon* m_polygon = new BPolygon(BGraphicsItem::ItemType::Polygon);
-	pSceneMain.addItem(m_polygon);
 
-	connect(&pSceneMain, SIGNAL(updatePoint(QPointF, QList<QPointF>, bool)), m_polygon, SLOT(pushPoint(QPointF, QList<QPointF>, bool)));
-	connect(&pSceneMain, &BQGraphicsScene::createFinished, [=]() {
-		//setBtnEnabled(true);
-		});
-}
 
 
 
@@ -1032,8 +1052,8 @@ int ParaModel::InitUnitLib()
 	QFile file(Path);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		QMessageBox::information(NULL, "信息提示", "文件解析失败！");
-		MyLogOutput("文件解析失败！");
+		QMessageBox::information(NULL, "信息提示", "系统基本构建库解析失败！");
+		MyLogOutput("系统基本构建库解析失败！");
 		return 0;
 	}
 
@@ -1133,6 +1153,7 @@ int ParaModel::InitUnitLib()
 		basic.oShape = shape;
 		vBaseUnit.push_back(basic);
 	}
+	return 1;
 }
 // 初始化平面图库
 int ParaModel::InitPlaneDrawLib()
