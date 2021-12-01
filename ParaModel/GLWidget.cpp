@@ -5,7 +5,8 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
-#include <qdebug.h>
+#include <qdebug.h> 
+
 
 MyItem::MyItem()
 {
@@ -16,9 +17,10 @@ MyItem::MyItem()
     setAcceptHoverEvents(true);
 
 }
-void MyItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
-    QWidget*)
-{
+void MyItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*,QWidget*)
+{ 
+    painter->setBrush(this->brushColor);
+
     int m = points.size();
     qDebug() << m << endl;
     // 至少是一条线

@@ -26,10 +26,13 @@ public:
 
 	ItemType m_type;
 	QPointF getCenter() { return m_center; }
-	void setCenter(QPointF p) { m_center = p; }
+	void setCenter(QPointF p) {
+		return;  m_center = p; }
 
 	QPointF getEdge() { return m_edge; }
-	void setEdge(QPointF p) { m_edge = p; }
+	void setEdge(QPointF p) {  
+		return;
+		m_edge = p; }
 
 	ItemType getType() { return m_type; }
 

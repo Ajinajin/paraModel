@@ -67,6 +67,9 @@
     <ClCompile Include="resourcemanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DimDataConvert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLWidget.h">
@@ -88,6 +91,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParaType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DimDataConvert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

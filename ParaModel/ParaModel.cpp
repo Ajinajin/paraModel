@@ -16,6 +16,7 @@
 
 #include "bqgraphicsitem.h"
 #include "bqgraphicsscene.h"
+#include "DimDataConvert.h"
 
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
@@ -263,21 +264,30 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 				continue;
 			if (iter->oShape.nShapeType == 1)
 			{
+
+				//板墙门窗 宽度为1
+				int wThickNess = 0;
+				int hThickNess = 0;
+				if (iter->nUnitType > 2)
+				{
+					wThickNess = 1;
+					hThickNess = 20;
+				}
 				BRectangle* m_rectangle = new BRectangle(
 					100 + iter->oShape.nShapeRange[0], 100 + iter->oShape.nShapeRange[1],
-					100 + iter->oShape.nShapeRange[2], 100 + iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
-				//
-				if (iter->nUnitType == 3 || iter->nUnitType == 4)
-				{
-					m_rectangle->wallwidth = 100 + iter->oShape.nThickNess;
-				}
+					iter->oShape.nShapeRange[2] + wThickNess, iter->oShape.nShapeRange[3] + hThickNess, BGraphicsItem::ItemType::Rectangle);
+				m_rectangle->wallwidth = iter->oShape.nThickNess;
+
+
+
 				pSceneMain.addItem(m_rectangle);
 			}
 			else if (iter->oShape.nShapeType == 2)
 			{
 
 				BCircle* m_ellipse = new BCircle(100 + iter->oShape.nCen[0], 100 + iter->oShape.nCen[1],
-					100 + iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
+					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
+
 				pSceneMain.addItem(m_ellipse);
 			}
 			else if (iter->oShape.nShapeType == 3)
@@ -294,6 +304,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 
 				point.push_back(300);
 				point.push_back(410);
+
 
 				point.push_back(500);
 				point.push_back(300);
@@ -330,7 +341,9 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 	graphicsViewX = new BQGraphicsView();
 	graphicsViewY = new BQGraphicsView();
 	graphicsViewZ = new BQGraphicsView();
+
 	graphicsViewOgl = new BQGraphicsView();
+
 
 	pSceneX.setBackgroundBrush(Qt::darkGray);
 	pSceneY.setBackgroundBrush(Qt::lightGray);
@@ -360,9 +373,11 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 
 
 	//右下角小三维窗口
+
 	paraOglmanager = new ParaOGLManager();
 	graphicsViewOgl->setViewport(paraOglmanager);
 	myLayout->addWidget(graphicsViewOgl, 1, 1);
+
 
 
 	temp->setLayout(myLayout);
@@ -424,7 +439,12 @@ void ParaModel::updateScene()
 
 
 	if (MainDockState == 0)
-	{
+
+	{ 
+		DimDataConvert* d = new DimDataConvert();
+		VSHAPE v ;
+		int c= d->CalPlaneData(vModelTmpl,v);
+
 		//只绘制柱、墙、梁
 		for (size_t i = 0; i < vModelTmpl.size(); i++)
 		{
@@ -459,11 +479,14 @@ BasicUnit ParaModel::GetBaseUnit(int idx)
 void ParaModel::updateOGL()
 {
 
+
 	paraOglmanager->update();
+
 	paraOglmanagerMain->update();
 
 
 	//两个三维窗口要同步
+
 	paraOglmanager->camera = paraOglmanagerMain->camera;
 	paraOglmanager->isFirstMouse = paraOglmanagerMain->isFirstMouse;
 	paraOglmanager->lastX = paraOglmanagerMain->lastX;
@@ -474,6 +497,7 @@ void ParaModel::updateOGL()
 	//传入所有的建筑数据
 	paraOglmanagerMain->oglTopTable = & this->vModelTmpl;
 	paraOglmanagerMain->oglUnitTable =& this->vBaseUnit;
+
 }
 
 //初始化内容区域
@@ -714,6 +738,8 @@ void ParaModel::OpenFileAction()
 		Topo.nAdjUnitIdx[5] = -1;
 		Topo.nAdjUnitIdx[6] = -1;
 		Topo.nAdjUnitIdx[7] = -1;
+		Topo.nAdjUnitIdx[8] = -1;
+		Topo.nAdjUnitIdx[9] = -1;
 		Topo.nEdgeType = 0;
 		Topo.nStatusFlag = 0;
 		Topo.nUnitAngle = 0;
@@ -1124,21 +1150,25 @@ int ParaModel::InitUnitLib()
 		{
 			shapeName = list[2] + shapeName;
 			shape.nThickNess = list[2].toInt();
+			shape.nShapeType = 1;
 			basic.nUnitType = 3;
 		}
 		else if (list[1] == "墙")
 		{
 			shapeName = list[2] + shapeName;
 			shape.nThickNess = list[2].toInt();
+			shape.nShapeType = 1;
 			basic.nUnitType = 4;
 		}
 		else if (list[1] == "门")
 		{
 			basic.nUnitType = 5;
+			shape.nShapeType = 1;
 		}
 		else if (list[1] == "窗")
 		{
 			basic.nUnitType = 6;
+			shape.nShapeType = 1;
 		}
 #pragma endregion
 
@@ -1150,7 +1180,7 @@ int ParaModel::InitUnitLib()
 			{
 				shapeName = list[3] + "-" + list[4] + " " + shapeName;
 				shape.nShapeRange[0] = list[3].toInt();
-				shape.nShapeRange[3] = list[4].toInt();
+				shape.nShapeRange[1] = list[4].toInt();
 			}
 			else
 			{

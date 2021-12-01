@@ -65,8 +65,10 @@ private:
 
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
 	int MainDockState;								// 0是X视图 1是Y视图 2是Z视图 3是三维视图
-	// mainLabel显示的图像
-	QMenu* popMenu_In_ListWidget_;					/*弹出菜单被使用无法删除*/
+
+    // mainLabel显示的图像
+    QMenu* popMenu_In_ListWidget_;					/*弹出菜单被使用无法删除*/  
+
 public:
 	VUNITTABLE vBaseUnit;					// 系统基本构件库
 	VTOPOTABLE vModelTmpl;					// 系统平面图库
@@ -105,10 +107,12 @@ private:
 
 	BasicUnit GetBaseUnit(int idx);
 
+	 
 public slots:
 	void MyLogOutput(QString myLogout);         //输出日志
 	void ApplyDataAction();		//保存属性输入的数据 
-	void drawWall(const std::vector<float>& points);
+    void drawWall(const std::vector<float>& points);
+
 
 	void GraphicsViewXFocus(bool b); // 加载旁侧图X
 	void GraphicsViewYFocus(bool b); // 加载旁侧图Y
@@ -119,7 +123,9 @@ public slots:
 	void updateScene();				//更新画布内容
 
 
-private slots:
+
+private slots: 
+
 	void NewFileAction();
 	void OpenFileAction();
 	void CloseFileAction();

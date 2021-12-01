@@ -41,14 +41,18 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
         setCursor(QCursor(Qt::ClosedHandCursor));
     setSelected(true);
 }
+
+
+
+
 BEllipse::BEllipse(qreal x, qreal y, qreal width, qreal height, ItemType type)
     : BGraphicsItem(QPointF(x, y), QPointF(x+width/2,y+height/2), type)
 {
-    BPointItem *point = new BPointItem(this, m_edge, BPointItem::Edge);
+ /*   BPointItem *point = new BPointItem(this, m_edge, BPointItem::Edge);
     point->setParentItem(this);
     m_pointList.append(point);
     m_pointList.append(new BPointItem(this, m_center, BPointItem::Center));
-    m_pointList.setRandColor();
+    m_pointList.setRandColor();*/
 }
 
 QRectF BEllipse::boundingRect() const
@@ -88,12 +92,12 @@ void BEllipse::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     width_spinBox->setSingleStep(1);
     width_spinBox->setValue(2 * abs(m_edge.x()));
     connect(width_spinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=](int v){
-        if (m_edge.x() < 0) {
+        /*if (m_edge.x() < 0) {
             m_edge.setX((-1) * v/2);
         } else {
             m_edge.setX(v/2);
         }
-        m_pointList.at(0)->setPoint(m_edge);
+        m_pointList.at(0)->setPoint(m_edge);*/
         this->hide();
         this->update();
         this->show();
@@ -107,12 +111,12 @@ void BEllipse::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     height__spinBox->setSingleStep(1);
     height__spinBox->setValue(2 * abs(m_edge.y()));
     connect(height__spinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=](int v){
-        if (m_edge.y() < 0) {
+       /* if (m_edge.y() < 0) {
             m_edge.setY((-1) * v/2);
         } else {
             m_edge.setY(v/2);
         }
-        m_pointList.at(0)->setPoint(m_edge);
+        m_pointList.at(0)->setPoint(m_edge);*/
         this->hide();
         this->update();
         this->show();
@@ -194,7 +198,7 @@ void BCircle::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
             m_edge.setY(m_center.y() + m_radius * sqrt(2)/2);
         }
 
-        m_pointList.at(0)->setPoint(m_edge);
+        //m_pointList.at(0)->setPoint(m_edge);
         this->hide();
         this->update();
         this->show();
@@ -216,11 +220,11 @@ void BCircle::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 BRectangle::BRectangle(qreal x, qreal y, qreal width, qreal height, ItemType type)
     : BGraphicsItem(QPointF(x,y), QPointF(x+width/2,y+height/2), type)
 {
-    BPointItem *point = new BPointItem(this, m_edge, BPointItem::Edge);
-    point->setParentItem(this);
-    m_pointList.append(point);
-    m_pointList.append(new BPointItem(this, m_center, BPointItem::Center));
-    m_pointList.setRandColor();
+    /*BPointItem *point = new BPointItem(this, m_edge, BPointItem::Edge);
+    point->setParentItem(this);*/
+   // m_pointList.append(point);
+   // m_pointList.append(new BPointItem(this, m_center, BPointItem::Center));
+   // m_pointList.setRandColor();
 	m_leftup.setX(int((m_center.x() * 2 - m_edge.x() + 10) / 20) * 20);
 	m_leftup.setY(int((m_center.y() * 2 - m_edge.y() + 10) / 20) * 20);
 	
@@ -240,12 +244,12 @@ void BRectangle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     painter->setBrush(this->brush());
 	
 
-	m_center.setX(int((m_leftup.x() / 2 + m_edge.x() / 2 + 10) / 20) * 20);
-	m_center.setY(int((m_leftup.y() / 2 + m_edge.y() / 2 + 10) / 20) * 20);
+	//m_center.setX(int((m_leftup.x() / 2 + m_edge.x() / 2 + 10) / 20) * 20);
+	//m_center.setY(int((m_leftup.y() / 2 + m_edge.y() / 2 + 10) / 20) * 20);
 	m_edge.setX(int(m_edge.x() + 10) / 20 * 20);
 	m_edge.setY(int(m_edge.y() + 10) / 20 * 20);
 	
-	m_pointList[1]->setPoint(m_center);
+	//m_pointList[1]->setPoint(m_center);
 	
 	
     //QRectF ret(m_center.x()*2-m_edge.x(), m_center.y() * 2 - m_edge.y(),( m_edge.x()-m_center.x())*2 , (m_edge.y() - m_center.y()) * 2);
@@ -269,12 +273,12 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     width_spinBox->setSingleStep(1);
     width_spinBox->setValue(2 * abs(m_edge.x()));
     connect(width_spinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=](int v){
-        if (m_edge.x() < 0) {
+      /*  if (m_edge.x() < 0) {
             m_edge.setX((-1) * v/2);
         } else {
             m_edge.setX(v/2);
         }
-        m_pointList.at(0)->setPoint(m_edge);
+        m_pointList.at(0)->setPoint(m_edge);*/
         this->hide();
         this->update();
         this->show();
@@ -288,12 +292,12 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     height__spinBox->setSingleStep(1);
     height__spinBox->setValue(2 * abs(m_edge.y()));
     connect(height__spinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=](int v){
-        if (m_edge.y() < 0) {
+       /* if (m_edge.y() < 0) {
             m_edge.setY((-1) * v/2);
         } else {
             m_edge.setY(v/2);
         }
-        m_pointList.at(0)->setPoint(m_edge);
+        m_pointList.at(0)->setPoint(m_edge);*/
         this->hide();
         this->update();
         this->show();
@@ -334,14 +338,14 @@ void BSquare::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     distance_spinBox->setSingleStep(1);
     distance_spinBox->setValue(2 * abs(m_edge.x()));
     connect(distance_spinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=](int v){
-        if (m_edge.x() < 0) {
+        /*if (m_edge.x() < 0) {
             m_edge.setX((-1) * v/2);
             m_edge.setY((-1) * v/2);
         } else {
             m_edge.setX(v/2);
             m_edge.setY(v/2);
         }
-        m_pointList.at(0)->setPoint(m_edge);
+        m_pointList.at(0)->setPoint(m_edge);*/
         this->hide();
         this->update();
         this->show();
