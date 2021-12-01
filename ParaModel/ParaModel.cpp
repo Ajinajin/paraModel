@@ -268,7 +268,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 					100 + iter->oShape.nShapeRange[2], 100 + iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
 				//
 				if (iter->nUnitType == 3 || iter->nUnitType == 4)
-				{ 
+				{
 					m_rectangle->wallwidth = 100 + iter->oShape.nThickNess;
 				}
 				pSceneMain.addItem(m_rectangle);
@@ -276,7 +276,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 			else if (iter->oShape.nShapeType == 2)
 			{
 
-				BCircle* m_ellipse = new BCircle(100+iter->oShape.nCen[0], 100 + iter->oShape.nCen[1],
+				BCircle* m_ellipse = new BCircle(100 + iter->oShape.nCen[0], 100 + iter->oShape.nCen[1],
 					100 + iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
 				pSceneMain.addItem(m_ellipse);
 			}
@@ -291,10 +291,20 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 				}*/
 				point.push_back(100);
 				point.push_back(210);
+
 				point.push_back(300);
 				point.push_back(410);
+
 				point.push_back(500);
 				point.push_back(300);
+
+				point.push_back(600);
+				point.push_back(700);
+
+
+				point.push_back(900);
+				point.push_back(900);
+
 				drawWall(point);
 
 
@@ -305,7 +315,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 				//m_polygon->paint();
 				//pSceneMain.addItem(m_polygon);
 
-			} 
+			}
 		}
 		msg = item->text(0) + "构件加载完成";
 		MyLogOutput(msg);
@@ -420,17 +430,30 @@ void ParaModel::updateScene()
 			//柱梁板墙门窗
 			if (vModelTmpl[i].nUnitType == 1)//柱
 			{
+				BasicUnit unit = GetBaseUnit(vModelTmpl[i].nCenUnitIdx);
+				int coordX = vModelTmpl[i].nCenPos[0] + unit.oShape.nShapeRange[0] + 100;
+				int coordY = vModelTmpl[i].nCenPos[1] + unit.oShape.nShapeRange[1] + 100;
+				//根据构建id找到对应是构件
 				BRectangle* m_rectangle = new BRectangle(
-					vModelTmpl[i].nCenPos[0], vModelTmpl[i].nCenPos[1],
-					vModelTmpl[i].nCenPos[2], vModelTmpl[i].nCenPos[3], BGraphicsItem::ItemType::Rectangle);
-				
+					coordX, coordY,
+					 unit.oShape.nShapeRange[2] , unit.oShape.nShapeRange[3] ,
+					BGraphicsItem::ItemType::Rectangle);
 				pSceneMain.addItem(m_rectangle);
-
 			}
 		}
 	}
 }
 
+BasicUnit ParaModel::GetBaseUnit(int idx)
+{
+	for (size_t i = 0; i < vBaseUnit.size(); i++)
+	{
+		if (vBaseUnit[i].nUnitIdx == idx)
+			return vBaseUnit[i];
+	} 
+	BasicUnit b;
+	return b;
+}
 //更新OpenGL窗口
 void ParaModel::updateOGL()
 {
@@ -636,6 +659,7 @@ void ParaModel::OpenFileAction()
 	{
 		QMessageBox::information(NULL, "信息提示", "当前已有加载数据，请关闭后在打开");
 		MyLogOutput("当前已有加载数据，请关闭后在打开");
+		return;
 	}
 
 	QFileDialog* f = new QFileDialog(this);
@@ -645,6 +669,10 @@ void ParaModel::OpenFileAction()
 	QString filePath;
 	if (f->exec() == QDialog::Accepted) {
 		filePath = f->selectedFiles()[0];
+	}
+	if (filePath == "")
+	{
+		return;
 	}
 	// 获取文件内容
 	QFile file(filePath);
@@ -718,19 +746,19 @@ void ParaModel::OpenFileAction()
 
 			Topo.nCenUnitIdx = list[2].toInt();
 			Topo.nTopoIdx = list[0].toInt();
-			if (list.size() == 4)
+			if (list.size() >= 4)
 			{
 				Topo.nCenPos[0] = list[3].toInt();
 			}
-			if (list.size() == 5)
+			if (list.size() >= 5)
 			{
 				Topo.nCenPos[1] = list[4].toInt();
 			}
-			if (list.size() == 6)
+			if (list.size() >= 6)
 			{
 				Topo.nCenPos[2] = list[5].toInt();
 			}
-			if (list.size() == 7)
+			if (list.size() >= 7)
 			{
 				Topo.nCenPos[3] = list[6].toInt();
 			}
@@ -958,7 +986,7 @@ void ParaModel::ApplyDataAction()
 void ParaModel::drawWall(const std::vector<float>& points) {
 	MyItem* item = new MyItem;
 	item->points = points;
-	item->setPos(0, 0);
+	item->setPos(100, 100);
 	item->setColor(QColor(Qt::red));
 	pSceneMain.addItem(item);
 }
@@ -1141,7 +1169,7 @@ int ParaModel::InitUnitLib()
 			shapeName = list[2] + " " + shapeName;
 			shape.nShapeType = 3;
 			shape.nNumOrRadius = list[3].toInt();
-			for (size_t i = 0; i < shape.nNumOrRadius; i++)
+			for (size_t i = 0; i < shape.nNumOrRadius * 2; i++)
 			{
 				v.push_back(list[4 + i].toInt());
 			}

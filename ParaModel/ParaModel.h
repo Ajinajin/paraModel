@@ -102,6 +102,8 @@ private:
 
 	//初始化弹出窗口
 	void InitTipWindow(); 
+
+	BasicUnit GetBaseUnit(int idx);
 	 
 public slots:
 	void MyLogOutput(QString myLogout);         //输出日志
