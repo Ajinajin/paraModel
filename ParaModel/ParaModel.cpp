@@ -16,6 +16,7 @@
 
 #include "bqgraphicsitem.h"
 #include "bqgraphicsscene.h"
+#include "DimDataConvert.h"
 
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
@@ -428,7 +429,10 @@ void ParaModel::updateScene()
 
 
 	if (MainDockState == 0)
-	{
+	{ 
+		DimDataConvert* d = new DimDataConvert();
+		VSHAPE v ;
+		int c= d->CalPlaneData(vModelTmpl,v);
 		//Ö»»æÖÆÖù¡¢Ç½¡¢Áº
 		for (size_t i = 0; i < vModelTmpl.size(); i++)
 		{
@@ -714,6 +718,8 @@ void ParaModel::OpenFileAction()
 		Topo.nAdjUnitIdx[5] = -1;
 		Topo.nAdjUnitIdx[6] = -1;
 		Topo.nAdjUnitIdx[7] = -1;
+		Topo.nAdjUnitIdx[8] = -1;
+		Topo.nAdjUnitIdx[9] = -1;
 		Topo.nEdgeType = 0;
 		Topo.nStatusFlag = 0;
 		Topo.nUnitAngle = 0;

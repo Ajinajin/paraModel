@@ -2,6 +2,7 @@
 
 // 参数化建模 模块 数据结构定义
 #include <vector>
+#include <QtCore/qstring.h>
 using namespace std;
 
 typedef vector<int> VINT;
@@ -20,6 +21,7 @@ typedef struct SimpleShape
 {
 	int nCen[2];			// 中心点
 	int nWH[2];				// 宽高 XY范围
+	int unitType;
 	VPIXELPOS vCorner;
 }SimpleShape;
 typedef vector<SimpleShape> VSHAPE;
