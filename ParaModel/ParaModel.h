@@ -47,8 +47,8 @@ private:
 	BQGraphicsView* graphicsViewX;					// 二维模型X视图
 	BQGraphicsView* graphicsViewY;					// 二维模型Y视图
 	BQGraphicsView* graphicsViewZ;					// 二维模型Z视图
-	BQGraphicsView* graphicsViewMain;				// 二维模型Z视图
-	BQGraphicsView* graphicsViewOgl;				//三位模型展示视图
+	BQGraphicsView* graphicsViewMain;				// 二维模型 三维视图
+	BQGraphicsView* graphicsViewOgl;				// 三位模型展示视图
 
 	BQGraphicsScene pSceneX;						// 二维模型X视图画布
 	BQGraphicsScene pSceneY;						// 二维模型Y视图画布
@@ -56,16 +56,13 @@ private:
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布
 
 	ParaOGLManager* oglmanager;							// 三维显示窗口类
-	ParaOGLManager* oglmanagerMain;							// 三维显示窗口大屏幕主类
+	ParaOGLManager* oglmanagerMain;						// 三维显示窗口大屏幕主类
 	 
 	int if_data;									//0是未加载数据。1是有数据
 
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
-    // 图像的宽长
-    int mainLableWidth, mainLableHeight; 
 	int MainDockState;								// 0是X视图 1是Y视图 2是Z视图 3是三维视图
     // mainLabel显示的图像
-    QImage* img = nullptr;
     QMenu* popMenu_In_ListWidget_; /*弹出菜单*/
     QAction * action_Replace_ListWidget_;/*菜单上的Action*/
     //QGraphicsScene* m_scene = nullptr;
@@ -128,10 +125,7 @@ public slots:
 
 private slots:
 	void onCustomContextMenuRequested(const QPoint& pos);
-	void on_polygonBtn_clicked();
-	void on_clearBtn_clicked();
-	void my_save();
-	void on_loadBtn_clicked();
+	void on_polygonBtn_clicked(); 
 	void NewFileAction();
 	void OpenFileAction();
 	void CloseFileAction();

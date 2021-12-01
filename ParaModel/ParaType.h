@@ -4,9 +4,9 @@
 #include <vector>
 using namespace std;
 
-typedef vector<int> VINT; 
+typedef vector<int> VINT;
 typedef vector<float> VFLOAT;
- 
+
 // 整型平面点
 typedef struct PixelPos
 {
@@ -25,11 +25,12 @@ typedef vector<V3DPT> VV3DPT;
 
 typedef struct GeoShape
 {
-	int nShapeType;				// 形状类型 矩形 1 圆 2 多边形3
+	int nShapeType;				// 形状类型 方 圆 多边形
 	int nThickNess;				// 墙和板的厚度
 	int nShapeRange[4];			// 外框的左下右上 从小到大
 	int nCen[2];				// 中心点 圆心点
 	int nNumOrRadius;			// 圆半径 或者 多边形点数量
+	QString nShapeName;				// 构建名称
 	VINT vPolyPt;				// 多边形闭合顶点集 逆时针排列 首尾点重合
 }GeoShape;
 
@@ -44,22 +45,34 @@ typedef struct MatInfo
 typedef struct BasicUnit
 {
 	int nUnitIdx;				// 基本构件单元Idx
-	int nUnitType;				// 基本单元类型 柱1  梁2 板3 墙4 门5 窗6
+	int nUnitType;				// 基本单元类型 柱梁板墙门窗
 	GeoShape oShape;			// 外形轮廓描述
 	MatInfo  oMaterial;			// 组成材质描述
 }BasicUnit;
-typedef vector<BasicUnit> VUNITTABLE; 
+typedef vector<BasicUnit> VUNITTABLE;
 
 // 基本拓扑单元
 typedef struct TopoUnit
 {
-	int nTopoType;				// 中心构件单元类型 柱梁板墙门窗
+	int nTopoIdx;				// 构件序号
+	int nUnitType;				// 中心构件单元类型 柱梁板墙门窗
 	int nCenUnitIdx;			// 中心构件单元Id
-	int nAdjUnitIdx[12];			// 前后上下左右 邻接单元Id 无邻接-1
-	int nEdgeType;				// 边界类型 前后上下左右
-	Ver3D oUnitSE[2];			// 基本构件单元的起始点和终止点 Y值表示高度范围 有可能为半高墙 或者悬空梁
+	int nAdjUnitIdx[8];			// 前后左右方向 按上下表示梁墙 每方向最多两个 邻接单元Id 无邻接-1
+	int nEdgeType;				// 边界类型 前后上下左右 按向限角度划分 45度 右上为1 正下为6
+	int nStatusFlag;			// 标志0 1 2 正常 删除 其他
+	int nUnitAngle;				// 0 90度 两种
+	int nCenPos[4];				// 基本构件单元的中心线下点 和上点高度  Y值表示高度
 }TopoUnit;
 typedef vector<TopoUnit> VTOPOTABLE;
+typedef vector<TopoUnit> VLAYERTOPO;
+typedef vector<VLAYERTOPO> VBUILDTOPO;
+
+// 拓扑单元对应的实际空间数据
+typedef struct UnitData
+{
+	Ver3D oData[8];
+}UnitData;
+typedef vector<UnitData> VUNITDATA;
 
 // 设计系统模板库的存储方式 IO操作库
 
