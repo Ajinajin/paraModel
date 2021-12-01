@@ -265,11 +265,11 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 			{
 				BRectangle* m_rectangle = new BRectangle(
 					100 + iter->oShape.nShapeRange[0], 100 + iter->oShape.nShapeRange[1],
-					100 + iter->oShape.nShapeRange[2], 100 + iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
+					 iter->oShape.nShapeRange[2],  iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
 				//
 				if (iter->nUnitType == 3 || iter->nUnitType == 4)
 				{
-					m_rectangle->wallwidth = 100 + iter->oShape.nThickNess;
+					m_rectangle->wallwidth =  iter->oShape.nThickNess;
 				}
 				pSceneMain.addItem(m_rectangle);
 			}
@@ -277,7 +277,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 			{
 
 				BCircle* m_ellipse = new BCircle(100 + iter->oShape.nCen[0], 100 + iter->oShape.nCen[1],
-					100 + iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
+					 iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
 				pSceneMain.addItem(m_ellipse);
 			}
 			else if (iter->oShape.nShapeType == 3)
@@ -1119,21 +1119,25 @@ int ParaModel::InitUnitLib()
 		{
 			shapeName = list[2] + shapeName;
 			shape.nThickNess = list[2].toInt();
+			shape.nShapeType = 1;
 			basic.nUnitType = 3;
 		}
 		else if (list[1] == "«Ω")
 		{
 			shapeName = list[2] + shapeName;
 			shape.nThickNess = list[2].toInt();
+			shape.nShapeType = 1;
 			basic.nUnitType = 4;
 		}
 		else if (list[1] == "√≈")
 		{
 			basic.nUnitType = 5;
+			shape.nShapeType = 1;
 		}
 		else if (list[1] == "¥∞")
 		{
 			basic.nUnitType = 6;
+			shape.nShapeType = 1;
 		}
 #pragma endregion
 
