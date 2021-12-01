@@ -9,11 +9,21 @@
 
 
 // 定义全局变量 后期修改
-const QVector3D CAMERA_POSITION(0.0f, 2.0f, 5.0f);
+const QVector3D CAMERA_POSITION(500.0f, 100.0f, 800.0f);
 const QVector3D LIGHT_POSITION(0.0f, 1.0f, 0.0f);
 
 const int OGLMANAGER_WIDTH = 1200;
 const int OGLMANAGER_HEIGHT = 800;
+
+float Distance(float x1, float y1, float z1, float x2, float y2, float z2)
+{
+	float dis = 0;
+	dis += pow(x2 - x1, 2);
+	dis += pow(y2 - y1, 2);
+	dis += pow(z2 - z1, 2);
+
+	return sqrt(dis);
+}
 
 ParaOGLManager::ParaOGLManager(QWidget* parent) : QOpenGLWidget(parent)
 {
@@ -85,6 +95,8 @@ void ParaOGLManager::initializeGL()
 	switchView = NONE;
 
 	
+	oglTopTable = new VTOPOTABLE;
+	oglUnitTable = new VUNITTABLE;
 
 	/************ 载入shader ***********/
 	ResourceManager::loadShader("yellow", ":/shaders/res/shaders/GLSL_YELLOW.vert", ":/shaders/res/shaders/GLSL_YELLOW.frag");
@@ -170,15 +182,331 @@ void ParaOGLManager::paintGL()
 	//update
 	this->updateGL();
 
-	//画个柱
+
 	
+	//(模型根据鼠标操作旋转)
+	QMatrix4x4 model;
+	model.setToIdentity();
+	model.rotate(rotateRaw,0.0,1.0,0.0);
+	//model.rotate((GLfloat)time.elapsed() / 100,0.0,1.0,0.0);
+	//model.rotate((GLfloat)time.elapsed() / 100, 1.0, 0.0, 0.0);
+	model.rotate(-rotatePitch, 1.0, 0.0, 0.0);
 	ResourceManager::getShader("coordinate").use();
-	//ResourceManager::getShader("coordinate").use().setMatrix4f("model",model);
-	InitAndDrawColumn(1,2.5);
+	ResourceManager::getShader("coordinate").use().setMatrix4f("model", model);
 
-	
 
-	
+	//绘制三维模型
+	if (!oglUnitTable->empty() && !oglTopTable->empty())
+	{
+		for (int i = 0; i < oglTopTable->size(); i++)
+		{
+			//**判断此构件类型**
+
+			//柱
+			if (oglTopTable->at(i).nUnitType == 1)
+			{
+				//查找对应柱的相关信息
+				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
+				
+				//方柱
+				if (info.oShape.nShapeType == 1)
+				{
+					float x, y, z, length, thickness, height;
+
+					height = oglTopTable->at(i).nCenPos[3];
+					length = info.oShape.nShapeRange[2] - info.oShape.nShapeRange[0];
+					thickness = info.oShape.nShapeRange[3] - info.oShape.nShapeRange[1];
+
+					x = oglTopTable->at(i).nCenPos[0];
+					y = oglTopTable->at(i).nCenPos[1];
+					z = oglTopTable->at(i).nCenPos[2];
+
+					InitAndDrawCuboid(x, y, z, length, thickness, height);
+				}
+				
+				//圆柱
+				if (info.oShape.nShapeType == 2)
+				{
+					float x, y, z, radius, height;
+					x = oglTopTable->at(i).nCenPos[0];
+					y = oglTopTable->at(i).nCenPos[1];
+					//y = 0.5;
+					z = oglTopTable->at(i).nCenPos[1];
+					height = oglTopTable->at(i).nCenPos[3];
+					//height = 2;
+					radius = info.oShape.nNumOrRadius;
+					//radius = 1;
+					InitAndDrawColumn(x, y, z, radius, height);
+				}
+
+				//多边形柱
+				if (info.oShape.nShapeType == 3)
+				{
+					float height = oglTopTable->at(i).nCenPos[3];
+					InitAndDrawPolygonColumnPortrait(info.oShape.vPolyPt,height);
+				}
+			}
+			
+			//梁
+			if (oglTopTable->at(i).nUnitType == 2)
+			{
+				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
+				
+				//矩形
+				if (info.oShape.nShapeType == 1)
+				{
+					float x, y, z, length, thickness, height;
+					
+					height = oglTopTable->at(i).nCenPos[3];
+
+					//梁的厚度
+					//thickness = info.oShape.nThickNess;
+					thickness = 1;
+
+					//查找梁连接的两个柱之间的距离
+					vPoint columnPoints;
+					int j = 0;
+					while (oglTopTable->at(i).nAdjUnitIdx[j] != -1)
+					{
+						if (oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nUnitType == 1)
+						{
+							Point info;
+							info.x = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[0];
+							info.y = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[1];
+							info.z = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[2];
+							columnPoints.push_back(info);
+						}
+						j++;
+					}
+
+
+					x = oglTopTable->at(i).nCenPos[0];
+					y = oglTopTable->at(i).nCenPos[1];
+					z = oglTopTable->at(i).nCenPos[2];
+
+					length = Distance(columnPoints[0].x, columnPoints[0].y, columnPoints[0].z, columnPoints[1].x, columnPoints[1].y, columnPoints[1].z);
+
+					//InitAndDrawCuboid(x, y, z, length, thickness, height);
+				}
+				
+				
+				
+				//多边形
+				if (info.oShape.nShapeType == 3)
+				{
+					float height = oglTopTable->at(i).nCenPos[3];
+					//InitAndDrawPolygonColumnHorizontal(info.oShape.vPolyPt, height);
+				}
+			}
+
+			//板
+			if (oglTopTable->at(i).nUnitType == 3)
+			{
+				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
+			
+				float x, y, z, length, width, thickness;
+				
+				//height = oglTopTable->at(i).nCenPos[3];
+
+
+				//存储板连接的四个柱之间的信息
+				vPoint columnPoints;
+				int j = 0;
+				while (oglTopTable->at(i).nAdjUnitIdx[j] != -1)
+				{
+					if (oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nUnitType == 1)
+					{
+						Point info;
+						info.x = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[0];
+						info.y = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[1];
+						info.z = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[2];
+						columnPoints.push_back(info);
+					}
+					j++;
+				}
+
+				//板的厚度
+				thickness = info.oShape.nThickNess;
+
+				length = Distance(columnPoints[0].x, columnPoints[0].y, columnPoints[0].z, columnPoints[1].x, columnPoints[1].y, columnPoints[1].z);
+				width = Distance(columnPoints[1].x, columnPoints[1].y, columnPoints[1].z, columnPoints[2].x, columnPoints[2].y, columnPoints[2].z);
+				
+				x = oglTopTable->at(i).nCenPos[0];
+				y = oglTopTable->at(i).nCenPos[1];
+				z = oglTopTable->at(i).nCenPos[2];
+				
+				//InitAndDrawCuboid(x, y, z, length, width, thickness);
+			}
+
+			//墙
+			if (oglTopTable->at(i).nUnitType == 4)
+			{
+				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
+				//横墙   0度
+				if (oglTopTable->at(i).nUnitAngle == 0)
+				{
+					float x, y, z, length, thickness, height;
+
+					height = oglTopTable->at(i).nCenPos[3];
+
+					//墙的厚度
+
+					thickness = info.oShape.nThickNess;
+
+					//查找墙连接的两个柱之间的距离
+					vPoint columnPoints;
+					int j = 0, temp_length;
+					while (oglTopTable->at(i).nAdjUnitIdx[j] != -1)
+					{
+						if (oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nUnitType == 1)
+						{
+							BasicUnit tmpinfo = findUnit(oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenUnitIdx, *oglUnitTable);
+							//墙长度需再减去一个柱宽度
+							temp_length = tmpinfo.oShape.nShapeRange[2] - tmpinfo.oShape.nShapeRange[0];
+
+							Point info;
+							info.x = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[0];
+							info.y = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[1];
+							info.z = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[2];
+							columnPoints.push_back(info);
+						}
+						j++;
+					}
+
+					length = Distance(columnPoints[0].x, columnPoints[0].y, columnPoints[0].z, columnPoints[1].x, columnPoints[1].y, columnPoints[1].z);
+					length -= temp_length;
+
+					x = oglTopTable->at(i).nCenPos[0];
+					y = oglTopTable->at(i).nCenPos[1];
+					z = oglTopTable->at(i).nCenPos[2];
+					InitAndDrawCuboid(x, y, z, length, thickness, height);
+
+				}
+				//竖墙   90度
+				if (oglTopTable->at(i).nUnitAngle == 90)
+				{
+					float x, y, z, length, thickness, height;
+
+					height = oglTopTable->at(i).nCenPos[3];
+
+					//墙的厚度
+
+					thickness = info.oShape.nThickNess;
+
+					//查找墙连接的两个柱之间的距离
+					vPoint columnPoints;
+					int j = 0, temp_length;
+					while (oglTopTable->at(i).nAdjUnitIdx[j] != -1)
+					{
+						if (oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nUnitType == 1)
+						{
+							BasicUnit tmpinfo = findUnit(oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenUnitIdx, *oglUnitTable);
+							//墙长度需再减去一个柱宽度
+							temp_length = tmpinfo.oShape.nShapeRange[2] - tmpinfo.oShape.nShapeRange[0];
+
+							Point info;
+							info.x = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[0];
+							info.y = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[1];
+							info.z = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[2];
+							columnPoints.push_back(info);
+						}
+						j++;
+					}
+
+					length = Distance(columnPoints[0].x, columnPoints[0].y, columnPoints[0].z, columnPoints[1].x, columnPoints[1].y, columnPoints[1].z);
+					length -= temp_length;
+
+					x = oglTopTable->at(i).nCenPos[0];
+					y = oglTopTable->at(i).nCenPos[1];
+					z = oglTopTable->at(i).nCenPos[2];
+					InitAndDrawCuboid(x, y, z, thickness, length, height);
+
+				}
+				
+			}
+
+			//门
+			if (oglTopTable->at(i).nUnitType == 5)
+			{
+				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
+
+				float x, y, z, length, thickness, height;
+
+				//length = oglTopTable->at(i).nCenPos[3];
+				length = 5;
+
+				//门的厚度
+				//thickness = info.oShape.nThickNess;
+				thickness = 0.5;
+				
+				//vPoint columnPoints;
+				//int j = 0;
+				//while (oglTopTable->at(i).nAdjUnitIdx[j] != -1)
+				//{
+				//	if (oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nUnitType == 1)
+				//	{
+				//		Point info;
+				//		info.x = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[0];
+				//		info.y = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[1];
+				//		info.z = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[2];
+				//		columnPoints.push_back(info);
+				//	}
+				//	j++;
+				//}
+
+				//length = Distance(columnPoints[0].x, columnPoints[0].y, columnPoints[0].z, columnPoints[1].x, columnPoints[1].y, columnPoints[1].z);
+
+				height = 10;
+				x = oglTopTable->at(i).nCenPos[0];
+				y = oglTopTable->at(i).nCenPos[1];
+				z = oglTopTable->at(i).nCenPos[2];
+				//InitAndDrawCuboid(x, y, z, length, thickness, height);
+				//InitAndDrawCuboid(x, y, z, length, thickness, thickness);
+			}
+
+			//窗
+			if (oglTopTable->at(i).nUnitType == 6)
+			{
+				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
+
+				float x, y, z, length, thickness, height;
+
+				//length = oglTopTable->at(i).nCenPos[3];
+				length = 5;
+
+				//窗的厚度
+
+				//thickness = info.oShape.nThickNess;
+				thickness = 0.5;
+				
+				//vPoint columnPoints;
+				//int j = 0;
+				//while (oglTopTable->at(i).nAdjUnitIdx[j] != -1)
+				//{
+				//	if (oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nUnitType == 1)
+				//	{
+				//		Point info;
+				//		info.x = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[0];
+				//		info.y = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[1];
+				//		info.z = oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenPos[2];
+				//		columnPoints.push_back(info);
+				//	}
+				//	j++;
+				//}
+
+				//length = Distance(columnPoints[0].x, columnPoints[0].y, columnPoints[0].z, columnPoints[1].x, columnPoints[1].y, columnPoints[1].z);
+
+				height = 10;
+				x = oglTopTable->at(i).nCenPos[0];
+				y = oglTopTable->at(i).nCenPos[1] - height / 2;
+				z = oglTopTable->at(i).nCenPos[2] + thickness / 2;
+				//InitAndDrawCuboid(x, y, z, length, thickness, height);
+				//InitAndDrawCuboid(x, y, z, height, thickness, height);
+			}
+		}
+
+	}
+
 
 }
 
@@ -237,14 +565,13 @@ void ParaOGLManager::updateGL()
 	}
 	
 
-	//(模型根据鼠标操作旋转)
-	GLfloat currentFrame = (GLfloat)time.elapsed() / 100;
-	QMatrix4x4 model;
-	model.setToIdentity();
-	//model.rotate(rotateRaw,0.0,1.0,0.0);
-	//model.rotate(-rotatePitch, 1.0, 0.0, 0.0);
-	model.rotate(currentFrame * 5, QVector3D(0.0f, 0.0f, 1.0f));
-	ResourceManager::getShader("coordinate").use().setMatrix4f("model", model);
+	
+	//GLfloat currentFrame = (GLfloat)time.elapsed() / 100;
+	//QMatrix4x4 model;
+	//model.setToIdentity();
+	
+	//model.rotate(currentFrame * 5, QVector3D(0.0f, 0.0f, 1.0f));
+	//ResourceManager::getShader("coordinate").use().setMatrix4f("model", model);
 	ResourceManager::getShader("coordinate").use().setMatrix4f("projection", projection);
 	ResourceManager::getShader("coordinate").use().setMatrix4f("view", view);
 
@@ -281,33 +608,30 @@ void ParaOGLManager::mouseMoveEvent(QMouseEvent* event)
 		lastY = ypos;
 
 
-		xoffset *= 0.2;//根据鼠标灵敏度转换具体偏移角度
-		yoffset *= 0.2;
-
-		rotateRaw += xoffset;
-		rotatePitch += yoffset;
+		rotateRaw += xoffset*0.1;
+		rotatePitch += yoffset*0.1;
 
 	}
 	
-	if (isRightMousePress)//右键则旋转相机
-	{
-		GLint xpos = event->pos().x();
-		GLint ypos = event->pos().y();
+	//if (isRightMousePress)//右键则旋转相机
+	//{
+	//	GLint xpos = event->pos().x();
+	//	GLint ypos = event->pos().y();
 
-		if (isFirstMouse)
-		{
-			lastX = xpos;
-			lastY = ypos;
-			isFirstMouse = GL_FALSE;
-		}
+	//	if (isFirstMouse)
+	//	{
+	//		lastX = xpos;
+	//		lastY = ypos;
+	//		isFirstMouse = GL_FALSE;
+	//	}
 
-		GLint xoffset = xpos - lastX;
-		GLint yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-		lastX = xpos;
-		lastY = ypos;
-		camera->processMouseMovement(xoffset, yoffset);
-			
-	}
+	//	GLint xoffset = xpos - lastX;
+	//	GLint yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+	//	lastX = xpos;
+	//	lastY = ypos;
+	//	camera->processMouseMovement(xoffset, yoffset);
+	//		
+	//}
 }
 
 void ParaOGLManager::mousePressEvent(QMouseEvent* event)
@@ -334,7 +658,7 @@ void ParaOGLManager::wheelEvent(QWheelEvent* event)
 }
 
 
-void ParaOGLManager::InitAndDrawColumn(float radius, float height)
+void ParaOGLManager::InitAndDrawColumn(float x,float y, float z, float radius, float height)
 {
 	//圆柱通过两个圆上下连接实现
 
@@ -344,9 +668,9 @@ void ParaOGLManager::InitAndDrawColumn(float radius, float height)
 
 	for (int i = 0; i < pointNum; i++)
 	{
-		vertices[i * 6 + 0] = radius * cos(2 * 3.14 * i / pointNum);
-		vertices[i * 6 + 1] = 0;
-		vertices[i * 6 + 2] = radius * sin(2 * 3.14 * i / pointNum);
+		vertices[i * 6 + 0] = radius * cos(2 * 3.14 * i / pointNum) + x;
+		vertices[i * 6 + 1] = y;
+		vertices[i * 6 + 2] = radius * sin(2 * 3.14 * i / pointNum) + z;
 
 		vertices[i * 6 + 3] = vertices[i * 6];
 		vertices[i * 6 + 4] = vertices[i * 6 + 1] + height;
@@ -383,4 +707,174 @@ void ParaOGLManager::InitAndDrawColumn(float radius, float height)
 
 	//delete
 	pCore->glDeleteBuffers(1, &VBO);
+	delete[] vertices;
 }
+
+void ParaOGLManager::InitAndDrawCuboid(float x, float y, float z, float length, float thickness, float height)
+{
+	//init
+	float* vertices = new float[108];
+	
+	vPoint points;
+	Point tmp; 
+	tmp.x = x, tmp.y = y, tmp.z = z; points.push_back(tmp);
+	tmp.x = x + length, tmp.y = y, tmp.z = z; points.push_back(tmp);
+	tmp.x = x + length, tmp.y = y, tmp.z = z - thickness; points.push_back(tmp);
+	tmp.x = x, tmp.y = y, tmp.z = z - thickness; points.push_back(tmp);
+	tmp.x = x, tmp.y = y + height, tmp.z = z; points.push_back(tmp);
+	tmp.x = x + length, tmp.y = y + height, tmp.z = z; points.push_back(tmp);
+	tmp.x = x + length, tmp.y = y + height, tmp.z = z - thickness; points.push_back(tmp);
+	tmp.x = x, tmp.y = y + height, tmp.z = z - thickness; points.push_back(tmp);
+
+	int solidToFaceOrder[] = {0,1,2,0,2,3,0,1,4,1,5,4,1,2,5,2,5,6,2,3,6,3,6,7,0,3,7,0,4,7,4,5,6,4,7,6};
+
+	//12个面片 36个点索引
+
+	for (int k = 0; k < 36; k++)
+	{
+		vertices[k * 3] = points[solidToFaceOrder[k]].x;
+		vertices[k * 3 + 1] = points[solidToFaceOrder[k]].y;
+		vertices[k * 3 + 2] = points[solidToFaceOrder[k]].z;
+	}
+
+
+	pCore->glGenBuffers(1, &VBO);
+
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	pCore->glBufferData(GL_ARRAY_BUFFER, 108 * sizeof(float), vertices, GL_STATIC_DRAW);
+	
+
+
+	//draw
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	pCore->glEnableVertexAttribArray(0);
+	pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	
+	pCore->glDepthMask(GL_FALSE);//取消深度缓冲
+	pCore->glEnable(GL_BLEND);//开启颜色混合
+	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+
+	pCore->glDrawArrays(GL_TRIANGLE_STRIP, 0, 36);
+
+	pCore->glDisable(GL_BLEND);
+	pCore->glDepthMask(GL_TRUE);
+		
+
+	//delete
+	pCore->glDeleteBuffers(1, &VBO);
+	delete[] vertices;
+}
+
+BasicUnit ParaOGLManager::findUnit(int idx, VUNITTABLE oglUnitTable)
+{
+	for (int i = 0; i < oglUnitTable.size(); i++)
+	{
+		if (oglUnitTable[i].nUnitIdx == idx)
+		{
+			return oglUnitTable[i];
+		}
+	}
+	//return;
+}
+
+void ParaOGLManager::InitAndDrawPolygonColumnPortrait(VINT data, float height)
+{
+
+	float* vertices = new float[data.size() * 1.5 * 2];
+
+	for (int i = 0; i < data.size(); i+=2)
+	{
+		vertices[i * 6] = data[i];
+		vertices[i * 6 + 1] = 0;
+		vertices[i * 6 + 2] = data[i + 1];
+
+		vertices[i * 6 + 3] = vertices[i * 6];
+		vertices[i * 6 + 4] = 0 + height;
+		vertices[i * 6 + 5] = vertices[i * 6 + 2];
+	}
+
+
+	pCore->glGenBuffers(1, &VBO);
+
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	pCore->glBufferData(GL_ARRAY_BUFFER, data.size() * 3 * sizeof(float), vertices, GL_STATIC_DRAW);
+
+
+	//draw
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	pCore->glEnableVertexAttribArray(0);
+	pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+
+	pCore->glDepthMask(GL_FALSE);//取消深度缓冲
+	pCore->glEnable(GL_BLEND);//开启颜色混合
+	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+
+	pCore->glDrawArrays(GL_LINES, 0, data.size());
+
+	pCore->glDisable(GL_BLEND);
+	pCore->glDepthMask(GL_TRUE);
+
+
+
+
+	//delete
+	pCore->glDeleteBuffers(1, &VBO);
+	delete[] vertices;
+}
+
+void ParaOGLManager::InitAndDrawPolygonColumnHorizontal(VINT data, float length)
+{
+	float* vertices = new float[data.size() * 1.5 * 2];
+
+	for (int i = 0; i < data.size(); i += 2)
+	{
+		vertices[i * 6] = data[i];
+		vertices[i * 6 + 1] = 0;
+		vertices[i * 6 + 2] = data[i + 1];
+
+		vertices[i * 6 + 3] = vertices[i * 6] + length;
+		vertices[i * 6 + 4] = 0;
+		vertices[i * 6 + 5] = vertices[i * 6 + 2];
+	}
+
+
+	pCore->glGenBuffers(1, &VBO);
+
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	pCore->glBufferData(GL_ARRAY_BUFFER, data.size() * 3 * sizeof(float), vertices, GL_STATIC_DRAW);
+
+
+	//draw
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	pCore->glEnableVertexAttribArray(0);
+	pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+
+	pCore->glDepthMask(GL_FALSE);//取消深度缓冲
+	pCore->glEnable(GL_BLEND);//开启颜色混合
+	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+
+	pCore->glDrawArrays(GL_LINES, 0, data.size());
+
+	pCore->glDisable(GL_BLEND);
+	pCore->glDepthMask(GL_TRUE);
+
+
+
+
+	//delete
+	pCore->glDeleteBuffers(1, &VBO);
+	delete[] vertices;
+}
+
+
+
+
+
+
+
+
+
+

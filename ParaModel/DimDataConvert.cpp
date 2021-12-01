@@ -76,7 +76,7 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSH
 	int nWH[2], nCen[2];
 	if (oUnit.nUnitAngle == 0)
 	{
-		nCen[0] = oColShape0.nCen[0] - oColShape1.nCen[0];
+		//nWH[0] = oColShape0.nCen[0] - oColShape1.nCen[0];
 		nWH[0] -= (oColShape0.nWH[0] + oColShape1.nWH[0]) / 2;
 		nWH[1] = 0; // 厚度 查表得到
 

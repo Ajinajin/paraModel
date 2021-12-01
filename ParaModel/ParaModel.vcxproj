@@ -31,7 +31,7 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>5.12.11_msvc2017_64</QtInstall>
+    <QtInstall>5.12.11</QtInstall>
     <QtModules>axcontainer;axserver;core;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
@@ -55,18 +55,18 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>D:\Works\HS\ParaModel\SARibbon\src\SARibbonBar;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Study\Work\ParaModel\paramodel\ParaModel\SARibbon\src\SARibbonBar;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link />
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Qt\Qt5.12.11\5.12.11\msvc2017_64\lib;D:\Qt\Qt5.12.11\5.12.11\msvc2017_64\include\ActiveQt;D:\Qt\Qt5.12.11\5.12.11\msvc2017_64\include\QtXml;GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Qt\5.12.11\5.12.11\msvc2017_64\lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\include\ActiveQt;D:\Qt\5.12.11\5.12.11\msvc2017_64\include\QtXml;GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\openssl\lib;C:\Utils\my_sql\mysql-5.6.11-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>shell32.lib;D:\Qt\Qt5.12.11\5.12.11\msvc2017_64\lib\qtmaind.lib;D:\Qt\Qt5.12.11\5.12.11\msvc2017_64\lib\Qt5AxContainerd.lib;D:\Qt\Qt5.12.11\5.12.11\msvc2017_64\lib\Qt5AxBased.lib;D:\Qt\Qt5.12.11\5.12.11\msvc2017_64\lib\Qt5Xmld.lib;D:\Works\HS\ParaModel\SARibbon\bin_qt5.12.11_debug_64\SARibbonBard.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shell32.lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\lib\qtmaind.lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\lib\Qt5AxContainerd.lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\lib\Qt5AxBased.lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\lib\Qt5Xmld.lib;D:\Study\Work\ParaModel\paramodel\ParaModel\SARibbon\bin_qt5.12.11_debug_64\SARibbonBard.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">

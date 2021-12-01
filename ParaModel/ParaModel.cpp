@@ -264,6 +264,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 				continue;
 			if (iter->oShape.nShapeType == 1)
 			{
+
 				//板墙门窗 宽度为1
 				int wThickNess = 0;
 				int hThickNess = 0;
@@ -278,12 +279,15 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 				m_rectangle->wallwidth = iter->oShape.nThickNess;
 
 
+
 				pSceneMain.addItem(m_rectangle);
 			}
 			else if (iter->oShape.nShapeType == 2)
 			{
+
 				BCircle* m_ellipse = new BCircle(100 + iter->oShape.nCen[0], 100 + iter->oShape.nCen[1],
 					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
+
 				pSceneMain.addItem(m_ellipse);
 			}
 			else if (iter->oShape.nShapeType == 3)
@@ -300,6 +304,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 
 				point.push_back(300);
 				point.push_back(410);
+
 
 				point.push_back(500);
 				point.push_back(300);
@@ -337,6 +342,9 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 	graphicsViewY = new BQGraphicsView();
 	graphicsViewZ = new BQGraphicsView();
 
+	graphicsViewOgl = new BQGraphicsView();
+
+
 	pSceneX.setBackgroundBrush(Qt::darkGray);
 	pSceneY.setBackgroundBrush(Qt::lightGray);
 	pSceneZ.setBackgroundBrush(Qt::gray);
@@ -365,9 +373,11 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 
 
 	//右下角小三维窗口
-	//paraOglmanager = new ParaOGLManager();
-	//graphicsViewOgl->setViewport(paraOglmanager);
-	//myLayout->addWidget(graphicsViewOgl, 1, 1);
+
+	paraOglmanager = new ParaOGLManager();
+	graphicsViewOgl->setViewport(paraOglmanager);
+	myLayout->addWidget(graphicsViewOgl, 1, 1);
+
 
 
 	temp->setLayout(myLayout);
@@ -429,10 +439,12 @@ void ParaModel::updateScene()
 
 
 	if (MainDockState == 0)
+
 	{ 
 		DimDataConvert* d = new DimDataConvert();
 		VSHAPE v ;
 		int c= d->CalPlaneData(vModelTmpl,v);
+
 		//只绘制柱、墙、梁
 		for (size_t i = 0; i < vModelTmpl.size(); i++)
 		{
@@ -467,17 +479,25 @@ BasicUnit ParaModel::GetBaseUnit(int idx)
 void ParaModel::updateOGL()
 {
 
-	//paraOglmanager->update();
+
+	paraOglmanager->update();
+
 	paraOglmanagerMain->update();
 
 
 	//两个三维窗口要同步
-	//paraOglmanager->camera = paraOglmanagerMain->camera;
-	//paraOglmanager->isFirstMouse = paraOglmanagerMain->isFirstMouse;
-	//paraOglmanager->lastX = paraOglmanagerMain->lastX;
-	//paraOglmanager->lastY = paraOglmanagerMain->lastY;
-	//paraOglmanager->rotateRaw = paraOglmanagerMain->rotateRaw;
-	//paraOglmanager->rotatePitch = paraOglmanagerMain->rotatePitch;
+
+	paraOglmanager->camera = paraOglmanagerMain->camera;
+	paraOglmanager->isFirstMouse = paraOglmanagerMain->isFirstMouse;
+	paraOglmanager->lastX = paraOglmanagerMain->lastX;
+	paraOglmanager->lastY = paraOglmanagerMain->lastY;
+	paraOglmanager->rotateRaw = paraOglmanagerMain->rotateRaw;
+	paraOglmanager->rotatePitch = paraOglmanagerMain->rotatePitch;
+
+	//传入所有的建筑数据
+	paraOglmanagerMain->oglTopTable = & this->vModelTmpl;
+	paraOglmanagerMain->oglUnitTable =& this->vBaseUnit;
+
 }
 
 //初始化内容区域
