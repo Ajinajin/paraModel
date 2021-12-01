@@ -97,7 +97,7 @@ typedef vector<UnitData> VUNITDATA;
 // 设计多个视图的基本模板关联移动 编辑 功能
 
 // 属性之间的合规性检查
- 
+
 // 系统路径信息
 typedef struct SysPath
 {
