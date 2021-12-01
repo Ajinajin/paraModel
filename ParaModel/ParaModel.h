@@ -61,7 +61,7 @@ private:
 
 	 
 	int if_data;									//0是未加载数据。1是有数据
-
+	SysPath oPath;									//系统路径
 
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
 	int MainDockState;								// 0是X视图 1是Y视图 2是Z视图 3是三维视图
@@ -105,20 +105,10 @@ private:
 
 	//初始化弹出窗口
 	void InitTipWindow(); 
-
-
-	//初始化构建
-	void InitBaseUnit();
-
+	 
 public slots:
-	void MyLogOutput(const char* myLogout);         //输出日志
-	void ApplyDataAction();		//保存属性输入的数据
-    void openAndLoadPic(); // 打开
-    void getPara(); // 更改参数
-    void resetPara(); // 取消更改
-    void loadViews(); // 加载旁侧图
-    void showImageList(QStringList& fileNames); // 显示右侧图像列表
-    void replaceSlot(); // 右击替换
+	void MyLogOutput(QString myLogout);         //输出日志
+	void ApplyDataAction();		//保存属性输入的数据 
     void drawWall(const std::vector<float>& points);
 
 	void GraphicsViewXFocus(bool b); // 加载旁侧图

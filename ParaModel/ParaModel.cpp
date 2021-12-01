@@ -256,14 +256,13 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 		QVariant variant = item->data(0, Qt::UserRole);
 		int nUnitIdx = variant.value<int>();
 
-		char* msg = "";
+		QString msg;
 		for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
 		{
 			if (iter->nUnitIdx != nUnitIdx)
 				continue;
 			if (iter->oShape.nShapeType == 1)
 			{
-				msg = "矩形构件加载完成";
 				BRectangle* m_rectangle = new BRectangle(
 					iter->oShape.nShapeRange[0], iter->oShape.nShapeRange[1],
 					iter->oShape.nShapeRange[2], iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
@@ -272,28 +271,39 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 			}
 			else if (iter->oShape.nShapeType == 2)
 			{
-				msg = "圆形构件加载完成";
 
 				BCircle* m_ellipse = new BCircle(iter->oShape.nCen[0], iter->oShape.nCen[1],
 					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
 				pSceneMain.addItem(m_ellipse);
 			}
 			else if (iter->oShape.nShapeType == 3)
-			{
-				msg = "多边形构件加载完成";
+			{ 
+				
+				
+				vector<float> point;
+				/*for (size_t i = 0; i < iter->oShape.vPolyPt.size(); i++)
+				{
+					point.push_back(iter->oShape.vPolyPt[i]+100);
+				}*/
+				point.push_back(100);
+				point.push_back(200);
+				point.push_back(300);
+				point.push_back(400);
+				point.push_back(500);
+				point.push_back(100);
+				drawWall(point);
+
+
 
 				//setBtnEnabled(false);
-				BPolygon* m_polygon = new BPolygon(BGraphicsItem::ItemType::Polygon);
-				m_polygon->is_create_finished = true;
-
+				/*BPolygon* m_polygon = new BPolygon(BGraphicsItem::ItemType::Polygon);
+				m_polygon->is_create_finished = true;*/
 				//m_polygon->paint();
-
-				pSceneMain.addItem(m_polygon);
+				//pSceneMain.addItem(m_polygon);
 
 			}
 			else if (iter->oShape.nShapeType == 0)
 			{
-				msg = "构件加载完成";
 				BRectangle* m_rectangle = new BRectangle(
 					iter->oShape.nShapeRange[0], iter->oShape.nShapeRange[1],
 					iter->oShape.nShapeRange[2], iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
@@ -301,39 +311,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 				pSceneMain.addItem(m_rectangle);
 			}
 		}
-
-
-		//int col = parent->indexOfChild(item); //item在父项中的节点行号(从0开始)
-		////1圆 2椭圆 3正方形 4矩形
-		//char* msg = "";
-		//if (0 == col) {
-		//	//pSceneMain.clear();
-
-		//	/*foreach(QGraphicsItem * item, pSceneMain.items())
-		//	{
-		//		pSceneMain.removeItem(item);
-		//	} */
-
-		//	msg = "圆模型加载完成";
-		//	BCircle* m_circle = new BCircle(1000, 1000, 50, BGraphicsItem::ItemType::Circle);
-		//	pSceneMain.addItem(m_circle);
-		//}
-		//else if (1 == col) {
-		//	msg = "椭圆模型加载完成";
-		//	BEllipse* m_ellipse = new BEllipse(1000, 1000, 120, 80, BGraphicsItem::ItemType::Ellipse);
-		//	pSceneMain.addItem(m_ellipse);
-		//}
-		//else if (2 == col) {
-		//	msg = "正方形模型加载完成";
-		//	BSquare* m_square = new BSquare(1000, 1000, 60, BGraphicsItem::ItemType::Square);
-		//	pSceneMain.addItem(m_square);
-		//}
-		//else if (3 == col) {
-		//	msg = "矩形模型加载完成";
-		//	BRectangle* m_rectangle = new BRectangle(1000, 1000, 240, 120, BGraphicsItem::ItemType::Rectangle);
-		//	m_rectangle->wallwidth = 120;
-		//	pSceneMain.addItem(m_rectangle);
-		//}
+		msg = item->text(0) + "构件加载完成";
 		MyLogOutput(msg);
 		});
 	from->setWidget(pModelTreeWidget);
@@ -345,9 +323,8 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 {
 	graphicsViewX = new BQGraphicsView();
 	graphicsViewY = new BQGraphicsView();
-	graphicsViewZ = new BQGraphicsView();
+	graphicsViewZ = new BQGraphicsView(); 
 
-	graphicsViewOgl = new BQGraphicsView();
 	pSceneX.setBackgroundBrush(Qt::darkGray);
 	pSceneY.setBackgroundBrush(Qt::lightGray);
 	pSceneZ.setBackgroundBrush(Qt::gray);
@@ -376,10 +353,8 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 
 
 	//右下角小三维窗口
-	
 	paraOglmanager = new ParaOGLManager();
 	graphicsViewOgl->setViewport(paraOglmanager);
-
 	myLayout->addWidget(graphicsViewOgl, 1, 1);
 
 
@@ -394,7 +369,8 @@ void ParaModel::InitLogWidget(QDockWidget* from)
 	from->setMaximumHeight(100);
 	from->setFixedHeight(100);
 	from->setWindowTitle("信息输出");
-	myLogOutLabel = new QTextEdit();
+	if (myLogOutLabel == nullptr)
+		myLogOutLabel = new QTextEdit();
 	from->setWidget(myLogOutLabel);
 }
 
@@ -418,7 +394,7 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 	MainDockWidget->setWidget(paraOglmanagerMain);
 	MainDockWidget->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 
-	
+
 	QTimer* timer = new QTimer(this);
 	connect(timer, &QTimer::timeout, this, &ParaModel::updateOGL);
 	//每20ms刷新一次OpenGL界面 50FPS
@@ -430,7 +406,7 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 //更新OpenGL窗口
 void ParaModel::updateOGL()
 {
-	
+
 	paraOglmanager->update();
 	paraOglmanagerMain->update();
 
@@ -469,7 +445,7 @@ void ParaModel::InitCentralWidget()
 	QDockWidget* logWidget = new QDockWidget(this);
 	InitLogWidget(logWidget);
 
-	
+
 
 	addDockWidget(Qt::LeftDockWidgetArea, sysWidget);
 
@@ -606,6 +582,8 @@ void ParaModel::InitTipWindow()
 ParaModel::ParaModel(QWidget* parent)
 	: SARibbonMainWindow(parent)
 {
+	//初始化系统路径
+	InitPath();
 	//初始化系统数据
 	InitUnitLib();
 
@@ -713,7 +691,7 @@ void ParaModel::OpenFileAction()
 			Topo.nCenUnitIdx = list[2].toInt();
 			Topo.nTopoIdx = list[0].toInt();
 			if (list.size() == 4)
-			{ 
+			{
 				Topo.nCenPos[0] = list[3].toInt();
 			}
 			if (list.size() == 5)
@@ -739,7 +717,7 @@ void ParaModel::OpenFileAction()
 					for (size_t j = 0; j < list.size() - 2; j++)
 					{
 						vModelTmpl[i].nAdjUnitIdx[j] = list[j + 2].toInt();
-					} 
+					}
 				}
 			}
 		}
@@ -748,6 +726,8 @@ void ParaModel::OpenFileAction()
 	//vModelTmpl
 	if_data = 1;
 }
+
+
 void ParaModel::GraphicsViewXFocus(bool b)
 {
 	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");
@@ -788,8 +768,10 @@ void ParaModel::GraphicsViewOgl(bool b)
 }
 
 
-void ParaModel::MyLogOutput(const char* myLogout)
+void ParaModel::MyLogOutput(QString myLogout)
 {
+	if (myLogOutLabel == nullptr)
+		myLogOutLabel = new QTextEdit();
 	if (myLogOutLabel->toPlainText() == "")
 	{
 		myLogOutLabel->setText(myLogout);
@@ -933,208 +915,16 @@ void ParaModel::ApplyDataAction()
 	}
 	return;
 }
-
-// 打开 槽函数
-void ParaModel::openAndLoadPic() {
-	//选择文件对话框/
-
-	QFileDialog* f = new QFileDialog(this);
-	f->setWindowTitle("选择数据文件*.txt");
-	f->setNameFilter("*.txt");
-	f->setViewMode(QFileDialog::Detail);
-	QString filePath;
-	if (f->exec() == QDialog::Accepted) {
-		filePath = f->selectedFiles()[0];
-	}
-	// 获取文件内容
-	QFile file(filePath);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-	{
-		myLogOutLabel->clear();
-		myLogOutLabel->setText("文件打开失败");
-		return;
-	}
-	QTextStream readStream(&file);
-
-	while (!readStream.atEnd()) {
-		QString content = readStream.readLine();
-		QStringList list = content.split(' ');
-		if (list[0] == "wall") {
-			std::vector<float> points;
-			bool ok;
-			for (int i = 1; i < list.size(); i++) {
-				points.push_back(list[i].toFloat(&ok));
-			}
-			drawWall(points);
-		}
-	}
-}
+ 
 
 void ParaModel::drawWall(const std::vector<float>& points) {
 	MyItem* item = new MyItem;
 	item->points = points;
-
 	item->setPos(0, 0);
 	item->setColor(QColor(Qt::red));
-
-	pSceneMain.addItem(item);
-	//pSceneMain->setBackgroundBrush(Qt::gray);
-	graphicsViewX->setSceneRect(-100, -100, 670, 370);
-	graphicsViewX->setScene(&pSceneMain);
+	pSceneMain.addItem(item); 
 }
-
-// 图像缩放
-void ParaModel::getPara() {
-	//// 获取文本输入框内容
-	//QString strText = scalemyLogOutLabel->toPlainText();
-	//float width = 0, height = 0;
-	//bool ok = false;
-	//// 分割并转成float, 从而获得宽 高
-	//QStringList sList = strText.split(",");
-	//if (sList.size() != 2) {
-	//    myLogOutLabel->clear();
-	//    myLogOutLabel->setText("缩放失败，参数错误");
-	//    return;
-	//}
-
-	//width = sList[0].toFloat(&ok);
-	//if (!ok) {
-	//    myLogOutLabel->clear();
-	//    myLogOutLabel->setText("缩放失败，参数错误");
-	//    return;
-	//}
-
-	//height = sList[1].toFloat(&ok);
-	//if (!ok) {
-	//    myLogOutLabel->clear();
-	//    myLogOutLabel->setText("缩放失败，参数错误");
-	//    return;
-	//}
-
-	//if (height <= 0 || width <= 0) {
-	//    myLogOutLabel->clear();
-	//    myLogOutLabel->setText("缩放失败，参数错误");
-	//    return;
-	//}
-	//// 如果mainLabel尚未载入图像，即img为空，则不能进行缩放
-	////mainlabel->clear();
-	//if (img == nullptr) {
-	//    myLogOutLabel->clear();
-	//    myLogOutLabel->setText("缩放失败，图像打开错误");
-	//    return;
-	//}
-	//// 获取原图像的大小，乘以缩放系数，就是新的图像大小
-	//int nowWidth = mainlabel->pixmap()->toImage().width();
-	//int nowHeight = mainlabel->pixmap()->toImage().height();
-	//QSize picSize(int(width * nowWidth), int(height * nowHeight));
-
-	//QImage timage = mainlabel->pixmap()->toImage().scaled(picSize);
-	//mainlabel->setScaledContents(false); // 取消自适应
-	//// 把新图像添加到mainLabel上
-	//QPixmap pmap = QPixmap::fromImage(timage);
-	//QPixmap tpmap = pmap.scaled(picSize, Qt::KeepAspectRatio);
-	//mainlabel->setPixmap(tpmap);
-
-	//myLogOutLabel->clear();
-	//myLogOutLabel->setText("缩放成功");
-}
-
-// 取消缩放,主要逻辑就是保存缩放前的图像，重新载入即可
-void ParaModel::resetPara() {
-	//mainlabel->clear();
-	//mainlabel->setScaledContents(true); // 自适应
-	//mainlabel->setPixmap(QPixmap::fromImage(*img));
-	//myLogOutLabel->clear();
-	//myLogOutLabel->setText("取消成功");
-}
-
-// 加载图像列表
-void ParaModel::loadViews() {
-
-	//定义文件对话框类
-	QFileDialog* fileDialog = new QFileDialog(this);
-	//定义文件对话框标题
-	fileDialog->setWindowTitle(tr("打开图片"));
-	//设置默认文件路径
-	fileDialog->setDirectory(".");
-	//设置文件过滤器
-	fileDialog->setNameFilter(tr("Images(*.png *.jpg *.jpeg *.bmp)"));
-	//设置可以选择多个文件,默认为只能选择一个文件QFileDialog::ExistingFiles
-	fileDialog->setFileMode(QFileDialog::ExistingFiles);
-	//设置视图模式
-	fileDialog->setViewMode(QFileDialog::Detail);
-	//打印所有选择的文件的路径
-	if (fileDialog->exec()) {
-		QStringList fileNames = fileDialog->selectedFiles();
-		showImageList(fileNames);
-	}
-}
-
-// 显示图像列表
-void ParaModel::showImageList(QStringList& fileNames) {
-	if (fileNames.size() == 0) {
-		myLogOutLabel->clear();
-		myLogOutLabel->setText("文件列表空");
-		return;
-	}
-	// 遍历所有图像路径并添加
-	for (auto tmp : fileNames) {
-		QPixmap pixmap(tmp);
-		//定义QListWidgetItem对象
-		QListWidgetItem* imageItem = new QListWidgetItem;
-		// 定义 QWidget 和 QListWidgetItem 一起添加到 QListWidget
-		QWidget* widget = new QWidget;
-		// 设置 widget 布局方式为 box
-		QVBoxLayout* widgetLayout = new QVBoxLayout;
-		// 图像和图像名的label
-		QLabel* imageLabel = new QLabel;
-		QLabel* txtLabel = new QLabel(tr("Browse"));
-		// 设置widget的布局
-		widget->setLayout(widgetLayout);
-		widgetLayout->setMargin(0);
-		widgetLayout->setSpacing(0);
-		widgetLayout->addWidget(imageLabel);
-		widgetLayout->addWidget(txtLabel);
-
-		// 把图像和图像名添加到对应的label
-		pixmap = pixmap.scaled(200, 250, Qt::KeepAspectRatio);
-		// 修改label的信息
-		imageLabel->setPixmap(pixmap);
-		txtLabel->setFixedHeight(20);
-		txtLabel->setWordWrap(true);
-		imageItem->setSizeHint(QSize(200, 250));
-		// 把 imageItem, widget添加到 imageList
-		//imageList->addItem(imageItem);
-		//imageList->setItemWidget(imageItem, widget);
-	}
-}
-
-// 右击替换
-void ParaModel::replaceSlot() {
-	//// 所有选中的item，这里只有一个
-	//QList<QListWidgetItem*> items = imageList->selectedItems(); 
-	//if (items.count() != 1) { // 单选
-	//    return;
-	//}
-	//QListWidgetItem* item = items[0];
-
-	//// 通过 QListWidgetItem 找到 QWidget 方便获取子元素    
-	//QWidget* pw = imageList->itemWidget(item); 
-	//if (pw == nullptr) {
-	//    return;
-	//}
-	//// 默认获取第一张
-	//QLabel* imageLabel = pw->findChild<QLabel*>(); 
-	//// 获取图像
-	//QImage img = imageLabel->pixmap()->toImage(); 
-
-	//// 更新
-	//mainlabel->clear();
-	//mainlabel->setScaledContents(true); // 自适应
-	//mainlabel->setPixmap(QPixmap::fromImage(img));
-	//myLogOutLabel->clear();
-	//myLogOutLabel->setText("替换成功");
-}
+   
 
 // 自定义右键菜单动作
 void ParaModel::onCustomContextMenuRequested(const QPoint& pos) {
@@ -1216,10 +1006,29 @@ int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 	}
 	return 0;
 }
+// 初始化路径 
+int ParaModel::InitPath()
+{
+	// Exe文件完整路径
+	oPath.sExePath = qApp->applicationFilePath().toLocal8Bit().data();
+	// Exe文件所在目录
+	oPath.sExeDir = qApp->applicationDirPath().toLocal8Bit().data();
+
+	oPath.sBoomLibDir = oPath.sExeDir + "/BoomLib";
+	oPath.sModelLibDir = oPath.sExeDir + "/ModelLib";
+	oPath.sProcLibDir = oPath.sExeDir + "/ProcLib";
+	oPath.sTmpDir = oPath.sExeDir + "/Tmp";
+	oPath.sParaLibDir = oPath.sExeDir + "/ParaLib";
+
+	QString sLog = "完成系统路径初始化";
+	MyLogOutput(sLog);
+
+	return 1;
+}
 // 初始化基本构件库 
 int ParaModel::InitUnitLib()
 {
-	QString Path = "D:/Study/Work/ParaModel/paramodel/x64/Debug/buildinglib.txt";
+	QString Path = QString::fromStdString(oPath.sExeDir + "/buildinglib.txt");
 	QFile file(Path);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{

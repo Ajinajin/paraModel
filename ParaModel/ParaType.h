@@ -83,4 +83,15 @@ typedef vector<UnitData> VUNITDATA;
 // 设计多个视图的基本模板关联移动 编辑 功能
 
 // 属性之间的合规性检查
-
+ 
+// 系统路径信息
+typedef struct SysPath
+{
+	string sExePath;			// 可执行文件完整路径 含.exe
+	string sExeDir;				// 可执行文件所在目录完整路径
+	string sProcLibDir;			// 算法库路径
+	string sTmpDir;				// 临时数据路径
+	string sModelLibDir;		// 模型路径
+	string sBoomLibDir;			// 弹文件路径
+	string sParaLibDir;			// 弹及材料参数路径
+}SysPath;
