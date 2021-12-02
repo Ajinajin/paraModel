@@ -35,6 +35,7 @@
 #include "SAFramelessHelper.h"
 
 
+#pragma region 初始化窗口
 //初始化属性窗口
 void ParaModel::InitPropertyWidget(QDockWidget* from)
 {
@@ -256,12 +257,12 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 
 		QVariant variant = item->data(0, Qt::UserRole);
 		int nUnitIdx = variant.value<int>();
-
 		QString msg;
 		for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
 		{
 			if (iter->nUnitIdx != nUnitIdx)
 				continue;
+
 			if (iter->oShape.nShapeType == 1)
 			{
 
@@ -274,20 +275,19 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 					hThickNess = 20;
 				}
 				BRectangle* m_rectangle = new BRectangle(
-					100 + iter->oShape.nShapeRange[0], 100 + iter->oShape.nShapeRange[1],
-					iter->oShape.nShapeRange[2] + wThickNess, iter->oShape.nShapeRange[3] + hThickNess, BGraphicsItem::ItemType::Rectangle);
+					pSceneOffset + iter->oShape.nShapeRange[0], pSceneOffset + iter->oShape.nShapeRange[1],
+					wThickNess+iter->oShape.nShapeRange[2]  , hThickNess+iter->oShape.nShapeRange[3]  , BGraphicsItem::ItemType::Rectangle);
 				m_rectangle->wallwidth = iter->oShape.nThickNess;
 
-
-
+				m_rectangle->setBrush(ColorHelper(iter->nUnitType));
 				pSceneMain.addItem(m_rectangle);
 			}
 			else if (iter->oShape.nShapeType == 2)
 			{
 
-				BCircle* m_ellipse = new BCircle(100 + iter->oShape.nCen[0], 100 + iter->oShape.nCen[1],
+				BCircle* m_ellipse = new BCircle(pSceneOffset + iter->oShape.nCen[0], pSceneOffset + iter->oShape.nCen[1],
 					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
-
+				m_ellipse->setBrush(ColorHelper(iter->nUnitType));
 				pSceneMain.addItem(m_ellipse);
 			}
 			else if (iter->oShape.nShapeType == 3)
@@ -295,27 +295,10 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 
 
 				vector<float> point;
-				/*for (size_t i = 0; i < iter->oShape.vPolyPt.size(); i++)
+				for (size_t i = 0; i < iter->oShape.vPolyPt.size(); i++)
 				{
-					point.push_back(iter->oShape.vPolyPt[i]+100);
-				}*/
-				point.push_back(100);
-				point.push_back(210);
-
-				point.push_back(300);
-				point.push_back(410);
-
-
-				point.push_back(500);
-				point.push_back(300);
-
-				point.push_back(600);
-				point.push_back(700);
-
-
-				point.push_back(900);
-				point.push_back(900);
-
+					point.push_back(iter->oShape.vPolyPt[i] + 100);
+				}
 				drawWall(point);
 
 
@@ -438,30 +421,57 @@ void ParaModel::updateScene()
 		return;
 
 
-	if (MainDockState == 0)
-
-	{ 
-		DimDataConvert* d = new DimDataConvert();
-		VSHAPE v ;
-		int c= d->CalPlaneData(vModelTmpl,v);
-
-		//只绘制柱、墙、梁
-		for (size_t i = 0; i < vModelTmpl.size(); i++)
+	DimDataConvert* d = new DimDataConvert();
+	VSHAPE viewShape;
+	  d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
+	//只绘制柱、墙、梁
+	for (size_t i = 0; i < vModelTmpl.size(); i++)
+	{
+		//柱梁板墙门窗
+		if (vModelTmpl[i].nUnitType == 1)//柱
 		{
-			//柱梁板墙门窗
-			if (vModelTmpl[i].nUnitType == 1)//柱
-			{
-				BasicUnit unit = GetBaseUnit(vModelTmpl[i].nCenUnitIdx);
-				int coordX = vModelTmpl[i].nCenPos[0] + unit.oShape.nShapeRange[0] + 100;
-				int coordY = vModelTmpl[i].nCenPos[1] + unit.oShape.nShapeRange[1] + 100;
-				//根据构建id找到对应是构件
-				BRectangle* m_rectangle = new BRectangle(
-					coordX, coordY,
-					unit.oShape.nShapeRange[2], unit.oShape.nShapeRange[3],
-					BGraphicsItem::ItemType::Rectangle);
-				pSceneMain.addItem(m_rectangle);
-			}
+			BasicUnit unit = GetBaseUnit(vModelTmpl[i].nCenUnitIdx);
+			int coordX = vModelTmpl[i].nCenPos[0] + unit.oShape.nShapeRange[0] + pSceneOffset;
+			int coordY = vModelTmpl[i].nCenPos[1] + unit.oShape.nShapeRange[1] + pSceneOffset;
+			//根据构建id找到对应是构件
+			BRectangle* pillar = new BRectangle(
+				coordX, coordY,
+				unit.oShape.nShapeRange[2], unit.oShape.nShapeRange[3],
+				BGraphicsItem::ItemType::Rectangle);
+			pillar->setBrush(ColorHelper(vModelTmpl[i].nUnitType));
+			pSceneMain.addItem(pillar);
 		}
+	}
+
+	for (size_t i = 0; i < viewShape.size(); i++)
+	{
+		//墙
+		if (viewShape[i].unitType == 4)//墙
+		{
+			int coordX = viewShape[i].nCen[0] + pSceneOffset;
+			int coordY = viewShape[i].nCen[1] + pSceneOffset;
+			//根据构建id找到对应是构件
+			BRectangle* wall = new BRectangle(
+				coordX, coordY,
+				viewShape[i].nWH[0], viewShape[i].nWH[1],
+				BGraphicsItem::ItemType::Rectangle);
+			wall->setBrush(ColorHelper(viewShape[i].unitType));
+			pSceneMain.addItem(wall);
+		}
+		//门
+		if (viewShape[i].unitType >4)//门
+		{
+			int coordX = viewShape[i].nCen[0] + pSceneOffset;
+			int coordY = viewShape[i].nCen[1] + pSceneOffset;
+			//根据构建id找到对应是构件
+			BRectangle* wall = new BRectangle(
+				coordX, coordY,
+				viewShape[i].nWH[0], viewShape[i].nWH[1],
+				BGraphicsItem::ItemType::Rectangle);
+			wall->setBrush(ColorHelper(viewShape[i].unitType));
+			pSceneMain.addItem(wall);
+		}
+
 	}
 }
 
@@ -495,8 +505,8 @@ void ParaModel::updateOGL()
 	paraOglmanager->rotatePitch = paraOglmanagerMain->rotatePitch;
 
 	//传入所有的建筑数据
-	paraOglmanagerMain->oglTopTable = & this->vModelTmpl;
-	paraOglmanagerMain->oglUnitTable =& this->vBaseUnit;
+	paraOglmanagerMain->oglTopTable = &this->vModelTmpl;
+	paraOglmanagerMain->oglUnitTable = &this->vBaseUnit;
 
 }
 
@@ -658,10 +668,12 @@ void ParaModel::InitTipWindow()
 {
 
 }
+#pragma endregion
 
 ParaModel::ParaModel(QWidget* parent)
 	: SARibbonMainWindow(parent)
 {
+	pSceneOffset = 700;
 	//初始化系统路径
 	InitPath();
 	//初始化系统数据
@@ -672,6 +684,7 @@ ParaModel::ParaModel(QWidget* parent)
 	InitTipWindow();
 }
 
+#pragma region 界面交互
 void ParaModel::NewFileAction()
 {
 	if_data = 1;
@@ -750,33 +763,16 @@ void ParaModel::OpenFileAction()
 
 		if (parsingState == 0)
 		{
-			if (list[1] == "柱")
-			{
-				Topo.nUnitType = 1;
-			}
-			else if (list[1] == "梁")
-			{
-				Topo.nUnitType = 2;
-			}
-			else if (list[1] == "楼板")
-			{
-				Topo.nUnitType = 3;
-			}
-			else if (list[1] == "墙")
-			{
-				Topo.nUnitType = 4;
-			}
-			else if (list[1] == "门")
-			{
-				Topo.nUnitType = 5;
-			}
-			else if (list[1] == "窗")
-			{
-				Topo.nUnitType = 6;
-			}
+			Topo.nUnitType = GetUnitTypeCode(list[1]);
 
 			Topo.nCenUnitIdx = list[2].toInt();
 			Topo.nTopoIdx = list[0].toInt();
+			if (Topo.nUnitType==4)
+			{ 
+				Topo.nUnitAngle = list[3].toInt();;
+				vModelTmpl.push_back(Topo);
+				continue;
+			}
 			if (list.size() >= 4)
 			{
 				Topo.nCenPos[0] = list[3].toInt();
@@ -812,7 +808,6 @@ void ParaModel::OpenFileAction()
 	if_data = 1;
 	ParaModel::updateScene();
 }
-
 
 void ParaModel::GraphicsViewXFocus(bool b)
 {
@@ -864,7 +859,6 @@ void ParaModel::GraphicsViewOgl(bool b)
 	return;
 }
 
-
 void ParaModel::MyLogOutput(QString myLogout)
 {
 	if (myLogOutLabel == nullptr)
@@ -878,7 +872,6 @@ void ParaModel::MyLogOutput(QString myLogout)
 		myLogOutLabel->setText(myLogOutLabel->toPlainText() + "\r\n" + myLogout);
 	}
 }
-
 
 // 数据修改后更新
 void ParaModel::ApplyDataAction()
@@ -1022,8 +1015,9 @@ void ParaModel::drawWall(const std::vector<float>& points) {
 	pSceneMain.addItem(item);
 }
 
+#pragma endregion
 
-
+#pragma region 初始化数据
 
 
 //ParaModel::~ParaModel()
@@ -1137,46 +1131,32 @@ int ParaModel::InitUnitLib()
 		QString shapeName = list[1];
 
 #pragma region UnitType识别
-
-		if (list[1] == "柱")
-		{
-			basic.nUnitType = 1;
-		}
-		else if (list[1] == "梁")
-		{
-			basic.nUnitType = 2;
-		}
-		else if (list[1] == "楼板")
+		basic.nUnitType = GetUnitTypeCode(list[1]);
+		if (basic.nUnitType == 3)
 		{
 			shapeName = list[2] + shapeName;
 			shape.nThickNess = list[2].toInt();
 			shape.nShapeType = 1;
-			basic.nUnitType = 3;
 		}
-		else if (list[1] == "墙")
+		if (basic.nUnitType == 4)
 		{
 			shapeName = list[2] + shapeName;
 			shape.nThickNess = list[2].toInt();
 			shape.nShapeType = 1;
-			basic.nUnitType = 4;
 		}
-		else if (list[1] == "门")
+		if (basic.nUnitType > 4)
 		{
-			basic.nUnitType = 5;
-			shape.nShapeType = 1;
-		}
-		else if (list[1] == "窗")
-		{
-			basic.nUnitType = 6;
 			shape.nShapeType = 1;
 		}
 #pragma endregion
 
 #pragma region 形状识别
-		if (list[2] == "矩形")
+
+		shape.nShapeType = GetShapeTypeCode(list[2]);
+		if (shape.nShapeType == 1)
 		{
-			shape.nShapeType = 1;
-			if (list[1] == "门" || list[1] == "窗")
+			int unitType = GetUnitTypeCode(list[1]);
+			if (unitType > 4) //如果是门和窗的情况
 			{
 				shapeName = list[3] + "-" + list[4] + " " + shapeName;
 				shape.nShapeRange[0] = list[3].toInt();
@@ -1191,7 +1171,7 @@ int ParaModel::InitUnitLib()
 				shape.nShapeRange[3] = list[6].toInt();
 			}
 		}
-		else if (list[2] == "圆形")
+		else if (shape.nShapeType == 2)
 		{
 			shapeName = list[2] + " " + shapeName;
 			shape.nShapeType = 2;
@@ -1199,7 +1179,7 @@ int ParaModel::InitUnitLib()
 			shape.nCen[1] = list[4].toInt();
 			shape.nNumOrRadius = list[5].toInt();
 		}
-		else if (list[2] == "多边形")
+		else if (shape.nShapeType == 3)
 		{
 			shapeName = list[2] + " " + shapeName;
 			shape.nShapeType = 3;
@@ -1228,4 +1208,108 @@ int ParaModel::InitParaTmpl()
 {
 	return 0;
 }
+#pragma endregion
 
+#pragma region 数据识别帮助方法
+
+QColor ParaModel::ColorHelper(int nUnitType)
+{
+	if (nUnitType == 1)
+	{
+		return QColor(64, 135, 163);
+	}
+	else if (nUnitType == 2)
+	{
+		return QColor(69, 173, 206);
+	}
+	else if (nUnitType == 3)
+	{
+		return QColor(62, 179, 203);
+	}
+	else if (nUnitType == 4)
+	{
+		return QColor(47, 65, 80);
+	}
+	else if (nUnitType == 5)
+	{
+		return QColor(65, 98, 124);
+	}
+	else if (nUnitType == 6)
+	{
+		return QColor(72, 104, 146);
+	}
+	return QColor(72, 104, 146);
+}
+QString ParaModel::GetUnitType(int nUnitType)
+{
+	if (nUnitType == 1)
+	{
+		return "柱";
+	}
+	else if (nUnitType == 2)
+	{
+		return "梁";
+	}
+	else if (nUnitType == 3)
+	{
+		return "楼板";
+	}
+	else if (nUnitType == 4)
+	{
+		return  "墙";
+	}
+	else if (nUnitType == 5)
+	{
+		return "门";
+	}
+	else if (nUnitType == 6)
+	{
+		return "窗";
+	}
+	return "";
+}
+int ParaModel::GetUnitTypeCode(QString unitTypeStr)
+{
+	if (unitTypeStr == "柱")
+	{
+		return 1;
+	}
+	else if (unitTypeStr == "梁")
+	{
+		return 2;
+	}
+	else if (unitTypeStr == "楼板")
+	{
+		return 3;
+	}
+	else if (unitTypeStr == "墙")
+	{
+		return 4;
+	}
+	else if (unitTypeStr == "门")
+	{
+		return 5;
+	}
+	else if (unitTypeStr == "窗")
+	{
+		return 6;
+	}
+	return 0;
+}
+int ParaModel::GetShapeTypeCode(QString shapeTypeStr)
+{
+	if (shapeTypeStr == "矩形")
+	{
+		return 1;
+	}
+	else if (shapeTypeStr == "圆形")
+	{
+		return 2;
+	}
+	else if (shapeTypeStr == "多边形")
+	{
+		return 3;
+	}
+	return 0;
+}
+#pragma endregion

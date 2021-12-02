@@ -54,14 +54,13 @@ private:
 	BQGraphicsScene pSceneY;						// 二维模型Y视图画布
 	BQGraphicsScene pSceneZ;						// 二维模型Z视图画布
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布
-
-
+	
 	ParaOGLManager* paraOglmanager;							// 三维显示窗口类
 	ParaOGLManager* paraOglmanagerMain;						// 三维显示窗口大屏幕主类
 
-
 	int if_data;									//0是未加载数据。1是有数据
 	SysPath oPath;									//系统路径
+	int pSceneOffset;
 
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
 	int MainDockState;								// 0是X视图 1是Y视图 2是Z视图 3是三维视图
@@ -107,6 +106,14 @@ private:
 
 	BasicUnit GetBaseUnit(int idx);
 
+	//根据绘制构件类别识别颜色
+	QColor ColorHelper(int nUnitType);
+	//根据构件类别编码转换成对应的字符描述
+	QString GetUnitType(int nUnitType);
+	//根据构建类别的字符描述转换成对应的类别编码
+	int GetUnitTypeCode(QString unitTypeStr);
+	//根据构建形状的字符描述转换成对应的类别编码
+	int GetShapeTypeCode(QString shapeTypeStr);
 	 
 public slots:
 	void MyLogOutput(QString myLogout);         //输出日志
