@@ -649,6 +649,7 @@ void ParaModel::InitTipWindow()
 ParaModel::ParaModel(QWidget* parent)
 	: SARibbonMainWindow(parent)
 {
+	myLogOutLabel = new QTextEdit();
 	pSceneOffset = 700;
 	//初始化系统路径
 	InitPath();
@@ -835,9 +836,7 @@ void ParaModel::GraphicsViewOgl(bool b)
 }
 
 void ParaModel::MyLogOutput(QString myLogout)
-{
-	if (myLogOutLabel == nullptr)
-		myLogOutLabel = new QTextEdit();
+{  
 	if (myLogOutLabel->toPlainText() == "")
 	{
 		myLogOutLabel->setText(myLogout);
