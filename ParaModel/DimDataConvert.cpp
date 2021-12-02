@@ -1,6 +1,7 @@
 
 #include <ParaType.h>
 #include <DimDataConvert.h>
+#include <math.h>
 
 
 // 根据中心点和长宽生成矩形形状信息
@@ -31,21 +32,22 @@ int DimDataConvert::GenRectShape(int nCen[2], int nWH[2], SimpleShape& oRectShap
 	return 0;
 }
 // 求解平面图中 柱构件绝对坐标集
-int DimDataConvert::CalPlaneColShape(TopoUnit oUnit, SimpleShape& oShape)
+int DimDataConvert::CalPlaneColShape(TopoUnit oUnit, SimpleShape& oShape, VUNITTABLE table)
 {
 	// 在系统构件库中查找柱子截面形状及尺寸 目前只处理方形柱子
 	int nWH[2];
-
+	nWH[0] = table[oUnit.nCenUnitIdx].oShape.nShapeRange[2];
+	nWH[1] = table[oUnit.nCenUnitIdx].oShape.nShapeRange[3];
 	int nCen[2];
 	nCen[0] = oUnit.nCenPos[0];
-	nCen[1] = oUnit.nCenPos[2];
+	nCen[1] = oUnit.nCenPos[1];
 	GenRectShape(nCen, nWH, oShape);
 
 	return 0;
 }
 
 // 基于柱子基础上计算墙
-int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw)
+int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	// 得到墙的关联柱
 	int nAdjNum = 10;
@@ -76,27 +78,37 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSH
 	int nWH[2], nCen[2];
 	if (oUnit.nUnitAngle == 0)
 	{
-		nCen[0] = oColShape0.nCen[0] - oColShape1.nCen[0];
-		nWH[0] -= (oColShape0.nWH[0] + oColShape1.nWH[0]) / 2;
-		nWH[1] = 0; // 厚度 查表得到
+		nWH[0] = oColShape0.nCen[0] - oColShape1.nCen[0];
+		nWH[1] = table[oUnit.nCenUnitIdx].oShape.nThickNess; // 厚度 查表得到
 
-		nCen[1] = oColShape0.nCen[1];
 		if (oColShape0.nCen[0] > oColShape1.nCen[0])
 		{
+			nWH[0] -= (oColShape0.nWH[0] + oColShape1.nWH[0]) / 2;
+			nCen[1] = oColShape0.nCen[1];
 			nCen[0] = oColShape0.nCen[0] - oColShape0.nWH[0] / 2 - nWH[0] / 2;
 		}
 		else
 		{
-			nCen[0] = oColShape1.nCen[0] - oColShape1.nWH[0] / 2 - nWH[0] / 2;
+			nWH[0] += (oColShape0.nWH[0] + oColShape1.nWH[0]) / 4;
+			nCen[1] = oColShape0.nCen[1];
+			nCen[0] = oColShape1.nCen[0] - oColShape1.nWH[0] / 2 - abs(nWH[0] / 2);
 		}
 	}
 	// 垂直墙
+	else if (oUnit.nUnitAngle == 90)
+	{
+		nWH[0] = table[oUnit.nCenUnitIdx].oShape.nThickNess; // 厚度 查表得到
+		nWH[1] = oColShape0.nCen[1] - oColShape1.nCen[1];
+		nWH[1] -= (oColShape0.nWH[1] + oColShape1.nWH[1]) / 2;
+		nWH[1] = abs(nWH[1]) - (oColShape0.nWH[1] + oColShape1.nWH[1]) ;
+		nCen[0] = oColShape0.nCen[0];
+		nCen[1] = abs(oColShape0.nCen[1] - oColShape1.nCen[1]) / 2;
+	}
 	else
 	{
-		nWH[0] = 0; // 厚度 查表得到
+		nWH[0] = table[oUnit.nCenUnitIdx].oShape.nThickNess; // 厚度 查表得到
 		nWH[1] = oColShape0.nCen[0] - oColShape1.nCen[0];
 		nWH[1] -= (oColShape0.nWH[0] + oColShape1.nWH[0]) / 2;
-
 		nCen[0] = oColShape0.nCen[0];
 		if (oColShape0.nCen[1] > oColShape1.nCen[1])
 		{
@@ -118,7 +130,7 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSH
 }
 
 // 基于墙基础上计算门窗
-int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw)
+int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	// 得到门窗的关联墙
 	int nWallIdx = vLayerTopo[nUnitIdx].nAdjUnitIdx[0];
@@ -131,21 +143,21 @@ int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, 
 	{
 		nCen[0] = vLayerTopo[nUnitIdx].nCenPos[0];
 		nCen[1] = vPlaneDraw[nWallIdx].nCen[1];
-		nWH[0] = 0; // 窗户宽度 查系统表得到
+		nWH[0] = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[1]; // 窗户宽度 查系统表得到
 		nWH[1] = vPlaneDraw[nWallIdx].nWH[1] + 10; // 窗户厚度 之前没给定 设置为墙厚+10
 	}
 	// 垂直墙
 	else
 	{
 		nCen[0] = vPlaneDraw[nWallIdx].nCen[0];
-		nCen[1] = vLayerTopo[nUnitIdx].nCenPos[2];
+		nCen[1] = vLayerTopo[nUnitIdx].nCenPos[2] + table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[1];
 		nWH[0] = vPlaneDraw[nWallIdx].nWH[0] + 10; // 窗户厚度 之前没给定 设置为墙厚+10
-		nWH[1] = 0; // 窗户宽度 查系统表得到
+		nWH[1] = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[1]; // 窗户宽度 查系统表得到
 	}
 	SimpleShape oDoorWndShape;
 	GenRectShape(nCen, nWH, oDoorWndShape);
 
-	oDoorWndShape.unitType = 5;
+	oDoorWndShape.unitType = table[vLayerTopo[nUnitIdx].nCenUnitIdx].nUnitType;
 	// 保存门窗形状信息
 	vPlaneDraw[nUnitIdx] = oDoorWndShape;
 
@@ -153,7 +165,7 @@ int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, 
 }
 
 // 拓扑结构数据转为现实数据 只考虑矩形截面
-int DimDataConvert::CalPlaneData(VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw)
+int DimDataConvert::CalPlaneData(VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	int nRe = 0;
 	// 只处理柱 墙 门窗
@@ -170,7 +182,7 @@ int DimDataConvert::CalPlaneData(VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDra
 		if (oCurUnit.nUnitType == 1)
 		{
 			oShape.vCorner.clear();
-			CalPlaneColShape(oCurUnit, oShape);
+			CalPlaneColShape(oCurUnit, oShape, table);
 			oShape.unitType = 1;
 			vPlaneDraw[i] = oShape;
 		}
@@ -181,7 +193,7 @@ int DimDataConvert::CalPlaneData(VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDra
 		oCurUnit = vLayerTopo[i];
 		if (oCurUnit.nUnitType == 4)
 		{
-			CalWallShape(i, vLayerTopo, vPlaneDraw);
+			CalWallShape(i, vLayerTopo, vPlaneDraw, table);
 		}
 	}
 
@@ -191,7 +203,7 @@ int DimDataConvert::CalPlaneData(VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDra
 		oCurUnit = vLayerTopo[i];
 		if (oCurUnit.nUnitType > 4)
 		{
-			CalDoorWndShape(i, vLayerTopo, vPlaneDraw);
+			CalDoorWndShape(i, vLayerTopo, vPlaneDraw, table);
 		}
 	}
 	return 0;

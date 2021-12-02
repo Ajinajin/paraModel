@@ -260,25 +260,26 @@ void BRectangle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     if ( !this->isSelected() )
+        return; 
+    if (nUnitType <= 4)
         return;
-
     QMenu* menu = new QMenu();
     menu->setStyleSheet("QMenu { background-color:rgb(89,87,87); border: 5px solid rgb(235,110,36); }");
 
     QSpinBox* width_spinBox = new QSpinBox(menu);
     width_spinBox->setStyleSheet("QSpinBox{ width:120px; height:30px; font-size:16px; font-weight:bold; }");
     width_spinBox->setRange(0, 1000);
-    width_spinBox->setPrefix("w: ");
+    width_spinBox->setPrefix("X: ");
     width_spinBox->setSuffix(" mm");
     width_spinBox->setSingleStep(1);
     width_spinBox->setValue(2 * abs(m_edge.x()));
     connect(width_spinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=](int v){
-      /*  if (m_edge.x() < 0) {
+       if (m_edge.x() < 0) {
             m_edge.setX((-1) * v/2);
         } else {
             m_edge.setX(v/2);
         }
-        m_pointList.at(0)->setPoint(m_edge);*/
+       /*  m_pointList.at(0)->setPoint(m_edge);*/
         this->hide();
         this->update();
         this->show();
@@ -287,17 +288,17 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     QSpinBox* height__spinBox = new QSpinBox(menu);
     height__spinBox->setStyleSheet("QSpinBox{ width:120px; height:30px; font-size:16px; font-weight:bold; }");
     height__spinBox->setRange(0, 1000);
-    height__spinBox->setPrefix("h: ");
+    height__spinBox->setPrefix("Y: ");
     height__spinBox->setSuffix(" mm");
     height__spinBox->setSingleStep(1);
     height__spinBox->setValue(2 * abs(m_edge.y()));
     connect(height__spinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=](int v){
-       /* if (m_edge.y() < 0) {
+       if (m_edge.y() < 0) {
             m_edge.setY((-1) * v/2);
         } else {
             m_edge.setY(v/2);
         }
-        m_pointList.at(0)->setPoint(m_edge);*/
+       /*  m_pointList.at(0)->setPoint(m_edge);*/
         this->hide();
         this->update();
         this->show();
