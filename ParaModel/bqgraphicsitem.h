@@ -80,7 +80,7 @@ class BCircle : public BEllipse
 public:
 	BCircle(qreal x, qreal y, qreal radius, ItemType type);
 	void updateRadius();
-
+	int nUnitType;
 protected:
 	virtual QRectF boundingRect() const override;
 
@@ -104,6 +104,7 @@ class BRectangle : public BGraphicsItem
 public:
 	BRectangle(qreal x, qreal y, qreal width, qreal height, ItemType type);
 	qreal wallwidth;
+	int nUnitType;
 protected:
 	virtual QRectF boundingRect() const override;
 

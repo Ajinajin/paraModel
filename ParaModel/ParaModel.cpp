@@ -276,9 +276,9 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 				}
 				BRectangle* m_rectangle = new BRectangle(
 					pSceneOffset + iter->oShape.nShapeRange[0], pSceneOffset + iter->oShape.nShapeRange[1],
-					wThickNess+iter->oShape.nShapeRange[2]  , hThickNess+iter->oShape.nShapeRange[3]  , BGraphicsItem::ItemType::Rectangle);
+					wThickNess + iter->oShape.nShapeRange[2], hThickNess + iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
 				m_rectangle->wallwidth = iter->oShape.nThickNess;
-
+				m_rectangle->nUnitType = iter->nUnitType;
 				m_rectangle->setBrush(ColorHelper(iter->nUnitType));
 				pSceneMain.addItem(m_rectangle);
 			}
@@ -288,21 +288,18 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 				BCircle* m_ellipse = new BCircle(pSceneOffset + iter->oShape.nCen[0], pSceneOffset + iter->oShape.nCen[1],
 					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
 				m_ellipse->setBrush(ColorHelper(iter->nUnitType));
+				m_ellipse->nUnitType = iter->nUnitType;
 				pSceneMain.addItem(m_ellipse);
 			}
 			else if (iter->oShape.nShapeType == 3)
-			{
-
-
+			{ 
 				vector<float> point;
 				for (size_t i = 0; i < iter->oShape.vPolyPt.size(); i++)
 				{
 					point.push_back(iter->oShape.vPolyPt[i] + 100);
 				}
 				drawWall(point);
-
-
-
+				 
 				//setBtnEnabled(false);
 				/*BPolygon* m_polygon = new BPolygon(BGraphicsItem::ItemType::Polygon);
 				m_polygon->is_create_finished = true;*/
@@ -423,7 +420,7 @@ void ParaModel::updateScene()
 
 	DimDataConvert* d = new DimDataConvert();
 	VSHAPE viewShape;
-	  d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
+	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 	//只绘制柱、墙、梁
 	for (size_t i = 0; i < vModelTmpl.size(); i++)
 	{
@@ -438,6 +435,7 @@ void ParaModel::updateScene()
 				coordX, coordY,
 				unit.oShape.nShapeRange[2], unit.oShape.nShapeRange[3],
 				BGraphicsItem::ItemType::Rectangle);
+			pillar->nUnitType = viewShape[i].unitType;
 			pillar->setBrush(ColorHelper(vModelTmpl[i].nUnitType));
 			pSceneMain.addItem(pillar);
 		}
@@ -445,33 +443,16 @@ void ParaModel::updateScene()
 
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
-		//墙
-		if (viewShape[i].unitType == 4)//墙
-		{
-			int coordX = viewShape[i].nCen[0] + pSceneOffset;
-			int coordY = viewShape[i].nCen[1] + pSceneOffset;
-			//根据构建id找到对应是构件
-			BRectangle* wall = new BRectangle(
-				coordX, coordY,
-				viewShape[i].nWH[0], viewShape[i].nWH[1],
-				BGraphicsItem::ItemType::Rectangle);
-			wall->setBrush(ColorHelper(viewShape[i].unitType));
-			pSceneMain.addItem(wall);
-		}
-		//门
-		if (viewShape[i].unitType >4)//门
-		{
-			int coordX = viewShape[i].nCen[0] + pSceneOffset;
-			int coordY = viewShape[i].nCen[1] + pSceneOffset;
-			//根据构建id找到对应是构件
-			BRectangle* wall = new BRectangle(
-				coordX, coordY,
-				viewShape[i].nWH[0], viewShape[i].nWH[1],
-				BGraphicsItem::ItemType::Rectangle);
-			wall->setBrush(ColorHelper(viewShape[i].unitType));
-			pSceneMain.addItem(wall);
-		}
-
+		int coordX = viewShape[i].nCen[0] + pSceneOffset;
+		int coordY = viewShape[i].nCen[1] + pSceneOffset;
+		//根据构建id找到对应是构件
+		BRectangle* viewItem = new BRectangle(
+			coordX, coordY,
+			viewShape[i].nWH[0], viewShape[i].nWH[1],
+			BGraphicsItem::ItemType::Rectangle);
+		viewItem->nUnitType = viewShape[i].unitType;
+		viewItem->setBrush(ColorHelper(viewShape[i].unitType));
+		pSceneMain.addItem(viewItem);
 	}
 }
 
@@ -572,15 +553,7 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setText(("新建"));
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+N")));
 	act->setCheckable(true);
-	pannel->addLargeAction(act);
-	connect(act, &QAction::toggled, this, [act](bool b) {
-		if (b) {
-			act->setIcon(QIcon(":/qss/res/qss/White/success.png"));
-		}
-		else {
-			act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-		}
-		});
+	pannel->addLargeAction(act); 
 	connect(act, &QAction::triggered, this, &ParaModel::NewFileAction);
 
 	act = new QAction(this);
@@ -687,6 +660,12 @@ ParaModel::ParaModel(QWidget* parent)
 #pragma region 界面交互
 void ParaModel::NewFileAction()
 {
+	if (if_data == 1)
+	{
+		QMessageBox::information(NULL, "信息提示", "当前已有加载数据，请关闭后在新建");
+		MyLogOutput("当前已有加载数据，请关闭后在新建");
+		return;
+	}
 	if_data = 1;
 	MyLogOutput("新建场景文件成功");
 }
@@ -767,8 +746,8 @@ void ParaModel::OpenFileAction()
 
 			Topo.nCenUnitIdx = list[2].toInt();
 			Topo.nTopoIdx = list[0].toInt();
-			if (Topo.nUnitType==4)
-			{ 
+			if (Topo.nUnitType == 4)
+			{
 				Topo.nUnitAngle = list[3].toInt();;
 				vModelTmpl.push_back(Topo);
 				continue;

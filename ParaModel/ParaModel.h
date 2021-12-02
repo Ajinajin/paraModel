@@ -55,8 +55,8 @@ private:
 	BQGraphicsScene pSceneZ;						// 二维模型Z视图画布
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布
 	
-	ParaOGLManager* paraOglmanager;							// 三维显示窗口类
-	ParaOGLManager* paraOglmanagerMain;						// 三维显示窗口大屏幕主类
+	ParaOGLManager* paraOglmanager;					// 三维显示窗口类
+	ParaOGLManager* paraOglmanagerMain;				// 三维显示窗口大屏幕主类
 
 	int if_data;									//0是未加载数据。1是有数据
 	SysPath oPath;									//系统路径
