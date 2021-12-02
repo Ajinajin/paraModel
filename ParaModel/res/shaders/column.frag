@@ -7,5 +7,5 @@ uniform int B;
 
 void main(){
   
-    FragColor = vec4(R/255.0, G/255.0, B/255.0, 0.25f);
+    FragColor = vec4(R/255.0, G/255.0, B/255.0, 0.75f);
 }
