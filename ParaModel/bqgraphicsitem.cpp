@@ -6,6 +6,7 @@
 #include <QWidgetAction>
 #include <QGraphicsObject>
 #include <QtMath>
+#include <QPushButton>
 
 BGraphicsItem::BGraphicsItem(QPointF center, QPointF edge, ItemType type)
     : m_center(center), m_edge(edge), m_type(type)
@@ -253,7 +254,10 @@ void BRectangle::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 	
 	
     //QRectF ret(m_center.x()*2-m_edge.x(), m_center.y() * 2 - m_edge.y(),( m_edge.x()-m_center.x())*2 , (m_edge.y() - m_center.y()) * 2);
-	QRectF ret(m_leftup.x(), m_leftup.y(), int((m_edge.x() - m_leftup.x()+10)/20)*20 , int((m_edge.y() - m_leftup.y() + 10) / 20) * 20);
+   
+    //一旦m_leftup.x(), m_leftup.y()任意一个值发生变化就往外发送信号
+    
+    QRectF ret(m_leftup.x(), m_leftup.y(), int((m_edge.x() - m_leftup.x()+10)/20)*20 , int((m_edge.y() - m_leftup.y() + 10) / 20) * 20);
     painter->drawRect(ret);
 }
 
@@ -288,6 +292,14 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         //发送信号 确认修改后的值
     });
 
+    QPushButton* pApplyBtn = new QPushButton(QString::fromStdString(u8"确认"));
+    pApplyBtn->setFixedWidth(100);
+
+    connect(pApplyBtn, &QPushButton::clicked, this, [=]() {
+        //发送信号 确认修改后的值
+      
+        });
+
     QWidgetAction* width_widgetAction = new QWidgetAction(menu);
     width_widgetAction->setDefaultWidget(width_spinBox);
     menu->addAction(width_widgetAction);
@@ -295,6 +307,11 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     QWidgetAction* height_widgetAction = new QWidgetAction(menu);
     height_widgetAction->setDefaultWidget(height__spinBox);
     menu->addAction(height_widgetAction);
+
+
+    QWidgetAction* applyBtn_widgetAction = new QWidgetAction(menu);
+    applyBtn_widgetAction->setDefaultWidget(pApplyBtn);
+    menu->addAction(applyBtn_widgetAction);
 
     menu->exec(QCursor::pos());
     delete menu;

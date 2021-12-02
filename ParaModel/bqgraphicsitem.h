@@ -81,6 +81,7 @@ public:
 	BCircle(qreal x, qreal y, qreal radius, ItemType type);
 	void updateRadius();
 	int nUnitType;
+	int nUnitIdx;
 protected:
 	virtual QRectF boundingRect() const override;
 
@@ -105,6 +106,7 @@ public:
 	BRectangle(qreal x, qreal y, qreal width, qreal height, ItemType type);
 	qreal wallwidth;
 	int nUnitType;
+	int nUnitIdx; 
 protected:
 	virtual QRectF boundingRect() const override;
 
@@ -113,7 +115,6 @@ protected:
 		QWidget* widget) override;
 
 	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
-
 };
 
 //------------------------------------------------------------------------------

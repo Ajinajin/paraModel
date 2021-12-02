@@ -279,6 +279,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 					wThickNess + iter->oShape.nShapeRange[2], hThickNess + iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
 				m_rectangle->wallwidth = iter->oShape.nThickNess;
 				m_rectangle->nUnitType = iter->nUnitType;
+				m_rectangle->nUnitIdx = iter->nUnitIdx;
 				m_rectangle->setBrush(ColorHelper(iter->nUnitType));
 				pSceneMain.addItem(m_rectangle);
 			}
@@ -289,6 +290,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
 				m_ellipse->setBrush(ColorHelper(iter->nUnitType));
 				m_ellipse->nUnitType = iter->nUnitType;
+				m_ellipse->nUnitIdx = iter->nUnitIdx;
 				pSceneMain.addItem(m_ellipse);
 			}
 			else if (iter->oShape.nShapeType == 3)
@@ -422,25 +424,25 @@ void ParaModel::updateScene()
 	VSHAPE viewShape;
 	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 	//只绘制柱、墙、梁
-	for (size_t i = 0; i < vModelTmpl.size(); i++)
-	{
-		//柱梁板墙门窗
-		if (vModelTmpl[i].nUnitType == 1)//柱
-		{
-			BasicUnit unit = GetBaseUnit(vModelTmpl[i].nCenUnitIdx);
-			int coordX = vModelTmpl[i].nCenPos[0] + unit.oShape.nShapeRange[0] + pSceneOffset;
-			int coordY = vModelTmpl[i].nCenPos[1] + unit.oShape.nShapeRange[1] + pSceneOffset;
-			//根据构建id找到对应是构件
-			BRectangle* pillar = new BRectangle(
-				coordX, coordY,
-				unit.oShape.nShapeRange[2], unit.oShape.nShapeRange[3],
-				BGraphicsItem::ItemType::Rectangle);
-			pillar->nUnitType = viewShape[i].unitType;
-			pillar->setBrush(ColorHelper(vModelTmpl[i].nUnitType));
-			pSceneMain.addItem(pillar);
-		}
-	}
-
+	//for (size_t i = 0; i < vModelTmpl.size(); i++)
+	//{
+	//	//柱梁板墙门窗
+	//	if (vModelTmpl[i].nUnitType == 1)//柱
+	//	{
+	//		BasicUnit unit = GetBaseUnit(vModelTmpl[i].nCenUnitIdx);
+	//		int coordX = vModelTmpl[i].nCenPos[0] + unit.oShape.nShapeRange[0] + pSceneOffset;
+	//		int coordY = vModelTmpl[i].nCenPos[1] + unit.oShape.nShapeRange[1] + pSceneOffset;
+	//		//根据构建id找到对应是构件
+	//		BRectangle* pillar = new BRectangle(
+	//			coordX, coordY,
+	//			unit.oShape.nShapeRange[2], unit.oShape.nShapeRange[3],
+	//			BGraphicsItem::ItemType::Rectangle);
+	//		pillar->nUnitType = vModelTmpl[i].nUnitType;
+	//		pillar->nUnitIdx = vModelTmpl[i].nCenUnitIdx;
+	//		pillar->setBrush(ColorHelper(vModelTmpl[i].nUnitType));
+	//		pSceneMain.addItem(pillar);
+	//	}
+	//}
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
 		int coordX = viewShape[i].nCen[0] + pSceneOffset;
@@ -451,6 +453,7 @@ void ParaModel::updateScene()
 			viewShape[i].nWH[0], viewShape[i].nWH[1],
 			BGraphicsItem::ItemType::Rectangle);
 		viewItem->nUnitType = viewShape[i].unitType;
+		viewItem->nUnitIdx = viewShape[i].unitIdx;
 		viewItem->setBrush(ColorHelper(viewShape[i].unitType));
 		pSceneMain.addItem(viewItem);
 	}
@@ -1208,7 +1211,7 @@ QColor ParaModel::ColorHelper(int nUnitType)
 	}
 	else if (nUnitType == 6)
 	{
-		return QColor(72, 104, 146);
+		return QColor(93, 91, 83);
 	}
 	return QColor(72, 104, 146);
 }

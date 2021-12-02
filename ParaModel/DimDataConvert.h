@@ -12,11 +12,11 @@ public:
 	int CalPlaneColShape(TopoUnit oUnit, SimpleShape& oShape, VUNITTABLE table);
 
 	// 基于柱子基础上计算墙
-	int CalWallShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table);
+	int CalWallShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table);
 
 	// 基于墙基础上计算门窗
-	int CalDoorWndShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table);
+	int CalDoorWndShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table);
 
 	// 拓扑结构数据转为现实数据 只考虑矩形截面
-	int CalPlaneData(VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw,  VUNITTABLE table);
+	int CalPlaneData(VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw,  VUNITTABLE table);
 };

@@ -47,7 +47,7 @@ int DimDataConvert::CalPlaneColShape(TopoUnit oUnit, SimpleShape& oShape, VUNITT
 }
 
 // 基于柱子基础上计算墙
-int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
+int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	// 得到墙的关联柱
 	int nAdjNum = 10;
@@ -73,6 +73,16 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSH
 	// 得到两个柱子的范围
 	SimpleShape oColShape0 = vPlaneDraw[nAdjColIdx[0]];
 	SimpleShape oColShape1 = vPlaneDraw[nAdjColIdx[1]];
+	int nXDis = oColShape0.nCen[0] - oColShape1.nCen[0];
+	int nYDis = oColShape0.nCen[1] - oColShape1.nCen[1];
+	nXDis *= nXDis; 
+	nYDis *= nYDis; 
+	if (nXDis > nYDis)
+		oUnit.nUnitAngle = 0;
+	else
+		oUnit.nUnitAngle = 90; 
+
+	vLayerTopo[nUnitIdx].nUnitAngle = oUnit.nUnitAngle; 
 	// 水平墙
 	SimpleShape oWallShape;
 	int nWH[2], nCen[2];
@@ -130,12 +140,14 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSH
 }
 
 // 基于墙基础上计算门窗
-int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
+int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	// 得到门窗的关联墙
 	int nWallIdx = vLayerTopo[nUnitIdx].nAdjUnitIdx[0];
 	if (nWallIdx < 0)
 		return 1;
+
+	vLayerTopo[nUnitIdx].nUnitAngle = vLayerTopo[nWallIdx].nUnitAngle; 
 	// 水平墙 
 	int nCen[2];
 	int nWH[2];
@@ -165,7 +177,7 @@ int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE const& vLayerTopo, 
 }
 
 // 拓扑结构数据转为现实数据 只考虑矩形截面
-int DimDataConvert::CalPlaneData(VTOPOTABLE const& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
+int DimDataConvert::CalPlaneData(VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	int nRe = 0;
 	// 只处理柱 墙 门窗

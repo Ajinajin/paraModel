@@ -22,6 +22,7 @@ typedef struct SimpleShape
 	int nCen[2];			// 中心点
 	int nWH[2];				// 宽高 XY范围
 	int unitType;
+	int unitIdx;
 	VPIXELPOS vCorner;
 }SimpleShape;
 typedef vector<SimpleShape> VSHAPE;
