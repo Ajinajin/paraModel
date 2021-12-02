@@ -133,6 +133,7 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& 
 	GenRectShape(nCen, nWH, oWallShape);
 
 	oWallShape.unitType = 4;
+	oWallShape.unitIdx = nUnitIdx;
 	// 保存墙形状信息
 	vPlaneDraw[nUnitIdx] = oWallShape;
 
@@ -155,7 +156,7 @@ int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAP
 	{
 		nCen[0] = vLayerTopo[nUnitIdx].nCenPos[0];
 		nCen[1] = vPlaneDraw[nWallIdx].nCen[1];
-		nWH[0] = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[1]; // 窗户宽度 查系统表得到
+		nWH[0] = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[0]; // 窗户宽度 查系统表得到
 		nWH[1] = vPlaneDraw[nWallIdx].nWH[1] + 10; // 窗户厚度 之前没给定 设置为墙厚+10
 	}
 	// 垂直墙
@@ -164,12 +165,13 @@ int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAP
 		nCen[0] = vPlaneDraw[nWallIdx].nCen[0];
 		nCen[1] = vLayerTopo[nUnitIdx].nCenPos[2] + table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[1];
 		nWH[0] = vPlaneDraw[nWallIdx].nWH[0] + 10; // 窗户厚度 之前没给定 设置为墙厚+10
-		nWH[1] = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[1]; // 窗户宽度 查系统表得到
+		nWH[1] = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[0]; // 窗户宽度 查系统表得到
 	}
 	SimpleShape oDoorWndShape;
 	GenRectShape(nCen, nWH, oDoorWndShape);
 
 	oDoorWndShape.unitType = table[vLayerTopo[nUnitIdx].nCenUnitIdx].nUnitType;
+	oDoorWndShape.unitIdx = nUnitIdx;
 	// 保存门窗形状信息
 	vPlaneDraw[nUnitIdx] = oDoorWndShape;
 
@@ -196,6 +198,7 @@ int DimDataConvert::CalPlaneData(VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VU
 			oShape.vCorner.clear();
 			CalPlaneColShape(oCurUnit, oShape, table);
 			oShape.unitType = 1;
+			oShape.unitIdx = oCurUnit.nCenUnitIdx;
 			vPlaneDraw[i] = oShape;
 		}
 	}

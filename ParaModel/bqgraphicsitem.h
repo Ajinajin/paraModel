@@ -19,37 +19,37 @@ public:
 		Square,             // 正方形
 		Polygon,            // 多边形
 	};
+	QPointF m_oldleftup;          //中心点，拖动图形
 	QPointF m_center;          //中心点，拖动图形
 	QPointF m_edge;            //右下角点，拉动大小
 	QPointF m_leftup;          //左上角点
 	BPointItemList m_pointList;//绘图形的各个点
 
+	int nUnitType;
+	int nUnitIdx;
+
 	ItemType m_type;
 	QPointF getCenter() { return m_center; }
-	void setCenter(QPointF p) {
-		return;  m_center = p; }
+	void setCenter(QPointF p) { m_center = p; }
 
 	QPointF getEdge() { return m_edge; }
 	void setEdge(QPointF p) {  
-		return;
 		m_edge = p; }
 
 	ItemType getType() { return m_type; }
 
-
 protected:
-	BGraphicsItem(QPointF center, QPointF edge, ItemType type);
-
+	BGraphicsItem(QPointF center, QPointF edge, ItemType type); 
 	virtual void focusInEvent(QFocusEvent* event) override;
 	virtual void focusOutEvent(QFocusEvent* event) override;
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
 
 protected:
-
-
-
 	QPen m_pen_isSelected;
 	QPen m_pen_noSelected;
+signals:
+	void ItemMove(int nUnitType, int nUnitIdx, QPointF pos);
 };
 
 //------------------------------------------------------------------------------
@@ -79,9 +79,7 @@ class BCircle : public BEllipse
 {
 public:
 	BCircle(qreal x, qreal y, qreal radius, ItemType type);
-	void updateRadius();
-	int nUnitType;
-	int nUnitIdx;
+	void updateRadius(); 
 protected:
 	virtual QRectF boundingRect() const override;
 
@@ -105,8 +103,6 @@ class BRectangle : public BGraphicsItem
 public:
 	BRectangle(qreal x, qreal y, qreal width, qreal height, ItemType type);
 	qreal wallwidth;
-	int nUnitType;
-	int nUnitIdx; 
 protected:
 	virtual QRectF boundingRect() const override;
 
@@ -114,7 +110,7 @@ protected:
 		const QStyleOptionGraphicsItem* option,
 		QWidget* widget) override;
 
-	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override; 
 };
 
 //------------------------------------------------------------------------------
