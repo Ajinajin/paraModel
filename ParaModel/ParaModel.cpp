@@ -1190,7 +1190,7 @@ QColor ParaModel::ColorHelper(int nUnitType)
 {
 	if (nUnitType == 1)
 	{
-		return QColor(64, 135, 163);
+		return QColor(47, 65, 80);
 	}
 	else if (nUnitType == 2)
 	{
@@ -1202,15 +1202,15 @@ QColor ParaModel::ColorHelper(int nUnitType)
 	}
 	else if (nUnitType == 4)
 	{
-		return QColor(47, 65, 80);
+		return QColor(64, 135, 163);
 	}
 	else if (nUnitType == 5)
 	{
-		return QColor(65, 98, 124);
+		return QColor(232, 220, 102);
 	}
 	else if (nUnitType == 6)
 	{
-		return QColor(93, 91, 83);
+		return QColor(170, 101, 96);
 	}
 	return QColor(72, 104, 146);
 }
@@ -1226,7 +1226,7 @@ QString ParaModel::GetUnitType(int nUnitType)
 	}
 	else if (nUnitType == 3)
 	{
-		return "Â¥°å";
+		return "°å";
 	}
 	else if (nUnitType == 4)
 	{
@@ -1252,7 +1252,7 @@ int ParaModel::GetUnitTypeCode(QString unitTypeStr)
 	{
 		return 2;
 	}
-	else if (unitTypeStr == "Â¥°å")
+	else if (unitTypeStr == "°å")
 	{
 		return 3;
 	}
