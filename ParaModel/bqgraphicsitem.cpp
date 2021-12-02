@@ -279,7 +279,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
     QSpinBox* height__spinBox = new QSpinBox(menu);
     height__spinBox->setStyleSheet("QSpinBox{ width:120px; height:30px; font-size:16px; font-weight:bold; }");
-    height__spinBox->setRange(0, 1000);
+    height__spinBox->setRange(0, 10000);
     height__spinBox->setPrefix("Y: ");
     height__spinBox->setSuffix(" mm");
     height__spinBox->setSingleStep(1);
