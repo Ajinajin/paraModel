@@ -85,6 +85,11 @@ public:
 	GLfloat deltaTime;
 	GLfloat lastFrame;											//上一帧
 
+	//模型旋转相关参数
+	QMatrix4x4 targetModel;//模型的模型GLSL矩阵
+	QMatrix4x4 targetModelsave;
+	QMatrix4x4 targetModeluse;
+
 	GLfloat rotateRaw;											//每次对模型的raw旋转
 	GLfloat rotatePitch;										//每次对模型的pitch旋转
 
