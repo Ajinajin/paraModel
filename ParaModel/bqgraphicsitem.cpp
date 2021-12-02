@@ -268,21 +268,13 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
     QSpinBox* width_spinBox = new QSpinBox(menu);
     width_spinBox->setStyleSheet("QSpinBox{ width:120px; height:30px; font-size:16px; font-weight:bold; }");
-    width_spinBox->setRange(0, 1000);
+    width_spinBox->setRange(0, 10000);
     width_spinBox->setPrefix("X: ");
     width_spinBox->setSuffix(" mm");
     width_spinBox->setSingleStep(1);
-    width_spinBox->setValue(2 * abs(m_edge.x()));
+    width_spinBox->setValue(2 * abs(m_center.x()));
     connect(width_spinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=](int v){
-       if (m_edge.x() < 0) {
-            m_edge.setX((-1) * v/2);
-        } else {
-            m_edge.setX(v/2);
-        }
-       /*  m_pointList.at(0)->setPoint(m_edge);*/
-        this->hide();
-        this->update();
-        this->show();
+        //发送信号 确认修改后的值
     });
 
     QSpinBox* height__spinBox = new QSpinBox(menu);
@@ -293,15 +285,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     height__spinBox->setSingleStep(1);
     height__spinBox->setValue(2 * abs(m_edge.y()));
     connect(height__spinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [=](int v){
-       if (m_edge.y() < 0) {
-            m_edge.setY((-1) * v/2);
-        } else {
-            m_edge.setY(v/2);
-        }
-       /*  m_pointList.at(0)->setPoint(m_edge);*/
-        this->hide();
-        this->update();
-        this->show();
+        //发送信号 确认修改后的值
     });
 
     QWidgetAction* width_widgetAction = new QWidgetAction(menu);

@@ -721,25 +721,18 @@ void ParaModel::OpenFileAction()
 			continue;
 		TopoUnit Topo;
 		Topo.nUnitType = 0;
-		Topo.nCenUnitIdx = 0;
-		Topo.nAdjUnitIdx[0] = -1;
-		Topo.nAdjUnitIdx[1] = -1;
-		Topo.nAdjUnitIdx[2] = -1;
-		Topo.nAdjUnitIdx[3] = -1;
-		Topo.nAdjUnitIdx[4] = -1;
-		Topo.nAdjUnitIdx[5] = -1;
-		Topo.nAdjUnitIdx[6] = -1;
-		Topo.nAdjUnitIdx[7] = -1;
-		Topo.nAdjUnitIdx[8] = -1;
-		Topo.nAdjUnitIdx[9] = -1;
+		Topo.nCenUnitIdx = 0; 
+		for (size_t i = 0; i < 10; i++)
+		{ 
+			Topo.nAdjUnitIdx[i]=-1;
+		}
 		Topo.nEdgeType = 0;
 		Topo.nStatusFlag = 0;
 		Topo.nUnitAngle = 0;
-		Topo.nCenPos[0] = 0;
-		Topo.nCenPos[1] = 0;
-		Topo.nCenPos[2] = 0;
-		Topo.nCenPos[3] = 0;
-
+		for (size_t i = 0; i < 4; i++)
+		{
+			Topo.nCenPos[i] = 0;
+		}
 		if (parsingState == 0)
 		{
 			Topo.nUnitType = GetUnitTypeCode(list[1]);
