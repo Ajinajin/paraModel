@@ -112,16 +112,46 @@
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\GLSL_YELLOW.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\shaders\GLSL_YELLOW.vert">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\shaders\coordinate.frag">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\shaders\coordinate.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\beam.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\beam.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\board.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\board.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\column.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\column.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\door.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\door.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\wall.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\wall.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\window.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\window.vert">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

@@ -127,10 +127,20 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shaders\beam.frag" />
+    <None Include="res\shaders\beam.vert" />
+    <None Include="res\shaders\board.frag" />
+    <None Include="res\shaders\board.vert" />
+    <None Include="res\shaders\column.frag" />
+    <None Include="res\shaders\column.vert" />
     <None Include="res\shaders\coordinate.frag" />
     <None Include="res\shaders\coordinate.vert" />
-    <None Include="res\shaders\GLSL_YELLOW.frag" />
-    <None Include="res\shaders\GLSL_YELLOW.vert" />
+    <None Include="res\shaders\door.frag" />
+    <None Include="res\shaders\door.vert" />
+    <None Include="res\shaders\wall.frag" />
+    <None Include="res\shaders\wall.vert" />
+    <None Include="res\shaders\window.frag" />
+    <None Include="res\shaders\window.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

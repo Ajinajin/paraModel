@@ -9,7 +9,7 @@
 
 
 // 定义全局变量 后期修改
-const QVector3D CAMERA_POSITION(500.0f, 100.0f, 800.0f);
+const QVector3D CAMERA_POSITION(200.0f, 100.0f, 1000.0f);
 const QVector3D LIGHT_POSITION(0.0f, 1.0f, 0.0f);
 
 const int OGLMANAGER_WIDTH = 1200;
@@ -98,14 +98,19 @@ void ParaOGLManager::initializeGL()
 	oglTopTable = new VTOPOTABLE;
 	oglUnitTable = new VUNITTABLE;
 
-	/************ 载入shader ***********/
-	ResourceManager::loadShader("yellow", ":/shaders/res/shaders/GLSL_YELLOW.vert", ":/shaders/res/shaders/GLSL_YELLOW.frag");
-	ResourceManager::loadShader("red", ":/shaders/res/shaders/GLSL_RED.vert", ":/shaders/res/shaders/GLSL_RED.frag");
-	ResourceManager::loadShader("green", ":/shaders/res/shaders/GLSL_GREEN.vert", ":/shaders/res/shaders/GLSL_GREEN.frag");
-	ResourceManager::loadShader("blue", ":/shaders/res/shaders/GLSL_BLUE.vert", ":/shaders/res/shaders/GLSL_BLUE.frag");
-	ResourceManager::loadShader("coordinate", ":/shaders/res/shaders/coordinate.vert", ":/shaders/res/shaders/coordinate.frag");
-	
+	targetModel.setToIdentity();
+	targetModelsave.setToIdentity();
+	targetModeluse.setToIdentity();
 
+	/************ 载入shader ***********/
+	
+	ResourceManager::loadShader("coordinate", ":/shaders/res/shaders/coordinate.vert", ":/shaders/res/shaders/coordinate.frag");
+	ResourceManager::loadShader("column", ":/shaders/res/shaders/column.vert", ":/shaders/res/shaders/column.frag");
+	ResourceManager::loadShader("beam", ":/shaders/res/shaders/beam.vert", ":/shaders/res/shaders/beam.frag");
+	ResourceManager::loadShader("board", ":/shaders/res/shaders/board.vert", ":/shaders/res/shaders/board.frag");
+	ResourceManager::loadShader("wall", ":/shaders/res/shaders/wall.vert", ":/shaders/res/shaders/wall.frag");
+	ResourceManager::loadShader("door", ":/shaders/res/shaders/door.vert", ":/shaders/res/shaders/door.frag");
+	ResourceManager::loadShader("window", ":/shaders/res/shaders/window.vert", ":/shaders/res/shaders/window.frag");
 
 	/************ 载入Texture ***********/
 	//ResourceManager::loadTexture("brickwall", ":/textures/res/textures/brickwall.jpg");
@@ -116,24 +121,6 @@ void ParaOGLManager::initializeGL()
 	QMatrix4x4 projection, view;
 	//给着色器变量赋值
 	ResourceManager::getShader("coordinate").use().setMatrix4f("model", model);
-	
-	/***********  GLSL系列（Uniform Buffer） shader参数 **************/
-	model.setToIdentity();
-	//model.translate(-0.75f, 0.75f, 0.0f);
-	ResourceManager::getShader("red").use().setMatrix4f("model", model);
-
-	//model.setToIdentity();
-	//model.translate(0.75f, 0.75f, 0.0f);
-	ResourceManager::getShader("green").use().setMatrix4f("model", model);
-
-	//model.setToIdentity();
-	//model.translate(-0.75f, -0.75f, 0.0f);
-	ResourceManager::getShader("yellow").use().setMatrix4f("model", model);
-
-	//model.setToIdentity();
-	//model.translate(0.75f, -0.75f, 0.0f);
-	ResourceManager::getShader("blue").use().setMatrix4f("model", model);
-
 
 
 	/***********  处理Uniform Buffer相关参数 **************/
@@ -183,16 +170,8 @@ void ParaOGLManager::paintGL()
 	this->updateGL();
 
 
-	
-	//(模型根据鼠标操作旋转)
-	QMatrix4x4 model;
-	model.setToIdentity();
-	model.rotate(rotateRaw,0.0,1.0,0.0);
-	//model.rotate((GLfloat)time.elapsed() / 100,0.0,1.0,0.0);
-	//model.rotate((GLfloat)time.elapsed() / 100, 1.0, 0.0, 0.0);
-	model.rotate(-rotatePitch, 1.0, 0.0, 0.0);
 	ResourceManager::getShader("coordinate").use();
-	ResourceManager::getShader("coordinate").use().setMatrix4f("model", model);
+	ResourceManager::getShader("coordinate").use().setMatrix4f("model", targetModel);
 
 
 	//绘制三维模型
@@ -575,7 +554,23 @@ void ParaOGLManager::updateGL()
 	ResourceManager::getShader("coordinate").use().setMatrix4f("projection", projection);
 	ResourceManager::getShader("coordinate").use().setMatrix4f("view", view);
 
-	
+	ResourceManager::getShader("column").use().setMatrix4f("projection", projection);
+	ResourceManager::getShader("column").use().setMatrix4f("view", view);
+
+	ResourceManager::getShader("beam").use().setMatrix4f("projection", projection);
+	ResourceManager::getShader("beam").use().setMatrix4f("view", view);
+
+	ResourceManager::getShader("board").use().setMatrix4f("projection", projection);
+	ResourceManager::getShader("board").use().setMatrix4f("view", view);
+
+	ResourceManager::getShader("wall").use().setMatrix4f("projection", projection);
+	ResourceManager::getShader("wall").use().setMatrix4f("view", view);
+
+	ResourceManager::getShader("door").use().setMatrix4f("projection", projection);
+	ResourceManager::getShader("door").use().setMatrix4f("view", view);
+
+	ResourceManager::getShader("window").use().setMatrix4f("projection", projection);
+	ResourceManager::getShader("window").use().setMatrix4f("view", view);
 
 
 
@@ -591,6 +586,8 @@ void ParaOGLManager::mouseMoveEvent(QMouseEvent* event)
 	
 	if (isLeftMousePress)//左键则旋转模型
 	{
+		targetModeluse = targetModelsave;
+
 		GLint xpos = event->pos().x();
 		GLint ypos = event->pos().y();
 
@@ -607,10 +604,23 @@ void ParaOGLManager::mouseMoveEvent(QMouseEvent* event)
 		lastX = xpos;
 		lastY = ypos;
 
-
+		
 		rotateRaw += xoffset*0.1;
 		rotatePitch += yoffset*0.1;
 
+		//根据鼠标操作旋转模型矩阵
+		targetModel.translate(200, 0, 300);
+
+		targetModel.setToIdentity();
+		GLfloat angle_now = qSqrt(qPow(xoffset, 2) + qPow(yoffset, 2)) / 5;
+		targetModel.rotate(angle_now, -yoffset, xoffset, 0.0);
+		targetModel *= targetModeluse;
+
+		targetModelsave.setToIdentity();
+		targetModelsave.rotate(angle_now, -yoffset, xoffset, 0.0);
+		targetModelsave *= targetModeluse;
+		
+		targetModel.translate(-200, 0, -300);
 	}
 	
 	//if (isRightMousePress)//右键则旋转相机
@@ -713,7 +723,7 @@ void ParaOGLManager::InitAndDrawColumn(float x,float y, float z, float radius, f
 void ParaOGLManager::InitAndDrawCuboid(float x, float y, float z, float length, float thickness, float height)
 {
 	//init
-	float* vertices = new float[108];
+	float* vertices = new float[72];
 	
 	vPoint points;
 	Point tmp; 
@@ -726,11 +736,11 @@ void ParaOGLManager::InitAndDrawCuboid(float x, float y, float z, float length, 
 	tmp.x = x + length, tmp.y = y + height, tmp.z = z - thickness; points.push_back(tmp);
 	tmp.x = x, tmp.y = y + height, tmp.z = z - thickness; points.push_back(tmp);
 
-	int solidToFaceOrder[] = {0,1,2,0,2,3,0,1,4,1,5,4,1,2,5,2,5,6,2,3,6,3,6,7,0,3,7,0,4,7,4,5,6,4,7,6};
+	int solidToFaceOrder[] = {0,1,2,3,0,1,5,4,1,2,6,5,3,2,6,7,0,3,7,4,4,5,6,7};
 
-	//12个面片 36个点索引
+	//6个矩形面片 24个点索引
 
-	for (int k = 0; k < 36; k++)
+	for (int k = 0; k < 24; k++)
 	{
 		vertices[k * 3] = points[solidToFaceOrder[k]].x;
 		vertices[k * 3 + 1] = points[solidToFaceOrder[k]].y;
@@ -741,7 +751,7 @@ void ParaOGLManager::InitAndDrawCuboid(float x, float y, float z, float length, 
 	pCore->glGenBuffers(1, &VBO);
 
 	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	pCore->glBufferData(GL_ARRAY_BUFFER, 108 * sizeof(float), vertices, GL_STATIC_DRAW);
+	pCore->glBufferData(GL_ARRAY_BUFFER, 72 * sizeof(float), vertices, GL_STATIC_DRAW);
 	
 
 
@@ -755,7 +765,7 @@ void ParaOGLManager::InitAndDrawCuboid(float x, float y, float z, float length, 
 	pCore->glEnable(GL_BLEND);//开启颜色混合
 	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 
-	pCore->glDrawArrays(GL_TRIANGLE_STRIP, 0, 36);
+	pCore->glDrawArrays(GL_QUADS, 0, 24);
 
 	pCore->glDisable(GL_BLEND);
 	pCore->glDepthMask(GL_TRUE);
