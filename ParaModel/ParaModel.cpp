@@ -472,15 +472,11 @@ BasicUnit ParaModel::GetBaseUnit(int idx)
 //更新OpenGL窗口
 void ParaModel::updateOGL()
 {
-
-
 	paraOglmanager->update();
-
 	paraOglmanagerMain->update();
 
 
 	//两个三维窗口要同步
-
 	paraOglmanager->camera = paraOglmanagerMain->camera;
 	paraOglmanager->isFirstMouse = paraOglmanagerMain->isFirstMouse;
 	paraOglmanager->lastX = paraOglmanagerMain->lastX;
@@ -489,8 +485,14 @@ void ParaModel::updateOGL()
 	paraOglmanager->rotatePitch = paraOglmanagerMain->rotatePitch;
 
 	//传入所有的建筑数据
+
+	paraOglmanager->oglTopTable = &this->vModelTmpl;
+	paraOglmanager->oglUnitTable = &this->vBaseUnit;
+
 	paraOglmanagerMain->oglTopTable = &this->vModelTmpl;
 	paraOglmanagerMain->oglUnitTable = &this->vBaseUnit;
+
+	
 
 }
 

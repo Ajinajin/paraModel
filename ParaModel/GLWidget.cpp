@@ -11,7 +11,7 @@
 MyItem::MyItem()
 {
     brushColor = Qt::red;
-      
+    
     setFlag(QGraphicsItem::ItemIsFocusable);
     setFlag(QGraphicsItem::ItemIsMovable);
     setAcceptHoverEvents(true);
