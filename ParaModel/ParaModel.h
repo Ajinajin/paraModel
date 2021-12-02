@@ -47,7 +47,7 @@ private:
 	BQGraphicsView* graphicsViewX;					// 二维模型X视图
 	BQGraphicsView* graphicsViewY;					// 二维模型Y视图
 	BQGraphicsView* graphicsViewZ;					// 二维模型Z视图
-	BQGraphicsView* graphicsViewMain;				// 二维模型 三维视图
+	BQGraphicsView* graphicsViewMain;				// 二维模型三维视图
 	BQGraphicsView* graphicsViewOgl;				// 三位模型展示视图
 
 	BQGraphicsScene pSceneX;						// 二维模型X视图画布
@@ -132,7 +132,6 @@ public slots:
 
 
 private slots: 
-
 	void NewFileAction();
 	void OpenFileAction();
 	void CloseFileAction();

@@ -294,14 +294,14 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 				pSceneMain.addItem(m_ellipse);
 			}
 			else if (iter->oShape.nShapeType == 3)
-			{ 
+			{
 				vector<float> point;
 				for (size_t i = 0; i < iter->oShape.vPolyPt.size(); i++)
 				{
 					point.push_back(iter->oShape.vPolyPt[i] + 100);
 				}
 				drawWall(point);
-				 
+
 				//setBtnEnabled(false);
 				/*BPolygon* m_polygon = new BPolygon(BGraphicsItem::ItemType::Polygon);
 				m_polygon->is_create_finished = true;*/
@@ -456,6 +456,49 @@ void ParaModel::updateScene()
 		viewItem->nUnitIdx = viewShape[i].unitIdx;
 		viewItem->setBrush(ColorHelper(viewShape[i].unitType));
 		pSceneMain.addItem(viewItem);
+
+	}
+	for (size_t i = 0; i < viewShape.size(); i++)
+	{
+		//根据墙的角度判断线的方向
+		if (viewShape[i].unitType == 4)
+		{
+			int coordX = viewShape[i].nCen[0] + pSceneOffset;
+			int coordY = viewShape[i].nCen[1] + pSceneOffset;
+			if (vModelTmpl[viewShape[i].unitIdx].nUnitAngle == 0)
+			{
+				BRectangle* divideLine = new BRectangle(
+					0, coordY,
+					8000, 10,
+					BGraphicsItem::ItemType::Rectangle);
+				divideLine->nUnitType = 1;
+				divideLine->nUnitIdx = viewShape[i].unitIdx;
+				/*QBrush b = (Qt::DashLine);
+				b.setColor(ColorHelper(viewShape[i].unitType));
+				divideLine->setBrush(b);*/
+				QPen pen = QPen(Qt::yellow);
+				pen.setStyle(Qt::DashLine);
+				divideLine->setPen(pen);
+				pSceneMain.addItem(divideLine);
+			}
+			else
+			{
+				BRectangle* divideLine = new BRectangle(
+					coordX, 0,
+					10, 8000,
+					BGraphicsItem::ItemType::Rectangle);
+				divideLine->nUnitType = 1;
+				divideLine->nUnitIdx = viewShape[i].unitIdx;
+				/*QBrush b = (Qt::DashLine);
+				b.setColor(ColorHelper(viewShape[i].unitType));
+				divideLine->setBrush(b);*/
+				QPen pen = QPen(Qt::yellow);
+				pen.setStyle(Qt::DashLine);
+				divideLine->setPen(pen);
+				pSceneMain.addItem(divideLine);
+			}
+
+		}
 	}
 }
 
@@ -558,7 +601,7 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setText(("新建"));
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+N")));
 	act->setCheckable(true);
-	pannel->addLargeAction(act); 
+	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::NewFileAction);
 
 	act = new QAction(this);
@@ -727,10 +770,10 @@ void ParaModel::OpenFileAction()
 			continue;
 		TopoUnit Topo;
 		Topo.nUnitType = 0;
-		Topo.nCenUnitIdx = 0; 
+		Topo.nCenUnitIdx = 0;
 		for (size_t i = 0; i < 10; i++)
-		{ 
-			Topo.nAdjUnitIdx[i]=-1;
+		{
+			Topo.nAdjUnitIdx[i] = -1;
 		}
 		Topo.nEdgeType = 0;
 		Topo.nStatusFlag = 0;
@@ -745,12 +788,6 @@ void ParaModel::OpenFileAction()
 
 			Topo.nCenUnitIdx = list[2].toInt();
 			Topo.nTopoIdx = list[0].toInt();
-			if (Topo.nUnitType == 4)
-			{
-				Topo.nUnitAngle = list[3].toInt();;
-				vModelTmpl.push_back(Topo);
-				continue;
-			}
 			if (list.size() >= 4)
 			{
 				Topo.nCenPos[0] = list[3].toInt();
@@ -838,7 +875,7 @@ void ParaModel::GraphicsViewOgl(bool b)
 }
 
 void ParaModel::MyLogOutput(QString myLogout)
-{  
+{
 	if (myLogOutLabel->toPlainText() == "")
 	{
 		myLogOutLabel->setText(myLogout);

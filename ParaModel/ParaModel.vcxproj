@@ -31,7 +31,7 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>5.12.11</QtInstall>
+    <QtInstall>5.12.11_msvc2017_64</QtInstall>
     <QtModules>axcontainer;axserver;core;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
@@ -55,14 +55,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>D:\Study\Work\ParaModel\paramodel\ParaModel\SARibbon\src\SARibbonBar;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Works\HS\ParaModel\SARibbon\src\SARibbonBar;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link />
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Qt\5.12.11\5.12.11\msvc2017_64\lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\include\ActiveQt;D:\Qt\5.12.11\5.12.11\msvc2017_64\include\QtXml;GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Qt\Qt5.12.11\5.12.11\msvc2017_64\lib;D:\Qt\Qt5.12.11\5.12.11\msvc2017_64\include\ActiveQt;D:\Qt\Qt5.12.11\5.12.11\msvc2017_64\include\QtXml;GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\openssl\lib;C:\Utils\my_sql\mysql-5.6.11-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -127,20 +127,10 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\beam.frag" />
-    <None Include="res\shaders\beam.vert" />
-    <None Include="res\shaders\board.frag" />
-    <None Include="res\shaders\board.vert" />
-    <None Include="res\shaders\column.frag" />
-    <None Include="res\shaders\column.vert" />
     <None Include="res\shaders\coordinate.frag" />
     <None Include="res\shaders\coordinate.vert" />
-    <None Include="res\shaders\door.frag" />
-    <None Include="res\shaders\door.vert" />
-    <None Include="res\shaders\wall.frag" />
-    <None Include="res\shaders\wall.vert" />
-    <None Include="res\shaders\window.frag" />
-    <None Include="res\shaders\window.vert" />
+    <None Include="res\shaders\GLSL_YELLOW.frag" />
+    <None Include="res\shaders\GLSL_YELLOW.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
