@@ -171,7 +171,7 @@ int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAP
 	else
 	{
 		nCen[0] = vPlaneDraw[nWallIdx].nCen[0];
-		nCen[1] = vLayerTopo[nUnitIdx].nCenPos[2] + table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[1];
+		nCen[1] = vPlaneDraw[nWallIdx].nWH[1] - table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[1];
 		nWH[0] = vPlaneDraw[nWallIdx].nWH[0] + 10; // 窗户厚度 之前没给定 设置为墙厚+10
 		nWH[1] = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[0]; // 窗户宽度 查系统表得到
 	}
