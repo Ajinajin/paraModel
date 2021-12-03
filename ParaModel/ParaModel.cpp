@@ -702,7 +702,6 @@ void ParaModel::OpenFileAction()
 		if (parsingState == 0)
 		{
 			Topo.nUnitType = GetUnitTypeCode(list[1]);
-
 			Topo.nCenUnitIdx = list[2].toInt();
 			Topo.nTopoIdx = list[0].toInt();
 			if (list.size() >= 4)
@@ -805,7 +804,7 @@ void ParaModel::MyLogOutput(QString myLogout)
 
 // 数据修改后更新
 void ParaModel::ApplyDataAction()
-{  
+{
 	// 场景未 没有数据
 	// if (pEnvir2 == NULL)
 	// {
@@ -1161,6 +1160,7 @@ TopoUnit ParaModel::GetTopoUnit(int idx)
 	TopoUnit b;
 	return b;
 }
+//根据构件类型查找颜色
 QColor ParaModel::ColorHelper(int nUnitType)
 {
 	if (nUnitType == 1)
@@ -1189,6 +1189,7 @@ QColor ParaModel::ColorHelper(int nUnitType)
 	}
 	return QColor(72, 104, 146);
 }
+//根据构件类型id查找对应的中文名
 QString ParaModel::GetUnitType(int nUnitType)
 {
 	if (nUnitType == 1)
@@ -1217,45 +1218,47 @@ QString ParaModel::GetUnitType(int nUnitType)
 	}
 	return "";
 }
+//根据构件中文名查找对应的id
 int ParaModel::GetUnitTypeCode(QString unitTypeStr)
 {
-	if (unitTypeStr == "柱")
+	if (unitTypeStr.compare("柱") == 0)
 	{
 		return 1;
 	}
-	else if (unitTypeStr == "梁")
+	else if (unitTypeStr.compare("梁") == 0)
 	{
 		return 2;
 	}
-	else if (unitTypeStr == "板")
+	else if (unitTypeStr.compare("板") == 0)
 	{
 		return 3;
 	}
-	else if (unitTypeStr == "墙")
+	else if (unitTypeStr.compare("墙") == 0)
 	{
 		return 4;
 	}
-	else if (unitTypeStr == "门")
+	else if (unitTypeStr.compare("门") == 0)
 	{
 		return 5;
 	}
-	else if (unitTypeStr == "窗")
+	else if (unitTypeStr.compare("窗") == 0)
 	{
 		return 6;
 	}
 	return 0;
 }
+//根据形状中文名查找对应的id
 int ParaModel::GetShapeTypeCode(QString shapeTypeStr)
 {
-	if (shapeTypeStr == "矩形")
+	if (shapeTypeStr.compare("矩形") == 0)
 	{
 		return 1;
 	}
-	else if (shapeTypeStr == "圆形")
+	else if (shapeTypeStr.compare("圆形") == 0)
 	{
 		return 2;
 	}
-	else if (shapeTypeStr == "多边形")
+	else if (shapeTypeStr.compare("多边形") == 0)
 	{
 		return 3;
 	}
@@ -1299,22 +1302,12 @@ void ParaModel::ReleaseSysModel()
 
 //画布移动元素
 void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
-{
-	int a = nUnitType;
-	int v = nUnitIdx;
-	QPointF pos1 = pos;
-	int s = a + v;
-	//QList<QGraphicsItem*> itemList = pSceneMain.selectedItems();
-	//for (size_t i = 0; i < itemList.size(); i++)
-	//{
-	//	BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
-	//	if (!proxyWidget->isAuxiliary)
-	//	{
-	//		//获取到当前选中的
-	//		proxyWidget->nUnitIdx;
-	//		proxyWidget->nUnitType;
-	//	}
-	//}
+{ 
+	if (MainDockState != 3)
+	{
+		graphicsViewMain->hide();
+		graphicsViewMain->show();
+	}
 	return;
 }
 //画布菜单点击
@@ -1322,7 +1315,6 @@ void ParaModel::SceneMenuClickAction(int nUnitType, int nUnitIdx, int clickType)
 {
 	return;
 }
-
 //更新画布内容
 void ParaModel::updateScene()
 {
@@ -1335,26 +1327,6 @@ void ParaModel::updateScene()
 	DimDataConvert* d = new DimDataConvert();
 	VSHAPE viewShape;
 	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
-	//只绘制柱、墙、梁
-	//for (size_t i = 0; i < vModelTmpl.size(); i++)
-	//{
-	//	//柱梁板墙门窗
-	//	if (vModelTmpl[i].nUnitType == 1)//柱
-	//	{
-	//		BasicUnit unit = GetBaseUnit(vModelTmpl[i].nCenUnitIdx);
-	//		int coordX = vModelTmpl[i].nCenPos[0] + unit.oShape.nShapeRange[0] + pSceneOffset;
-	//		int coordY = vModelTmpl[i].nCenPos[1] + unit.oShape.nShapeRange[1] + pSceneOffset;
-	//		//根据构建id找到对应是构件
-	//		BRectangle* pillar = new BRectangle(
-	//			coordX, coordY,
-	//			unit.oShape.nShapeRange[2], unit.oShape.nShapeRange[3],
-	//			BGraphicsItem::ItemType::Rectangle);
-	//		pillar->nUnitType = vModelTmpl[i].nUnitType;
-	//		pillar->nUnitIdx = vModelTmpl[i].nCenUnitIdx;
-	//		pillar->setBrush(ColorHelper(vModelTmpl[i].nUnitType));
-	//		pSceneMain.addItem(pillar);
-	//	}
-	//}
 	//根据数据绘制图形
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
@@ -1375,15 +1347,16 @@ void ParaModel::updateScene()
 			connect(viewItem, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
 			pSceneMain.addItem(viewItem);
 		}
-
 	}
+	//加载标准线
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
-		//根据墙的角度判断线的方向
+		//如果当前要渲染的是强
 		if (viewShape[i].unitType == 4)
 		{
 			int coordX = viewShape[i].nCen[0] + pSceneOffset;
 			int coordY = viewShape[i].nCen[1] + pSceneOffset;
+			//判断墙的角度加标准线
 			if (vModelTmpl[viewShape[i].unitIdx].nUnitAngle == 0)
 			{
 				BRectangle* divideLine = new BRectangle(
@@ -1419,8 +1392,14 @@ void ParaModel::updateScene()
 
 		}
 	}
-}
 
+	if (MainDockState != 3)
+	{
+		graphicsViewMain->hide();
+		graphicsViewMain->show();
+	}
+}
+//更新画布中单独的元素
 void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height)
 {
 	bool isWall = false;
@@ -1474,7 +1453,14 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 			pSceneMain.addItem(divideLine);
 		}
 	}
+
+	if (MainDockState != 3)
+	{
+		graphicsViewMain->hide();
+		graphicsViewMain->show();
+	}
 }
+//清除画布数据
 void ParaModel::SceneMainClear()
 {
 	pSceneMain.clear();

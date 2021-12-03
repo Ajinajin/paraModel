@@ -70,7 +70,8 @@ private:
 
 public:
 	VUNITTABLE vBaseUnit;					// 系统基本构件库
-	VTOPOTABLE vModelTmpl;					// 系统平面图库
+	VTOPOTABLE vModelTmpl;					// 当前绘制计算用的平面图
+	VBUILDTOPO vBuildTopo;					// 系统平面图库
 	int InitPath();							// 初始化路径
 	int InitUnitLib();						// 初始化基本构件库 
 	int InitPlaneDrawLib();					// 初始化平面图库
