@@ -64,7 +64,7 @@ public:
 	//多边形柱(横着)
 	void InitAndDrawPolygonColumnHorizontal(VINT data, float length);
 	//长方体（墙、板等）x\y\z 为墙体最左下角的点坐标
-	void InitAndDrawCuboid(float x, float y, float z, float length, float thickness, float height);
+	void InitAndDrawCuboid(float x, float y, float z, float length, float thickness, float height, int type);
 
 	//根据中心构件单元Id去构件库里查具体模型参数
 	BasicUnit findUnit(int idx, VUNITTABLE oglUnitTable);

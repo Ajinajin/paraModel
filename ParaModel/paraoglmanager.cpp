@@ -61,8 +61,8 @@ ParaOGLManager::ParaOGLManager(QWidget* parent) : QOpenGLWidget(parent)
 }
 
 ParaOGLManager::~ParaOGLManager() {
-	if (camera)
-		delete camera;
+	//if (camera)
+		//delete camera;
 
 }
 
@@ -195,7 +195,9 @@ void ParaOGLManager::resizeGL(int w, int h)
 void ParaOGLManager::paintGL()
 {
 	pCore->glClear(GL_COLOR_BUFFER_BIT);
-
+	pCore->glClear(GL_DEPTH_BUFFER_BIT);
+	
+	
 	/*********** 计算两次帧数之间的时间间隔  ***************/
 	GLfloat currentFrame = (GLfloat)time.elapsed() / 100;
 	deltaTime = currentFrame - lastFrame;
@@ -207,6 +209,15 @@ void ParaOGLManager::paintGL()
 	int layerHeight;
 	int boardHeight;
 	int columnHeight = 250;
+
+	
+	//六种构建的透明度
+	float transOfColumn = 1.0;
+	float transOfBeam = 1.0;
+	float transOfBoard = 1.0;
+	float transOfWall = 0.5;
+	float transOfDoor = 0.75;
+	float transOfWindow = 0.75;
 
 	//绘制三维模型
 	if (!oglUnitTable->empty() && !oglTopTable->empty())
@@ -224,6 +235,7 @@ void ParaOGLManager::paintGL()
 				ResourceManager::getShader("column").use().setInteger("R", color.red());
 				ResourceManager::getShader("column").use().setInteger("G", color.green());
 				ResourceManager::getShader("column").use().setInteger("B", color.blue());
+				ResourceManager::getShader("column").use().setFloat("tranS", transOfColumn);
 
 				//查找对应柱的相关信息
 				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
@@ -241,7 +253,7 @@ void ParaOGLManager::paintGL()
 					y = 0;
 					z = oglTopTable->at(i).nCenPos[1] + thickness / 2;
 
-					InitAndDrawCuboid(x, y, z, length, thickness, height);
+					InitAndDrawCuboid(x, y, z, length, thickness, height,1);
 				}
 
 				//圆柱
@@ -276,6 +288,7 @@ void ParaOGLManager::paintGL()
 				ResourceManager::getShader("beam").use().setInteger("R", color.red());
 				ResourceManager::getShader("beam").use().setInteger("G", color.green());
 				ResourceManager::getShader("beam").use().setInteger("B", color.blue());
+				ResourceManager::getShader("beam").use().setFloat("tranS", transOfBeam);
 
 				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
 
@@ -288,9 +301,9 @@ void ParaOGLManager::paintGL()
 
 
 					//梁的厚度
-					thickness = info.oShape.nShapeRange[2]- info.oShape.nShapeRange[0];
+					thickness = info.oShape.nShapeRange[3]- info.oShape.nShapeRange[1];
 					//梁的高度
-					height = info.oShape.nShapeRange[3] - info.oShape.nShapeRange[1];
+					height = info.oShape.nShapeRange[2] - info.oShape.nShapeRange[0];
 					//查找墙连接的两个柱之间的距离
 					vPoint columnPoints;		//记录两个柱的中心点
 					vector<BasicUnit> Columns;	//墙连接的柱子
@@ -330,14 +343,14 @@ void ParaOGLManager::paintGL()
 							x = columnPoints[0].x + (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2;
 							y = columnHeight - height;
 							z = columnPoints[0].z + (Columns[0].oShape.nShapeRange[3] - Columns[0].oShape.nShapeRange[1]) / 2;
-							InitAndDrawCuboid(x, y, z, length, thickness, height);
+							InitAndDrawCuboid(x, y, z, length, thickness, height,2);
 						}
 						else
 						{
 							x = columnPoints[1].x + (Columns[1].oShape.nShapeRange[2] - Columns[1].oShape.nShapeRange[0]) / 2;
 							y = columnHeight - height;
 							z = columnPoints[1].z + (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2;
-							InitAndDrawCuboid(x, y, z, length, thickness, height);
+							InitAndDrawCuboid(x, y, z, length, thickness, height,2);
 						}
 
 					}
@@ -348,14 +361,14 @@ void ParaOGLManager::paintGL()
 							x = columnPoints[0].x - (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2;
 							y = columnHeight - height;
 							z = columnPoints[1].z - (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2;
-							InitAndDrawCuboid(x, y, z, thickness, length, height);
+							InitAndDrawCuboid(x, y, z, thickness, length, height,2);
 						}
 						else
 						{
 							x = columnPoints[1].x - (Columns[1].oShape.nShapeRange[2] - Columns[1].oShape.nShapeRange[0]) / 2;
 							y = columnHeight - height;
 							z = columnPoints[0].z - (Columns[0].oShape.nShapeRange[3] - Columns[0].oShape.nShapeRange[1]) / 2;
-							InitAndDrawCuboid(x, y, z, thickness, length, height);
+							InitAndDrawCuboid(x, y, z, thickness, length, height,2);
 						}
 					}
 
@@ -387,7 +400,7 @@ void ParaOGLManager::paintGL()
 				ResourceManager::getShader("board").use().setInteger("R", color.red());
 				ResourceManager::getShader("board").use().setInteger("G", color.green());
 				ResourceManager::getShader("board").use().setInteger("B", color.blue());
-				
+				ResourceManager::getShader("board").use().setFloat("tranS", transOfBoard);
 
 				//存储板连接的四个柱之间的信息
 				vPoint columnPoints;
@@ -422,7 +435,7 @@ void ParaOGLManager::paintGL()
 				y = columnHeight;
 				z = columnPoints[3].z + (columns[3].oShape.nShapeRange[3] - columns[3].oShape.nShapeRange[1]) / 2;
 
-				InitAndDrawCuboid(x, y, z, length, width, thickness);
+				InitAndDrawCuboid(x, y, z, length, width, thickness,3);
 			}
 
 			//墙
@@ -434,6 +447,7 @@ void ParaOGLManager::paintGL()
 				ResourceManager::getShader("wall").use().setInteger("R", color.red());
 				ResourceManager::getShader("wall").use().setInteger("G", color.green());
 				ResourceManager::getShader("wall").use().setInteger("B", color.blue());
+				ResourceManager::getShader("wall").use().setFloat("tranS", transOfWall);
 
 				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
 				
@@ -465,7 +479,8 @@ void ParaOGLManager::paintGL()
 					{
 						BasicUnit tmpinfo = findUnit(oglTopTable->at(oglTopTable->at(i).nAdjUnitIdx[j]).nCenUnitIdx, *oglUnitTable);
 						//墙高度
-						height = columnHeight - (tmpinfo.oShape.nShapeRange[3]- tmpinfo.oShape.nShapeRange[1]);
+						//height = columnHeight - (tmpinfo.oShape.nShapeRange[2]- tmpinfo.oShape.nShapeRange[0]);//减去梁的高度
+						height = columnHeight;
 					}
 					j++;
 				}
@@ -474,6 +489,8 @@ void ParaOGLManager::paintGL()
 				length -= (Columns[0].oShape.nShapeRange[2]- Columns[0].oShape.nShapeRange[0])/2;
 				length -= (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2;
 				
+
+				//根据墙的不同角度来绘制
 				if (oglTopTable->at(i).nUnitAngle == 0)
 				{
 					//根据墙拓扑关系决定
@@ -482,14 +499,14 @@ void ParaOGLManager::paintGL()
 						x = columnPoints[0].x + (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2;
 						y = 0;
 						z = columnPoints[0].z + thickness / 2;
-						InitAndDrawCuboid(x, y, z, length, thickness, height);
+						InitAndDrawCuboid(x, y, z, length, thickness, height,4);
 					}
 					else
 					{
 						x = columnPoints[1].x + (Columns[1].oShape.nShapeRange[2] - Columns[1].oShape.nShapeRange[0]) / 2;
 						y = 0;
 						z = columnPoints[1].z + thickness / 2;
-						InitAndDrawCuboid(x, y, z, length, thickness, height);
+						InitAndDrawCuboid(x, y, z, length, thickness, height,4);
 					}
 					
 				}
@@ -497,24 +514,24 @@ void ParaOGLManager::paintGL()
 				{
 					if (columnPoints[0].z < columnPoints[1].z)
 					{
-						x = columnPoints[0].x - (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2;
+						x = columnPoints[0].x - thickness / 2;
 						y = 0;
 						z = columnPoints[1].z - (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2;
-						InitAndDrawCuboid(x, y, z, thickness, length, height);
+						InitAndDrawCuboid(x, y, z, thickness, length, height,4);
 					}
 					else
 					{
-						x = columnPoints[1].x - (Columns[1].oShape.nShapeRange[2] - Columns[1].oShape.nShapeRange[0]) / 2;
+						x = columnPoints[1].x - thickness / 2;
 						y = 0;
 						z = columnPoints[0].z - (Columns[0].oShape.nShapeRange[3] - Columns[0].oShape.nShapeRange[1]) / 2;
-						InitAndDrawCuboid(x, y, z, thickness, length, height);
+						InitAndDrawCuboid(x, y, z, thickness, length, height,4);
 					}
 				}
 				
 
 				
 			}
-
+			
 			//门
 			if (oglTopTable->at(i).nUnitType == 5)
 			{
@@ -524,6 +541,7 @@ void ParaOGLManager::paintGL()
 				ResourceManager::getShader("door").use().setInteger("R", color.red());
 				ResourceManager::getShader("door").use().setInteger("G", color.green());
 				ResourceManager::getShader("door").use().setInteger("B", color.blue());
+				ResourceManager::getShader("door").use().setFloat("tranS", transOfDoor);
 
 				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
 				float x, y, z, length, thickness, height;
@@ -559,7 +577,8 @@ void ParaOGLManager::paintGL()
 
 					//对应墙的信息
 					BasicUnit tmpWallInfo = findUnit(oglTopTable->at(wallId).nCenUnitIdx, *oglUnitTable);
-					thickness = tmpWallInfo.oShape.nThickNess;
+					
+					thickness = tmpWallInfo.oShape.nThickNess;//门厚度与墙一致
 
 					//墙对应角度不同，对应不同情况
 					int wallX, wallY, wallZ;
@@ -586,20 +605,20 @@ void ParaOGLManager::paintGL()
 						y = oglTopTable->at(i).nCenPos[1];
 						z = wallZ;
 
-						InitAndDrawCuboid(x, y, z, length, thickness, height);
+						InitAndDrawCuboid(x, y, z, length, thickness, height,5);
 					}
 					if (oglTopTable->at(wallId).nUnitAngle == 90)
 					{
 						if (columnPoints[0].z < columnPoints[1].z)
 						{
-							wallX = columnPoints[0].x - (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2;
+							wallX = columnPoints[0].x - thickness / 2;
 							wallY = 0;
 							wallZ = columnPoints[1].z - (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2;
 
 						}
 						else
 						{
-							wallX = columnPoints[1].x - (Columns[1].oShape.nShapeRange[2] - Columns[1].oShape.nShapeRange[0]) / 2;
+							wallX = columnPoints[1].x - thickness / 2;
 							wallY = 0;
 							wallZ = columnPoints[0].z - (Columns[0].oShape.nShapeRange[3] - Columns[0].oShape.nShapeRange[1]) / 2;
 
@@ -610,7 +629,7 @@ void ParaOGLManager::paintGL()
 						y = oglTopTable->at(i).nCenPos[1];
 						z = wallZ - oglTopTable->at(i).nCenPos[0];
 
-						InitAndDrawCuboid(x, y, z, thickness, length, height);
+						InitAndDrawCuboid(x, y, z, thickness, length, height,5);
 					}
 
 				}
@@ -626,7 +645,7 @@ void ParaOGLManager::paintGL()
 				ResourceManager::getShader("window").use().setInteger("R", color.red());
 				ResourceManager::getShader("window").use().setInteger("G", color.green());
 				ResourceManager::getShader("window").use().setInteger("B", color.blue());
-
+				ResourceManager::getShader("window").use().setFloat("tranS", transOfWindow);
 
 				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
 				float x, y, z, length, thickness, height;
@@ -662,7 +681,8 @@ void ParaOGLManager::paintGL()
 
 					//对应墙的信息
 					BasicUnit tmpWallInfo = findUnit(oglTopTable->at(wallId).nCenUnitIdx, *oglUnitTable);
-					thickness = tmpWallInfo.oShape.nThickNess;
+					
+					thickness = tmpWallInfo.oShape.nThickNess;//窗厚度与墙一致
 
 					//墙对应角度不同，对应不同情况
 					int wallX, wallY, wallZ;
@@ -689,20 +709,20 @@ void ParaOGLManager::paintGL()
 						y = oglTopTable->at(i).nCenPos[1];
 						z = wallZ;
 
-						InitAndDrawCuboid(x, y, z, length, thickness, height);
+						InitAndDrawCuboid(x, y, z, length, thickness, height,6);
 					}
 					if (oglTopTable->at(wallId).nUnitAngle == 90)
 					{
 						if (columnPoints[0].z < columnPoints[1].z)
 						{
-							wallX = columnPoints[0].x - (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2;
+							wallX = columnPoints[0].x - thickness / 2;
 							wallY = 0;
 							wallZ = columnPoints[1].z - (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2;
 
 						}
 						else
 						{
-							wallX = columnPoints[1].x - (Columns[1].oShape.nShapeRange[2] - Columns[1].oShape.nShapeRange[0]) / 2;
+							wallX = columnPoints[1].x - thickness / 2;
 							wallY = 0;
 							wallZ = columnPoints[0].z - (Columns[0].oShape.nShapeRange[3] - Columns[0].oShape.nShapeRange[1]) / 2;
 
@@ -713,7 +733,7 @@ void ParaOGLManager::paintGL()
 						y = oglTopTable->at(i).nCenPos[1];
 						z = wallZ - oglTopTable->at(i).nCenPos[0];
 
-						InitAndDrawCuboid(x, y, z, thickness, length, height);
+						InitAndDrawCuboid(x, y, z, thickness, length, height,6);
 					}
 
 				}
@@ -751,8 +771,8 @@ void ParaOGLManager::updateGL()
 	GLfloat a = width();
 	GLfloat b = height();
 	projection.perspective(camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 2000.f);
-
-
+	//projection.frustum(-10000, 10000, -10000, 10000, -10000, 10000);
+	//projection.ortho(-1000,1000,-1000,1000,-1000,10000);
 
 	switch (switchView)
 	{
@@ -949,7 +969,7 @@ void ParaOGLManager::InitAndDrawColumn(float x, float y, float z, float radius, 
 	delete[] vertices;
 }
 
-void ParaOGLManager::InitAndDrawCuboid(float x, float y, float z, float length, float thickness, float height)
+void ParaOGLManager::InitAndDrawCuboid(float x, float y, float z, float length, float thickness, float height,int type)
 {
 	//init
 	float* vertices = new float[72];
@@ -983,23 +1003,26 @@ void ParaOGLManager::InitAndDrawCuboid(float x, float y, float z, float length, 
 	pCore->glBufferData(GL_ARRAY_BUFFER, 72 * sizeof(float), vertices, GL_STATIC_DRAW);
 
 
-
+	
 	//draw
 	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	pCore->glEnableVertexAttribArray(0);
 	pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 
-	pCore->glDepthMask(GL_FALSE);//取消深度缓冲
+	//柱、门窗是不透明的，所以对其类型不加深度缓冲
+	if (type != 1 && type != 2 && type != 3 && type != 5 && type != 6) { pCore->glDepthMask(GL_FALSE); }//取消深度缓冲
 	pCore->glEnable(GL_BLEND);//开启颜色混合
 	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 
 	pCore->glDrawArrays(GL_QUADS, 0, 24);
 
 	pCore->glDisable(GL_BLEND);
-	pCore->glDepthMask(GL_TRUE);
+	if (type != 1 && type != 2 && type != 3 && type != 5 && type != 6) { pCore->glDepthMask(GL_TRUE); }
 
 
+
+	
 	//delete
 	pCore->glDeleteBuffers(1, &VBO);
 	delete[] vertices;
