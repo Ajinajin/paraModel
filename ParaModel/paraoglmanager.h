@@ -57,20 +57,24 @@ public:
 	// 
 	//柱
 	void InitAndDrawColumn(float x, float y, float z, float radius, float height);//参数：底面圆心xz，半径，高度
-
-	//多边形柱(竖着)
-	void InitAndDrawPolygonColumnPortrait(VINT data, float height);
-
-	//多边形柱(横着)
-	void InitAndDrawPolygonColumnHorizontal(VINT data, float length);
+	//多边形体(竖着)
+	void InitAndDrawPolygonPortrait(VINT data, float height);
+	//多边形体(横着)
+	void InitAndDrawPolygonHorizontal(VINT data, float length);
 	//长方体（墙、板等）x\y\z 为墙体最左下角的点坐标
 	void InitAndDrawCuboid(float x, float y, float z, float length, float thickness, float height, int type);
+	
 
 	//根据中心构件单元Id去构件库里查具体模型参数
 	BasicUnit findUnit(int idx, VUNITTABLE oglUnitTable);
 
-	VTOPOTABLE* oglTopTable;//绘制所需的拓扑结构表
-	VUNITTABLE* oglUnitTable;//绘制所需的结构单元表
+	VTOPOTABLE* oglTopTable;	//绘制所需的拓扑结构表
+	VUNITTABLE* oglUnitTable;	//绘制所需的结构单元表
+
+	//存储所有所需绘制物体的起始坐标与相关数据（长宽高等）
+	//长方体绘制起始点是左下角点，其他（比如圆柱）则暂时是中心线下点
+	vector<VINT> modelInfos;		
+
 
 public:
 	//相机、鼠标键入相关参数

@@ -214,14 +214,15 @@ void ParaOGLManager::paintGL()
 	//六种构建的透明度
 	float transOfColumn = 1.0;
 	float transOfBeam = 1.0;
-	float transOfBoard = 1.0;
+	float transOfBoard = 0.75;
 	float transOfWall = 0.5;
-	float transOfDoor = 0.75;
-	float transOfWindow = 0.75;
+	float transOfDoor = 0.25;
+	float transOfWindow = 0.25;
 
 	//绘制三维模型
 	if (!oglUnitTable->empty() && !oglTopTable->empty())
 	{
+		modelInfos.resize(oglTopTable->size());
 		for (int i = 0; i < oglTopTable->size(); i++)
 		{
 			//**判断此构件类型**
@@ -254,6 +255,9 @@ void ParaOGLManager::paintGL()
 					z = oglTopTable->at(i).nCenPos[1] + thickness / 2;
 
 					InitAndDrawCuboid(x, y, z, length, thickness, height,1);
+
+					//存储
+					//modelInfos[i].push_back();
 				}
 
 				//圆柱
@@ -275,7 +279,7 @@ void ParaOGLManager::paintGL()
 				if (info.oShape.nShapeType == 3)
 				{
 					float height = oglTopTable->at(i).nCenPos[3];
-					InitAndDrawPolygonColumnPortrait(info.oShape.vPolyPt, height);
+					InitAndDrawPolygonPortrait(info.oShape.vPolyPt, height);
 				}
 			}
 
@@ -390,6 +394,7 @@ void ParaOGLManager::paintGL()
 			if (oglTopTable->at(i).nUnitType == 3)
 			{
 				BasicUnit info = findUnit(oglTopTable->at(i).nCenUnitIdx, *oglUnitTable);
+
 				float x, y, z, length, width, thickness;
 				//板的厚度
 				thickness = info.oShape.nThickNess;
@@ -402,7 +407,7 @@ void ParaOGLManager::paintGL()
 				ResourceManager::getShader("board").use().setInteger("B", color.blue());
 				ResourceManager::getShader("board").use().setFloat("tranS", transOfBoard);
 
-				//存储板连接的四个柱之间的信息
+				//存储板连接的柱之间的信息
 				vPoint columnPoints;
 				vector<BasicUnit> columns;
 				int j = 0;
@@ -422,20 +427,30 @@ void ParaOGLManager::paintGL()
 					j++;
 				}
 
-				//长度减去两个柱的宽度的一半
-				length = Distance(columnPoints[0].x, columnPoints[0].y, columnPoints[0].z, columnPoints[1].x, columnPoints[1].y, columnPoints[1].z);
-				length += (columns[0].oShape.nShapeRange[2] - columns[0].oShape.nShapeRange[0]) / 2;
-				length += (columns[1].oShape.nShapeRange[2] - columns[1].oShape.nShapeRange[0]) / 2;
-				//宽度
-				width = Distance(columnPoints[1].x, columnPoints[1].y, columnPoints[1].z, columnPoints[2].x, columnPoints[2].y, columnPoints[2].z);
-				width += (columns[1].oShape.nShapeRange[3] - columns[1].oShape.nShapeRange[1]) / 2;
-				width += (columns[2].oShape.nShapeRange[3] - columns[2].oShape.nShapeRange[1]) / 2;
+				//普通的四柱矩形板
+				if (columns.size() == 4)
+				{
+					//长度减去两个柱的宽度的一半
+					length = Distance(columnPoints[0].x, columnPoints[0].y, columnPoints[0].z, columnPoints[1].x, columnPoints[1].y, columnPoints[1].z);
+					length += (columns[0].oShape.nShapeRange[2] - columns[0].oShape.nShapeRange[0]) / 2;
+					length += (columns[1].oShape.nShapeRange[2] - columns[1].oShape.nShapeRange[0]) / 2;
+					//宽度
+					width = Distance(columnPoints[1].x, columnPoints[1].y, columnPoints[1].z, columnPoints[2].x, columnPoints[2].y, columnPoints[2].z);
+					width += (columns[1].oShape.nShapeRange[3] - columns[1].oShape.nShapeRange[1]) / 2;
+					width += (columns[2].oShape.nShapeRange[3] - columns[2].oShape.nShapeRange[1]) / 2;
 
-				x = columnPoints[3].x - (columns[3].oShape.nShapeRange[2] - columns[3].oShape.nShapeRange[0]) / 2;
-				y = columnHeight;
-				z = columnPoints[3].z + (columns[3].oShape.nShapeRange[3] - columns[3].oShape.nShapeRange[1]) / 2;
+					x = columnPoints[3].x - (columns[3].oShape.nShapeRange[2] - columns[3].oShape.nShapeRange[0]) / 2;
+					y = columnHeight;
+					z = columnPoints[3].z + (columns[3].oShape.nShapeRange[3] - columns[3].oShape.nShapeRange[1]) / 2;
 
-				InitAndDrawCuboid(x, y, z, length, width, thickness,3);
+					InitAndDrawCuboid(x, y, z, length, width, thickness, 3);
+				}
+				//多边形板
+				if (columns.size() > 4)
+				{
+
+				}
+				
 			}
 
 			//墙
@@ -1011,14 +1026,14 @@ void ParaOGLManager::InitAndDrawCuboid(float x, float y, float z, float length, 
 
 
 	//柱、门窗是不透明的，所以对其类型不加深度缓冲
-	if (type != 1 && type != 2 && type != 3 && type != 5 && type != 6) { pCore->glDepthMask(GL_FALSE); }//取消深度缓冲
+	if (type != 1 && type != 2 /*&& type != 3 && type != 5 && type != 6*/) { pCore->glDepthMask(GL_FALSE); }//取消深度缓冲
 	pCore->glEnable(GL_BLEND);//开启颜色混合
 	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 
 	pCore->glDrawArrays(GL_QUADS, 0, 24);
 
 	pCore->glDisable(GL_BLEND);
-	if (type != 1 && type != 2 && type != 3 && type != 5 && type != 6) { pCore->glDepthMask(GL_TRUE); }
+	if (type != 1 && type != 2/* && type != 3 && type != 5 && type != 6*/) { pCore->glDepthMask(GL_TRUE); }
 
 
 
@@ -1040,11 +1055,12 @@ BasicUnit ParaOGLManager::findUnit(int idx, VUNITTABLE oglUnitTable)
 	//return;
 }
 
-void ParaOGLManager::InitAndDrawPolygonColumnPortrait(VINT data, float height)
+void ParaOGLManager::InitAndDrawPolygonPortrait(VINT data, float height)
 {
 
 	float* vertices = new float[data.size() * 1.5 * 2];
 
+	//先画侧面数据
 	for (int i = 0; i < data.size(); i += 2)
 	{
 		vertices[i * 6] = data[i];
@@ -1056,6 +1072,7 @@ void ParaOGLManager::InitAndDrawPolygonColumnPortrait(VINT data, float height)
 		vertices[i * 6 + 5] = vertices[i * 6 + 2];
 	}
 
+	
 
 	pCore->glGenBuffers(1, &VBO);
 
@@ -1084,9 +1101,14 @@ void ParaOGLManager::InitAndDrawPolygonColumnPortrait(VINT data, float height)
 	//delete
 	pCore->glDeleteBuffers(1, &VBO);
 	delete[] vertices;
+
+
+
+
+	//再画两个底面数据
 }
 
-void ParaOGLManager::InitAndDrawPolygonColumnHorizontal(VINT data, float length)
+void ParaOGLManager::InitAndDrawPolygonHorizontal(VINT data, float length)
 {
 	float* vertices = new float[data.size() * 1.5 * 2];
 
