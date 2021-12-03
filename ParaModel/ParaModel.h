@@ -128,7 +128,9 @@ private:
 	void SceneZClear();
 	//更新画布元素
 	void UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height);
-	 
+	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//画布移动元素
+	void SceneMenuClickAction(int nUnitType, int nUnitIdx, int clickType);	//画布菜单点击
+
 public slots:
 	void MyLogOutput(QString myLogout);         //输出日志
 	void ApplyDataAction();		//保存属性输入的数据 
@@ -143,11 +145,7 @@ public slots:
 	void updateOGL();				//更新三维窗口内容
 	void updateScene();				//更新画布内容
 
-
-private slots: 
 	void NewFileAction();
 	void OpenFileAction();
 	void CloseFileAction();
-	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//画布移动元素
-	void SceneMenuClickAction(int nUnitType, int nUnitIdx, int clickType);	//画布菜单点击
 };

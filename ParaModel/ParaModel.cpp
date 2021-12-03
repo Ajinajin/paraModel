@@ -1367,8 +1367,12 @@ void ParaModel::updateScene()
 			viewItem->nUnitType = viewShape[i].unitType;
 			viewItem->nUnitIdx = viewShape[i].unitIdx;
 			viewItem->setBrush(ColorHelper(viewShape[i].unitType));
-			connect(viewItem, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
-			connect(viewItem, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
+			connect(viewItem, &BRectangle::SceneItemMove, this, [=](int nUnitType, int nUnitIdx, QPointF pos) {
+				SceneItemMoveAction(nUnitType, nUnitIdx, pos);
+				});
+			connect(viewItem, &BRectangle::SceneMenuClick, this, [=](int nUnitType, int nUnitIdx, int clickType) {
+				SceneMenuClickAction(nUnitType, nUnitIdx, clickType);
+				});
 			pSceneMain.addItem(viewItem);
 		}
 
