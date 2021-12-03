@@ -1302,22 +1302,12 @@ void ParaModel::ReleaseSysModel()
 
 //画布移动元素
 void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
-{
-	int a = nUnitType;
-	int v = nUnitIdx;
-	QPointF pos1 = pos;
-	int s = a + v;
-	//QList<QGraphicsItem*> itemList = pSceneMain.selectedItems();
-	//for (size_t i = 0; i < itemList.size(); i++)
-	//{
-	//	BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
-	//	if (!proxyWidget->isAuxiliary)
-	//	{
-	//		//获取到当前选中的
-	//		proxyWidget->nUnitIdx;
-	//		proxyWidget->nUnitType;
-	//	}
-	//}
+{ 
+	if (MainDockState != 3)
+	{
+		graphicsViewMain->hide();
+		graphicsViewMain->show();
+	}
 	return;
 }
 //画布菜单点击
