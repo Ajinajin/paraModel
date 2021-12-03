@@ -34,6 +34,11 @@
 #include "SARibbonCustomizeDialog.h"
 #include "SAFramelessHelper.h"
 
+#define FREEPTR(p) if(p!=NULL)\
+	{ \
+		delete p;\
+		p = NULL ;\
+	 }\
 
 #pragma region 初始化窗口
 //初始化属性窗口
@@ -251,6 +256,12 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 
 	//树按钮响应
 	connect(pModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column) {
+		if (if_data == 0)
+		{
+			MyLogOutput("当前无画布信息，请新建或者打开后在操作");
+			return;
+		}
+
 		QTreeWidgetItem* parent = item->parent();
 		if (NULL == parent) //注意：最顶端项是没有父节点的，双击这些项时注意(陷阱)
 			return;
@@ -411,107 +422,6 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 	//timerSceneMain->start(20);
 }
 
-//更新画布内容
-void ParaModel::updateScene()
-{
-	if (if_data == 0)
-		return;
-	if (vModelTmpl.size() == 0)
-		return;
-
-
-	DimDataConvert* d = new DimDataConvert();
-	VSHAPE viewShape;
-	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
-	//只绘制柱、墙、梁
-	//for (size_t i = 0; i < vModelTmpl.size(); i++)
-	//{
-	//	//柱梁板墙门窗
-	//	if (vModelTmpl[i].nUnitType == 1)//柱
-	//	{
-	//		BasicUnit unit = GetBaseUnit(vModelTmpl[i].nCenUnitIdx);
-	//		int coordX = vModelTmpl[i].nCenPos[0] + unit.oShape.nShapeRange[0] + pSceneOffset;
-	//		int coordY = vModelTmpl[i].nCenPos[1] + unit.oShape.nShapeRange[1] + pSceneOffset;
-	//		//根据构建id找到对应是构件
-	//		BRectangle* pillar = new BRectangle(
-	//			coordX, coordY,
-	//			unit.oShape.nShapeRange[2], unit.oShape.nShapeRange[3],
-	//			BGraphicsItem::ItemType::Rectangle);
-	//		pillar->nUnitType = vModelTmpl[i].nUnitType;
-	//		pillar->nUnitIdx = vModelTmpl[i].nCenUnitIdx;
-	//		pillar->setBrush(ColorHelper(vModelTmpl[i].nUnitType));
-	//		pSceneMain.addItem(pillar);
-	//	}
-	//}
-	for (size_t i = 0; i < viewShape.size(); i++)
-	{
-		int coordX = viewShape[i].nCen[0] + pSceneOffset;
-		int coordY = viewShape[i].nCen[1] + pSceneOffset;
-		//根据构建id找到对应是构件
-		BRectangle* viewItem = new BRectangle(
-			coordX, coordY,
-			viewShape[i].nWH[0], viewShape[i].nWH[1],
-			BGraphicsItem::ItemType::Rectangle);
-		viewItem->nUnitType = viewShape[i].unitType;
-		viewItem->nUnitIdx = viewShape[i].unitIdx;
-		viewItem->setBrush(ColorHelper(viewShape[i].unitType));
-		pSceneMain.addItem(viewItem);
-
-	}
-	for (size_t i = 0; i < viewShape.size(); i++)
-	{
-		//根据墙的角度判断线的方向
-		if (viewShape[i].unitType == 4)
-		{
-			int coordX = viewShape[i].nCen[0] + pSceneOffset;
-			int coordY = viewShape[i].nCen[1] + pSceneOffset;
-			if (vModelTmpl[viewShape[i].unitIdx].nUnitAngle == 0)
-			{
-				BRectangle* divideLine = new BRectangle(
-					0, coordY,
-					8000, 10,
-					BGraphicsItem::ItemType::Rectangle);
-				divideLine->nUnitType = 1;
-				divideLine->nUnitIdx = viewShape[i].unitIdx;
-				/*QBrush b = (Qt::DashLine);
-				b.setColor(ColorHelper(viewShape[i].unitType));
-				divideLine->setBrush(b);*/
-				QPen pen = QPen(Qt::yellow);
-				pen.setStyle(Qt::DashLine);
-				divideLine->setPen(pen);
-				pSceneMain.addItem(divideLine);
-			}
-			else
-			{
-				BRectangle* divideLine = new BRectangle(
-					coordX, 0,
-					10, 8000,
-					BGraphicsItem::ItemType::Rectangle);
-				divideLine->nUnitType = 1;
-				divideLine->nUnitIdx = viewShape[i].unitIdx;
-				/*QBrush b = (Qt::DashLine);
-				b.setColor(ColorHelper(viewShape[i].unitType));
-				divideLine->setBrush(b);*/
-				QPen pen = QPen(Qt::yellow);
-				pen.setStyle(Qt::DashLine);
-				divideLine->setPen(pen);
-				pSceneMain.addItem(divideLine);
-			}
-
-		}
-	}
-}
-
-BasicUnit ParaModel::GetBaseUnit(int idx)
-{
-	for (size_t i = 0; i < vBaseUnit.size(); i++)
-	{
-		if (vBaseUnit[i].nUnitIdx == idx)
-			return vBaseUnit[i];
-	}
-	BasicUnit b;
-	return b;
-}
 //更新OpenGL窗口
 void ParaModel::updateOGL()
 {
@@ -535,7 +445,7 @@ void ParaModel::updateOGL()
 	paraOglmanagerMain->oglTopTable = &this->vModelTmpl;
 	paraOglmanagerMain->oglUnitTable = &this->vBaseUnit;
 
-	
+
 
 }
 
@@ -718,9 +628,16 @@ void ParaModel::NewFileAction()
 	if_data = 1;
 	MyLogOutput("新建场景文件成功");
 }
+
 void ParaModel::CloseFileAction()
 {
 	if_data = 0;
+	vModelTmpl.clear();
+	SceneMainClear();
+	SceneXClear();
+	SceneYClear();
+	SceneZClear();
+
 	MyLogOutput("清除数据成功");
 }
 void ParaModel::OpenFileAction()
@@ -888,8 +805,7 @@ void ParaModel::MyLogOutput(QString myLogout)
 
 // 数据修改后更新
 void ParaModel::ApplyDataAction()
-{
-
+{  
 	// 场景未 没有数据
 	// if (pEnvir2 == NULL)
 	// {
@@ -1033,10 +949,6 @@ void ParaModel::drawWall(const std::vector<float>& points) {
 #pragma region 初始化数据
 
 
-//ParaModel::~ParaModel()
-//{
-//	delete ui;
-//}
 
 int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 {
@@ -1225,6 +1137,30 @@ int ParaModel::InitParaTmpl()
 
 #pragma region 数据识别帮助方法
 
+//获取系统构建库中的构建
+BasicUnit ParaModel::GetBaseUnit(int idx)
+{
+	for (size_t i = 0; i < vBaseUnit.size(); i++)
+	{
+		if (vBaseUnit[i].nUnitIdx == idx)
+			return vBaseUnit[i];
+	}
+	BasicUnit b;
+	return b;
+}
+
+
+//获取加载构建集中的构建
+TopoUnit ParaModel::GetTopoUnit(int idx)
+{
+	for (size_t i = 0; i < vModelTmpl.size(); i++)
+	{
+		if (vModelTmpl[i].nTopoIdx == idx)
+			return vModelTmpl[i];
+	}
+	TopoUnit b;
+	return b;
+}
 QColor ParaModel::ColorHelper(int nUnitType)
 {
 	if (nUnitType == 1)
@@ -1324,5 +1260,247 @@ int ParaModel::GetShapeTypeCode(QString shapeTypeStr)
 		return 3;
 	}
 	return 0;
+}
+#pragma endregion
+
+#pragma region 释放资源
+
+ParaModel::~ParaModel()
+{
+	ReleaseUISource();
+	ReleaseSysModel();
+}
+
+// 释放各种界面资源
+void ParaModel::ReleaseUISource()
+{
+	// 释放各种资源
+	FREEPTR(pTipBar);
+	FREEPTR(myLogOutLabel);
+	FREEPTR(graphicsViewMain);
+	FREEPTR(graphicsViewOgl);
+	FREEPTR(graphicsViewX);
+	FREEPTR(graphicsViewY);
+	FREEPTR(graphicsViewZ);
+	FREEPTR(graphicsViewMain);
+	return;
+}
+
+
+// 释放系统模型库
+void ParaModel::ReleaseSysModel()
+{
+
+	return;
+}
+#pragma endregion
+
+#pragma region 画布操作
+
+//画布移动元素
+void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
+{
+	//QList<QGraphicsItem*> itemList = pSceneMain.selectedItems();
+	//for (size_t i = 0; i < itemList.size(); i++)
+	//{
+	//	BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
+	//	if (!proxyWidget->isAuxiliary)
+	//	{
+	//		//获取到当前选中的
+	//		proxyWidget->nUnitIdx;
+	//		proxyWidget->nUnitType;
+	//	}
+	//}
+	return;
+}
+//画布菜单点击
+void ParaModel::SceneMenuClickAction(int nUnitType, int nUnitIdx, int clickType)
+{
+	return;
+}
+
+//更新画布内容
+void ParaModel::updateScene()
+{
+	if (if_data == 0)
+		return;
+	if (vModelTmpl.size() == 0)
+		return;
+
+
+	DimDataConvert* d = new DimDataConvert();
+	VSHAPE viewShape;
+	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
+	//只绘制柱、墙、梁
+	//for (size_t i = 0; i < vModelTmpl.size(); i++)
+	//{
+	//	//柱梁板墙门窗
+	//	if (vModelTmpl[i].nUnitType == 1)//柱
+	//	{
+	//		BasicUnit unit = GetBaseUnit(vModelTmpl[i].nCenUnitIdx);
+	//		int coordX = vModelTmpl[i].nCenPos[0] + unit.oShape.nShapeRange[0] + pSceneOffset;
+	//		int coordY = vModelTmpl[i].nCenPos[1] + unit.oShape.nShapeRange[1] + pSceneOffset;
+	//		//根据构建id找到对应是构件
+	//		BRectangle* pillar = new BRectangle(
+	//			coordX, coordY,
+	//			unit.oShape.nShapeRange[2], unit.oShape.nShapeRange[3],
+	//			BGraphicsItem::ItemType::Rectangle);
+	//		pillar->nUnitType = vModelTmpl[i].nUnitType;
+	//		pillar->nUnitIdx = vModelTmpl[i].nCenUnitIdx;
+	//		pillar->setBrush(ColorHelper(vModelTmpl[i].nUnitType));
+	//		pSceneMain.addItem(pillar);
+	//	}
+	//}
+	//根据数据绘制图形
+	for (size_t i = 0; i < viewShape.size(); i++)
+	{
+		//绘制柱、墙、门、窗
+		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
+		{
+			int coordX = viewShape[i].nCen[0] + pSceneOffset;
+			int coordY = viewShape[i].nCen[1] + pSceneOffset;
+			BRectangle* viewItem = new BRectangle(
+				coordX, coordY,
+				viewShape[i].nWH[0], viewShape[i].nWH[1],
+				BGraphicsItem::ItemType::Rectangle);
+			viewItem->isAuxiliary = false;
+			viewItem->nUnitType = viewShape[i].unitType;
+			viewItem->nUnitIdx = viewShape[i].unitIdx;
+			viewItem->setBrush(ColorHelper(viewShape[i].unitType));
+			connect(viewItem, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+			connect(viewItem, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
+			pSceneMain.addItem(viewItem);
+		}
+
+	}
+	for (size_t i = 0; i < viewShape.size(); i++)
+	{
+		//根据墙的角度判断线的方向
+		if (viewShape[i].unitType == 4)
+		{
+			int coordX = viewShape[i].nCen[0] + pSceneOffset;
+			int coordY = viewShape[i].nCen[1] + pSceneOffset;
+			if (vModelTmpl[viewShape[i].unitIdx].nUnitAngle == 0)
+			{
+				BRectangle* divideLine = new BRectangle(
+					1, coordY,
+					8000, 2,
+					BGraphicsItem::ItemType::Rectangle);
+				divideLine->isAuxiliary = true;
+				divideLine->nUnitIdx = viewShape[i].unitIdx;
+				/*QBrush b = (Qt::DashLine);
+				b.setColor(ColorHelper(viewShape[i].unitType));
+				divideLine->setBrush(b);*/
+				QPen pen = QPen(Qt::yellow);
+				pen.setStyle(Qt::DashLine);
+				divideLine->setPen(pen);
+				pSceneMain.addItem(divideLine);
+			}
+			else
+			{
+				BRectangle* divideLine = new BRectangle(
+					coordX, 1,
+					2, 8000,
+					BGraphicsItem::ItemType::Rectangle);
+				divideLine->isAuxiliary = true;
+				divideLine->nUnitIdx = viewShape[i].unitIdx;
+				/*QBrush b = (Qt::DashLine);
+				b.setColor(ColorHelper(viewShape[i].unitType));
+				divideLine->setBrush(b);*/
+				QPen pen = QPen(Qt::yellow);
+				pen.setStyle(Qt::DashLine);
+				divideLine->setPen(pen);
+				pSceneMain.addItem(divideLine);
+			}
+
+		}
+	}
+}
+
+void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height)
+{
+	bool isWall = false;
+	QList<QGraphicsItem*> itemList = pSceneMain.items();
+	for (size_t i = 0; i < itemList.size(); i++)
+	{
+		BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
+		if (proxyWidget->nUnitIdx == nUnitIdx)
+		{
+			if (!proxyWidget->isAuxiliary)
+			{
+				proxyWidget->m_leftup = QPointF(pSceneOffset + x, pSceneOffset + y);
+				proxyWidget->m_edge = QPointF(pSceneOffset + x + width, pSceneOffset + y + height);
+			}
+			else
+			{
+				pSceneMain.removeItem(proxyWidget);
+				isWall = true;
+			}
+		}
+	}
+	if (isWall)
+	{
+		if (vModelTmpl[nUnitIdx].nUnitAngle == 0)
+		{
+			int center = (width / 2);
+			BRectangle* divideLine = new BRectangle(
+				1, pSceneOffset + x + center,
+				8000, 2,
+				BGraphicsItem::ItemType::Rectangle);
+			divideLine->isAuxiliary = true;
+			divideLine->nUnitIdx = nUnitIdx;
+			divideLine->wallwidth = 0;
+			QPen pen = QPen(Qt::yellow);
+			pen.setStyle(Qt::DashLine);
+			divideLine->setPen(pen);
+			pSceneMain.addItem(divideLine);
+		}
+		else
+		{
+			int center = (height / 2);
+			BRectangle* divideLine = new BRectangle(
+				pSceneOffset + y + center, 1,
+				2, 8000,
+				BGraphicsItem::ItemType::Rectangle);
+			divideLine->isAuxiliary = true;
+			divideLine->nUnitIdx = nUnitIdx;
+			QPen pen = QPen(Qt::yellow);
+			pen.setStyle(Qt::DashLine);
+			divideLine->setPen(pen);
+			pSceneMain.addItem(divideLine);
+		}
+	}
+}
+void ParaModel::SceneMainClear()
+{
+	pSceneMain.clear();
+	for (int x = 0; x <= 2000; x += 20)
+		pSceneMain.addLine(0, x, 2000, x, QPen(Qt::red));
+	for (int y = 0; y <= 2000; y += 20)
+		pSceneMain.addLine(y, 0, y, 2000, QPen(Qt::red));
+}
+void ParaModel::SceneXClear()
+{
+	pSceneX.clear();
+	for (int x = 0; x <= 2000; x += 20)
+		pSceneX.addLine(0, x, 2000, x, QPen(Qt::red));
+	for (int y = 0; y <= 2000; y += 20)
+		pSceneX.addLine(y, 0, y, 2000, QPen(Qt::red));
+}
+void ParaModel::SceneYClear()
+{
+	pSceneY.clear();
+	for (int x = 0; x <= 2000; x += 20)
+		pSceneY.addLine(0, x, 2000, x, QPen(Qt::red));
+	for (int y = 0; y <= 2000; y += 20)
+		pSceneY.addLine(y, 0, y, 2000, QPen(Qt::red));
+}
+void ParaModel::SceneZClear()
+{
+	pSceneZ.clear();
+	for (int x = 0; x <= 2000; x += 20)
+		pSceneZ.addLine(0, x, 2000, x, QPen(Qt::red));
+	for (int y = 0; y <= 2000; y += 20)
+		pSceneZ.addLine(y, 0, y, 2000, QPen(Qt::red));
 }
 #pragma endregion
