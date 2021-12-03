@@ -1300,6 +1300,10 @@ void ParaModel::ReleaseSysModel()
 //»­²¼ÒÆ¶¯ÔªËØ
 void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 {
+	int a = nUnitType;
+	int v = nUnitIdx;
+	QPointF pos1 = pos;
+	int s = a + v;
 	//QList<QGraphicsItem*> itemList = pSceneMain.selectedItems();
 	//for (size_t i = 0; i < itemList.size(); i++)
 	//{
@@ -1367,12 +1371,8 @@ void ParaModel::updateScene()
 			viewItem->nUnitType = viewShape[i].unitType;
 			viewItem->nUnitIdx = viewShape[i].unitIdx;
 			viewItem->setBrush(ColorHelper(viewShape[i].unitType));
-			connect(viewItem, &BRectangle::SceneItemMove, this, [=](int nUnitType, int nUnitIdx, QPointF pos) {
-				SceneItemMoveAction(nUnitType, nUnitIdx, pos);
-				});
-			connect(viewItem, &BRectangle::SceneMenuClick, this, [=](int nUnitType, int nUnitIdx, int clickType) {
-				SceneMenuClickAction(nUnitType, nUnitIdx, clickType);
-				});
+			connect(viewItem, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+			connect(viewItem, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
 			pSceneMain.addItem(viewItem);
 		}
 
