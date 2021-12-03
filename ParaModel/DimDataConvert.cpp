@@ -110,9 +110,17 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& 
 		nWH[0] = table[oUnit.nCenUnitIdx].oShape.nThickNess; // 厚度 查表得到
 		nWH[1] = oColShape0.nCen[1] - oColShape1.nCen[1];
 		nWH[1] -= (oColShape0.nWH[1] + oColShape1.nWH[1]) / 2;
-		nWH[1] = abs(nWH[1]) - (oColShape0.nWH[1] + oColShape1.nWH[1]) ;
 		nCen[0] = oColShape0.nCen[0];
-		nCen[1] = oColShape0.nCen[1] + abs(oColShape0.nCen[1] - oColShape1.nCen[1]) / 2;
+		if (oColShape0.nCen[1] > oColShape1.nCen[1])
+		{
+			nWH[1] = abs(nWH[1]);
+			nCen[1] = oColShape1.nCen[1] + abs(oColShape0.nCen[1] - oColShape1.nCen[1]) / 2;
+		}
+		else
+		{
+			nWH[1] = abs(nWH[1]) - (oColShape0.nWH[1] + oColShape1.nWH[1]);
+			nCen[1] = oColShape0.nCen[1] + abs(oColShape0.nCen[1] - oColShape1.nCen[1]) / 2;
+		}
 	}
 	else
 	{
@@ -207,16 +215,9 @@ int DimDataConvert::CalPlaneData(VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VU
 	{
 		oCurUnit = vLayerTopo[i];
 		if (oCurUnit.nUnitType == 4)
-		{
-			if (i == 15)
-			{
+		{ 
 				CalWallShape(i, vLayerTopo, vPlaneDraw, table);
-			}
-			else
-			{
-
-				CalWallShape(i, vLayerTopo, vPlaneDraw, table);
-			}
+			  
 		}
 	}
 
