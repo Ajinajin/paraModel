@@ -32,10 +32,10 @@ class SARibbonCategory;
 class ParaModel : public SARibbonMainWindow
 {
 	Q_OBJECT
-
 		//构造函数
 public:
-	ParaModel(QWidget* parent = 0);
+	explicit ParaModel(QWidget* parent = 0);
+	~ParaModel();
 
 private:
 	QStatusBar* winStatus;							//状态栏
@@ -76,7 +76,6 @@ public:
 	int InitPlaneDrawLib();					// 初始化平面图库
 	int InitParaTmpl();						// 初始化参数化生成模板
 
-
 private:
 	//初始化窗口
 	void InitWindow();
@@ -104,8 +103,10 @@ private:
 	//初始化弹出窗口
 	void InitTipWindow();
 
+	//获取系统构建库中的构建
 	BasicUnit GetBaseUnit(int idx);
-
+	//获取加载构建集中的构建
+	TopoUnit GetTopoUnit(int idx);
 	//根据绘制构件类别识别颜色
 	QColor ColorHelper(int nUnitType);
 	//根据构件类别编码转换成对应的字符描述
@@ -114,7 +115,20 @@ private:
 	int GetUnitTypeCode(QString unitTypeStr);
 	//根据构建形状的字符描述转换成对应的类别编码
 	int GetShapeTypeCode(QString shapeTypeStr);
-	 
+
+	// 释放各种界面资源
+	void ReleaseUISource();
+	// 释放系统模型库
+	void ReleaseSysModel();
+
+	//清除画布
+	void SceneMainClear();
+	void SceneXClear();
+	void SceneYClear();
+	void SceneZClear();
+	//更新画布元素
+	void UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height);
+
 public slots:
 	void MyLogOutput(QString myLogout);         //输出日志
 	void ApplyDataAction();		//保存属性输入的数据 
@@ -129,10 +143,10 @@ public slots:
 	void updateOGL();				//更新三维窗口内容
 	void updateScene();				//更新画布内容
 
-
-
-private slots: 
 	void NewFileAction();
 	void OpenFileAction();
 	void CloseFileAction();
+
+	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//画布移动元素
+	void SceneMenuClickAction(int nUnitType, int nUnitIdx, int clickType);	//画布菜单点击
 };

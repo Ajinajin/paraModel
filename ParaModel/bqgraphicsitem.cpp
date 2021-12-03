@@ -45,16 +45,14 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	QList<QGraphicsItem*> itemList=this->scene()->items();
 	for (size_t i = 0; i < itemList.size(); i++)
 	{
-		if (itemList[i]->type() == BGraphicsItem::type()) {
-
+		if (itemList[i]->type() == BGraphicsItem::type()) 
+		{
 			BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
 			if (proxyWidget->nUnitIdx == this->nUnitIdx)
 			{
 				itemList[i]->setSelected(true);
 			}
 		}
-
-		 ;
 	}
 	setSelected(true);
 }
@@ -64,8 +62,8 @@ void BGraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 	if (event->buttons() == Qt::LeftButton) {
 		if (nUnitType == 1)
 			return;
+		emit SceneItemMove(nUnitType, nUnitIdx, event->scenePos());
 		QAbstractGraphicsShapeItem::mouseMoveEvent(event);
-		emit ItemMove(nUnitType, nUnitIdx, event->scenePos());
 	}
 }
 
@@ -277,7 +275,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
 	if (!this->isSelected())
 		return;
-	if (nUnitType <= 4)
+	if (nUnitType == 1)
 		return;
 	QMenu* menu = new QMenu();
 	menu->setStyleSheet("QMenu { background-color:rgb(89,87,87); border: 5px solid rgb(235,110,36); }");
@@ -304,6 +302,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 		//发送信号 确认修改后的值
 		});
 
+
 	QPushButton* pApplyBtn = new QPushButton(QString::fromStdString(u8"确认"));
 	pApplyBtn->setFixedWidth(100);
 
@@ -311,8 +310,9 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 		//发送信号 确认修改后的值
 		int x = width_spinBox->value();
 		int y = height_spinBox->value();
-		emit ItemMove(nUnitType, nUnitIdx, QPointF(x, y));
-		});
+		emit SceneItemMove(nUnitType, nUnitIdx, QPointF(x, y));
+	});
+
 
 	QWidgetAction* width_widgetAction = new QWidgetAction(menu);
 	width_widgetAction->setDefaultWidget(width_spinBox);
@@ -326,6 +326,19 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	QWidgetAction* applyBtn_widgetAction = new QWidgetAction(menu);
 	applyBtn_widgetAction->setDefaultWidget(pApplyBtn);
 	menu->addAction(applyBtn_widgetAction);
+
+
+	QAction* act = new QAction(this);
+	act->setObjectName((u8"更换构件"));
+	act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
+	act->setText((u8"更换构件"));
+	act->setCheckable(true); 
+	connect(act, &QAction::triggered, this, [=]() {
+		//发送信号 提示点击了更换
+		emit SceneMenuClick(nUnitType, nUnitIdx, 1);
+		});
+	menu->addAction(act);
+
 
 	menu->exec(QCursor::pos());
 	delete menu;

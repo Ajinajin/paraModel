@@ -1,6 +1,7 @@
 ﻿#ifndef BQGRAPHICSITEM_H
 #define BQGRAPHICSITEM_H
 
+#include  <signal.h>
 #include <QObject>
 #include "bpointitem.h"
 
@@ -24,9 +25,10 @@ public:
 	QPointF m_edge;            //右下角点，拉动大小
 	QPointF m_leftup;          //左上角点
 	BPointItemList m_pointList;//绘图形的各个点
-
-	int nUnitType;
-	int nUnitIdx;
+	
+	int nUnitType;				//构件类型
+	int nUnitIdx;				//构件id
+	bool isAuxiliary;			//是否辅助线
 
 	ItemType m_type;
 	QPointF getCenter() { return m_center; }
@@ -49,7 +51,8 @@ protected:
 	QPen m_pen_isSelected;
 	QPen m_pen_noSelected;
 signals:
-	void ItemMove(int nUnitType, int nUnitIdx, QPointF pos);
+	void SceneItemMove(int nUnitType, int nUnitIdx, QPointF pos);
+	void SceneMenuClick(int nUnitType, int nUnitIdx, int clickType);
 };
 
 //------------------------------------------------------------------------------

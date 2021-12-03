@@ -198,7 +198,7 @@ int DimDataConvert::CalPlaneData(VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VU
 			oShape.vCorner.clear();
 			CalPlaneColShape(oCurUnit, oShape, table);
 			oShape.unitType = 1;
-			oShape.unitIdx = oCurUnit.nCenUnitIdx;
+			oShape.unitIdx = oCurUnit.nTopoIdx;
 			vPlaneDraw[i] = oShape;
 		}
 	}
