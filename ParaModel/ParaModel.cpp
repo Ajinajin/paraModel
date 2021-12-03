@@ -439,11 +439,11 @@ void ParaModel::updateOGL()
 
 	//传入所有的建筑数据
 
-	paraOglmanager->oglTopTable = &this->vModelTmpl;
-	paraOglmanager->oglUnitTable = &this->vBaseUnit;
+	paraOglmanager->oglTopTable = this->vModelTmpl;
+	paraOglmanager->oglUnitTable = this->vBaseUnit;
 
-	paraOglmanagerMain->oglTopTable = &this->vModelTmpl;
-	paraOglmanagerMain->oglUnitTable = &this->vBaseUnit;
+	paraOglmanagerMain->oglTopTable = this->vModelTmpl;
+	paraOglmanagerMain->oglUnitTable = this->vBaseUnit;
 
 
 
