@@ -702,7 +702,6 @@ void ParaModel::OpenFileAction()
 		if (parsingState == 0)
 		{
 			Topo.nUnitType = GetUnitTypeCode(list[1]);
-
 			Topo.nCenUnitIdx = list[2].toInt();
 			Topo.nTopoIdx = list[0].toInt();
 			if (list.size() >= 4)
@@ -1374,9 +1373,9 @@ void ParaModel::updateScene()
 			connect(viewItem, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
 			connect(viewItem, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
 			pSceneMain.addItem(viewItem);
-		}
-
+		} 
 	}
+	//加载标准线
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
 		//根据墙的角度判断线的方向
@@ -1418,6 +1417,12 @@ void ParaModel::updateScene()
 			}
 
 		}
+	}
+
+	if (MainDockState != 3)
+	{ 
+		graphicsViewMain->hide();
+		graphicsViewMain->show();
 	}
 }
 
@@ -1473,6 +1478,12 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 			divideLine->setPen(pen);
 			pSceneMain.addItem(divideLine);
 		}
+	}
+
+	if (MainDockState != 3)
+	{
+		graphicsViewMain->hide();
+		graphicsViewMain->show();
 	}
 }
 void ParaModel::SceneMainClear()
