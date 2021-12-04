@@ -40,28 +40,28 @@
 		p = NULL ;\
 	 }\
 
-#pragma region ��ʼ������
-//��ʼ�����Դ���
+#pragma region 初始化窗口
+//初始化属性窗口
 void ParaModel::InitPropertyWidget(QDockWidget* from)
 {
 
 	from->setMaximumWidth(300);
 	from->setMaximumHeight(390);
-	from->setWindowTitle("���Դ���");
-	// ��ǰѡ�񵯵�����
-	QLabel* lbl1 = new QLabel("����");
-	QLabel* lblvalue = new QLabel("ֵ");
-	QLabel* lbl2 = new QLabel("λ��XYZ");
+	from->setWindowTitle("属性窗口");
+	// 当前选择弹的属性
+	QLabel* lbl1 = new QLabel("属性");
+	QLabel* lblvalue = new QLabel("值");
+	QLabel* lbl2 = new QLabel("位置XYZ");
 	pModelEdit[0] = new QLineEdit;
 	pModelEdit[1] = new QLineEdit;
 	pModelEdit[2] = new QLineEdit;
 	pModelEdit[0]->setText("0");
 	pModelEdit[1]->setText("0");
 	pModelEdit[2]->setText("0");
-	QLabel* lbl3 = new QLabel("�ٶ�");
+	QLabel* lbl3 = new QLabel("速度");
 	pModelEdit[3] = new QLineEdit;
 	pModelEdit[3]->setText("1000");
-	QLabel* lbl4 = new QLabel("����XYZ");
+	QLabel* lbl4 = new QLabel("方向XYZ");
 	pModelEdit[4] = new QLineEdit;
 	pModelEdit[5] = new QLineEdit;
 	pModelEdit[6] = new QLineEdit;
@@ -69,17 +69,17 @@ void ParaModel::InitPropertyWidget(QDockWidget* from)
 	pModelEdit[5]->setText("-1");
 	pModelEdit[6]->setText("0");
 
-	// ��ǰѡ�񵯵�ս����
-	QLabel* lbl5 = new QLabel("����Kg");
+	// 当前选择弹的战斗部
+	QLabel* lbl5 = new QLabel("当量Kg");
 	pArmHeadEdit[0] = new QLineEdit;
 	pArmHeadEdit[0]->setText("100");
-	QLabel* lbl6 = new QLabel("��Ƭ����");
+	QLabel* lbl6 = new QLabel("弹片数量");
 	pArmHeadEdit[1] = new QLineEdit;
 	pArmHeadEdit[1]->setText("1000");
-	QLabel* lbl7 = new QLabel(QWidget::tr("��Ƭ����g"));
+	QLabel* lbl7 = new QLabel(QWidget::tr("弹片质量g"));
 	pArmHeadEdit[2] = new QLineEdit;
 	pArmHeadEdit[2]->setText("20");
-	QLabel* lbl8 = new QLabel(QWidget::tr("�ֲ���"));
+	QLabel* lbl8 = new QLabel(QWidget::tr("分布角"));
 	pArmHeadEdit[3] = new QLineEdit;
 	pArmHeadEdit[4] = new QLineEdit;
 	pArmHeadEdit[3]->setText("60");
@@ -100,14 +100,14 @@ void ParaModel::InitPropertyWidget(QDockWidget* from)
 	lbl2->setFixedWidth(56);
 	lbl3->setFixedWidth(56);
 	lbl4->setFixedWidth(56);
-	//ͨ���������������һ��
+	//通过这个把其他挤在一起
 	//QLabel* lbl9 = new QLabel(QWidget::tr(""));
 	//lbl9->hide();
 	//myVBoxLayout->setAlignment(Qt::AlignTop);
 	// 	mygridLayout->setRowStretch(1, 1);
 	// 	mygridLayout->setRowStretch(5, 10);
 	//myVBoxLayout->setMargin(15);
-	//��С���
+	//最小宽度
 	// 	mygridLayout->setColumnMinimumWidth(4, 10); 
 	//myVBoxLayout->addWidget(temp);
 	//myHBoxLayout->addWidget(lbl1);
@@ -180,7 +180,7 @@ void ParaModel::InitPropertyWidget(QDockWidget* from)
 	myLayout->addWidget(temp);
 
 
-	QPushButton* pApplyBtn = new QPushButton("Ӧ��", this);
+	QPushButton* pApplyBtn = new QPushButton("应用", this);
 	pApplyBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
 	pApplyBtn->setFixedWidth(100);
 	temp = new QWidget();
@@ -193,34 +193,35 @@ void ParaModel::InitPropertyWidget(QDockWidget* from)
 	connect(pApplyBtn, &QPushButton::clicked, this, &ParaModel::ApplyDataAction);
 }
 
-//��ʼ��ϵͳģ�ʹ���
+//初始化系统模型窗口
 void ParaModel::InitSysWidget(QDockWidget* from)
 {
-	//��ȡ�ļ����µ�ģ���ļ� ��ģ���ļ����Ʊ�����ṹ��ŵ� pModelTreeWidget ��
-	//˫��ʱ����ģ���ļ����ƶ�Ӧ���ļ�
 	QWidget* mytreewidget = new QWidget();
 	pModelTreeWidget = new QTreeWidget(mytreewidget);
 	pModelTreeWidget->setHeaderHidden(true);
+	from->setWidget(mytreewidget);
+	from->setFixedWidth(300);
+	from->setWindowTitle("模型组件/属性列表");
 
 
 	QTreeWidgetItem* rootItemPillar = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemPillar->setText(0, "��");
+	rootItemPillar->setText(0, "柱");
 	QTreeWidgetItem* rootItemBeam = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemBeam->setText(0, "��");
+	rootItemBeam->setText(0, "梁");
 	QTreeWidgetItem* rootItemBoard = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemBoard->setText(0, "��");
+	rootItemBoard->setText(0, "板");
 	QTreeWidgetItem* rootItemWall = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemWall->setText(0, "ǽ");
+	rootItemWall->setText(0, "墙");
 	QTreeWidgetItem* rootItemDoor = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemDoor->setText(0, "��");
+	rootItemDoor->setText(0, "门");
 	QTreeWidgetItem* rootItemWindow = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemWindow->setText(0, "��");
+	rootItemWindow->setText(0, "窗");
 
 	for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
 	{
 
 		QTreeWidgetItem* childItem;
-#pragma region nUnitType��ֵ
+#pragma region nUnitType赋值
 		if (iter->nUnitType == 1)
 		{
 			childItem = new QTreeWidgetItem(rootItemPillar);
@@ -246,23 +247,23 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 			childItem = new QTreeWidgetItem(rootItemWindow);
 		}
 #pragma endregion
-		//���� 1 Բ 2 �����3
+		//矩形 1 圆 2 多边形3
 
 		childItem->setText(0, iter->oShape.nShapeName);
 
 		childItem->setData(0, Qt::UserRole, iter->nUnitIdx);
 	}
 
-	//����ť��Ӧ
+	//树按钮响应
 	connect(pModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column) {
 		if (if_data == 0)
 		{
-			MyLogOutput("��ǰ�޻�����Ϣ�����½����ߴ򿪺��ڲ���");
+			MyLogOutput("当前无画布信息，请新建或者打开后在操作");
 			return;
 		}
 
 		QTreeWidgetItem* parent = item->parent();
-		if (NULL == parent) //ע�⣺�������û�и��ڵ�ģ�˫����Щ��ʱע��(����)
+		if (NULL == parent) //注意：最顶端项是没有父节点的，双击这些项时注意(陷阱)
 			return;
 
 		QVariant variant = item->data(0, Qt::UserRole);
@@ -276,7 +277,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 			if (iter->oShape.nShapeType == 1)
 			{
 
-				//��ǽ�Ŵ� ���Ϊ1
+				//板墙门窗 宽度为1
 				int wThickNess = 0;
 				int hThickNess = 0;
 				if (iter->nUnitType > 2)
@@ -320,18 +321,14 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 
 			}
 		}
-		msg = item->text(0) + "�����������";
+		msg = item->text(0) + "构件加载完成";
 		MyLogOutput(msg);
 		});
-
-	from->setWidget(mytreewidget);
-	from->setFixedWidth(300);
-	from->setWindowTitle("ģ�����/�����б�");
 	from->setWidget(pModelTreeWidget);
 	pModelTreeWidget->expandAll();
 }
 
-//��ʼ���Ѽ��ص�ģ�ʹ���
+//初始化已加载的模型窗口
 void ParaModel::InitLoadModelWidget(QDockWidget* from)
 {
 	graphicsViewX = new BQGraphicsView();
@@ -355,8 +352,8 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 	connect(graphicsViewOgl, &BQGraphicsView::GraphicsViewFocus, this, &ParaModel::GraphicsViewOgl);
 
 
-	from->setWindowTitle("����ͼ+��ά");
-	//layout����
+	from->setWindowTitle("三视图+三维");
+	//layout布局
 
 	QGridLayout* myLayout = new QGridLayout();
 	QWidget* temp = new QWidget();
@@ -368,7 +365,7 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 	myLayout->addWidget(graphicsViewZ, 1, 0);
 
 
-	//���½�С��ά����
+	//右下角小三维窗口
 
 	paraOglmanager = new ParaOGLManager();
 	graphicsViewOgl->setViewport(paraOglmanager);
@@ -381,18 +378,18 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 
 }
 
-//��ʼ����־����
+//初始化日志窗口
 void ParaModel::InitLogWidget(QDockWidget* from)
 {
 	from->setMaximumHeight(100);
 	from->setFixedHeight(100);
-	from->setWindowTitle("��Ϣ���");
+	from->setWindowTitle("信息输出");
 	if (myLogOutLabel == nullptr)
 		myLogOutLabel = new QTextEdit();
 	from->setWidget(myLogOutLabel);
 }
 
-//��ʼ��OpenGL����
+//初始化OpenGL窗口
 void ParaModel::InitOglManagerWidget(QDockWidget* from)
 {
 	MainDockWidget = from;
@@ -402,10 +399,10 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 	graphicsViewMain->setScene(&pSceneMain);
 	pSceneMain.setBackgroundBrush(Qt::darkGray);
 
-	MainDockWidget->setWindowTitle("��ǰ�༭��ͼ ����ά��");
+	MainDockWidget->setWindowTitle("当前编辑视图 （三维）");
 
 
-	//�м������λ����
+	//中间大屏三位窗口
 
 	MainDockState = 3;
 	paraOglmanagerMain = new ParaOGLManager();
@@ -415,7 +412,7 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 
 	QTimer* timer = new QTimer(this);
 	connect(timer, &QTimer::timeout, this, &ParaModel::updateOGL);
-	//ÿ20msˢ��һ��OpenGL���� 50FPS
+	//每20ms刷新一次OpenGL界面 50FPS
 	timer->start(20);
 
 
@@ -425,14 +422,14 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 	//timerSceneMain->start(20);
 }
 
-//����OpenGL����
+//更新OpenGL窗口
 void ParaModel::updateOGL()
 {
 	paraOglmanager->update();
 	paraOglmanagerMain->update();
 
 
-	//������ά����Ҫͬ��
+	//两个三维窗口要同步
 	paraOglmanager->camera = paraOglmanagerMain->camera;
 	paraOglmanager->isFirstMouse = paraOglmanagerMain->isFirstMouse;
 	paraOglmanager->lastX = paraOglmanagerMain->lastX;
@@ -440,7 +437,7 @@ void ParaModel::updateOGL()
 	paraOglmanager->rotateRaw = paraOglmanagerMain->rotateRaw;
 	paraOglmanager->rotatePitch = paraOglmanagerMain->rotatePitch;
 
-	//�������еĽ�������
+	//传入所有的建筑数据
 
 	paraOglmanager->oglTopTable = this->vModelTmpl;
 	paraOglmanager->oglUnitTable = this->vBaseUnit;
@@ -452,10 +449,10 @@ void ParaModel::updateOGL()
 
 }
 
-//��ʼ����������
+//初始化内容区域
 void ParaModel::InitCentralWidget()
 {
-	//ɾ�����봰��
+	//删除中央窗体
 	QWidget* p = takeCentralWidget();
 	if (p)
 		delete p;
@@ -490,7 +487,7 @@ void ParaModel::InitCentralWidget()
 
 }
 
-//��ʼ��״̬��������ʾ
+//初始化状态栏文字提示
 void ParaModel::InitStatusWidget()
 {
 	winStatus = new QStatusBar();
@@ -503,92 +500,92 @@ void ParaModel::InitStatusWidget()
 }
 
 
-//��ʼ��Ribbon�е��ļ��˵�
+//初始化Ribbon中的文件菜单
 void ParaModel::InitCategoryMain(SARibbonCategory* page)
 {
-	SARibbonPannel* pannel = page->addPannel(("�ļ�"));
+	SARibbonPannel* pannel = page->addPannel(("文件"));
 
 	QAction* act = new QAction(this);
-	act->setObjectName(("�½�"));
+	act->setObjectName(("新建"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("�½�"));
+	act->setText(("新建"));
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+N")));
 	act->setCheckable(true);
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::NewFileAction);
 
 	act = new QAction(this);
-	act->setObjectName(("��"));
+	act->setObjectName(("打开"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("��"));
+	act->setText(("打开"));
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+O")));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::OpenFileAction);
 
 	act = new QAction(this);
-	act->setObjectName(("����"));
+	act->setObjectName(("保存"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("����"));
+	act->setText(("保存"));
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
 	pannel->addLargeAction(act);
 	//connect(act, &QAction::triggered, this, &ParaModel::SaveFileAction);
 
 
 	act = new QAction(this);
-	act->setObjectName(("���Ϊ"));
+	act->setObjectName(("另存为"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("���Ϊ"));
+	act->setText(("另存为"));
 	pannel->addLargeAction(act);
 	//connect(act, &QAction::triggered, this, &ParaModel::SaveasFileAction);
 
 
 	act = new QAction(this);
-	act->setObjectName(("�ر�"));
+	act->setObjectName(("关闭"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("�ر�"));
+	act->setText(("关闭"));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::CloseFileAction);
 }
-//��ʼ��Ribbon
+//初始化Ribbon
 void ParaModel::InitSARibbon()
 {
 	SARibbonBar* ribbon = ribbonBar();
 
-	//Ӧ�ð�ť ��ǰ����
+	//应用按钮 当前隐藏
 	ribbon->applicationButton()->hide();
-	ribbon->applicationButton()->setText(("��ҳ"));
+	ribbon->applicationButton()->setText(("首页"));
 
-	//��ʼ���ļ�ribbon
+	//初始化文件ribbon
 	SARibbonCategory* categoryMain = new SARibbonCategory();
-	categoryMain->setCategoryName(("���˵�"));
+	categoryMain->setCategoryName(("主菜单"));
 	categoryMain->setObjectName(("categoryMain"));
 	ribbon->addCategoryPage(categoryMain);
 	InitCategoryMain(categoryMain);
 
-	//��ʼ��������ݲ˵�
+	//初始化顶部快捷菜单
 	//InitQuickAccess(ribbon);
 }
 
-//��ʼ������
+//初始化窗口
 void ParaModel::InitWindow()
 {
-	setWindowTitle(("������ģ��"));
-	//���ý���Ribbon
+	setWindowTitle(("参数化模型"));
+	//设置界面Ribbon
 	InitSARibbon();
 	ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyle::OfficeStyleTwoRow);
 
-	//��ʼ����������
+	//初始化界面内容
 	InitCentralWidget();
 
-	//��ʼ������״̬��
+	//初始化界面状态栏
 	InitStatusWidget();
-	//������С���
+	//设置最小宽度
 	setMinimumWidth(1000);
-	//�������
+	//窗口最大化
 	showMaximized();
-	//����ͼ��
+	//窗口图标
 	setWindowIcon(QIcon(":/qss/res/qss/White/icon2.png"));
-	//��������϶�
+	//进制鼠标拖动
 	//SAFramelessHelper* helper = framelessHelper();
 	//helper->setRubberBandOnResize(false);
 	//QElapsedTimer cost;
@@ -597,11 +594,12 @@ void ParaModel::InitWindow()
 
 }
 
-//��ʼ����������
+//初始化弹出窗口
 void ParaModel::InitTipWindow()
 {
+
 }
-//���������˵�����
+//显示选择构件窗口
 void ParaModel::ShowUnitSelectWindow()
 {
 	QWidget* unitSelectWidget = new QWidget();
@@ -612,7 +610,6 @@ void ParaModel::ShowUnitSelectWindow()
 	pTreeWidget->setFixedHeight(700);
 	pTreeWidget->setHeaderHidden(true);
 
-
 	for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
 	{
 		if (iter->nUnitType == SelectUnitType)
@@ -621,12 +618,12 @@ void ParaModel::ShowUnitSelectWindow()
 			rootItem->setText(0, iter->oShape.nShapeName);
 			rootItem->setData(0, Qt::UserRole, iter->nUnitIdx);
 		}
-	} 
-	//����ť��Ӧ
+	}
+	//树按钮响应
 	connect(pTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column) {
 		if (if_data == 0)
 		{
-			MyLogOutput("��ǰ�޻�����Ϣ�����½����ߴ򿪺��ڲ���");
+			MyLogOutput("当前无画布信息，请新建或者打开后在操作");
 			return;
 		}
 
@@ -641,7 +638,6 @@ void ParaModel::ShowUnitSelectWindow()
 			if (iter->oShape.nShapeType == 1)
 			{
 
-				//��ǽ�Ŵ� ���Ϊ1
 				int wThickNess = 0;
 				int hThickNess = 0;
 				if (iter->nUnitType > 2)
@@ -701,27 +697,27 @@ ParaModel::ParaModel(QWidget* parent)
 {
 	myLogOutLabel = new QTextEdit();
 	pSceneOffset = 700;
-	//��ʼ��ϵͳ·��
+	//初始化系统路径
 	InitPath();
-	//��ʼ��ϵͳ����
+	//初始化系统数据
 	InitUnitLib();
 
-	//��ʼ������
+	//初始化界面
 	InitWindow();
 	InitTipWindow();
 }
 
-#pragma region ���潻��
+#pragma region 界面交互
 void ParaModel::NewFileAction()
 {
 	if (if_data == 1)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "��ǰ���м������ݣ���رպ����½�");
-		MyLogOutput("��ǰ���м������ݣ���رպ����½�");
+		QMessageBox::information(NULL, "信息提示", "当前已有加载数据，请关闭后在新建");
+		MyLogOutput("当前已有加载数据，请关闭后在新建");
 		return;
 	}
 	if_data = 1;
-	MyLogOutput("�½������ļ��ɹ�");
+	MyLogOutput("新建场景文件成功");
 }
 
 void ParaModel::CloseFileAction()
@@ -733,20 +729,19 @@ void ParaModel::CloseFileAction()
 	SceneYClear();
 	SceneZClear();
 
-	MyLogOutput("������ݳɹ�");
+	MyLogOutput("清除数据成功");
 }
-
 void ParaModel::OpenFileAction()
 {
 	if (if_data == 1)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "��ǰ���м������ݣ���رպ��ڴ�");
-		MyLogOutput("��ǰ���м������ݣ���رպ��ڴ�");
+		QMessageBox::information(NULL, "信息提示", "当前已有加载数据，请关闭后在打开");
+		MyLogOutput("当前已有加载数据，请关闭后在打开");
 		return;
 	}
 
 	QFileDialog* f = new QFileDialog(this);
-	f->setWindowTitle("ѡ�������ļ�*.txt");
+	f->setWindowTitle("选择数据文件*.txt");
 	f->setNameFilter("*.txt");
 	f->setViewMode(QFileDialog::Detail);
 	QString filePath;
@@ -757,12 +752,12 @@ void ParaModel::OpenFileAction()
 	{
 		return;
 	}
-	// ��ȡ�ļ�����
+	// 获取文件内容
 	QFile file(filePath);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "���ݼ���ʧ��,�����ļ���");
-		MyLogOutput("���ݼ���ʧ��,�����ļ���");
+		QMessageBox::information(NULL, "信息提示", "数据加载失败,请检查文件。");
+		MyLogOutput("数据加载失败,请检查文件。");
 		return;
 	}
 	QTextStream readStream(&file);
@@ -837,12 +832,12 @@ void ParaModel::OpenFileAction()
 	pCalShapeData = new DimDataConvert();
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
-	ParaModel::updateScene();
+	ParaModel::AddSceneData();
 }
 
 void ParaModel::GraphicsViewXFocus(bool b)
 {
-	MainDockWidget->setWindowTitle("��ǰ�༭��ͼ ����άX��");
+	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");
 	if (MainDockState == 3)
 	{
 		MainDockWidget->setWidget(graphicsViewMain);
@@ -854,7 +849,7 @@ void ParaModel::GraphicsViewXFocus(bool b)
 
 void ParaModel::GraphicsViewYFocus(bool b)
 {
-	MainDockWidget->setWindowTitle("��ǰ�༭��ͼ ����άY��");
+	MainDockWidget->setWindowTitle("当前编辑视图 （二维Y）");
 	if (MainDockState == 3)
 	{
 		MainDockWidget->setWidget(graphicsViewMain);
@@ -867,7 +862,7 @@ void ParaModel::GraphicsViewYFocus(bool b)
 
 void ParaModel::GraphicsViewZFocus(bool b)
 {
-	MainDockWidget->setWindowTitle("��ǰ�༭��ͼ ����άZ��");
+	MainDockWidget->setWindowTitle("当前编辑视图 （二维Z）");
 	if (MainDockState == 3)
 	{
 		MainDockWidget->setWidget(graphicsViewMain);
@@ -881,7 +876,7 @@ void ParaModel::GraphicsViewZFocus(bool b)
 
 void ParaModel::GraphicsViewOgl(bool b)
 {
-	MainDockWidget->setWindowTitle("��ǰ�༭��ͼ ����άģ�ͣ�");
+	MainDockWidget->setWindowTitle("当前编辑视图 （三维模型）");
 	if (MainDockState != 3)
 	{
 		MainDockState = 3;
@@ -902,134 +897,134 @@ void ParaModel::MyLogOutput(QString myLogout)
 	}
 }
 
-// �����޸ĺ����
+// 数据修改后更新
 void ParaModel::ApplyDataAction()
 {
-	// ����δ û������
+	// 场景未 没有数据
 	// if (pEnvir2 == NULL)
 	// {
-	// 	QMessageBox::information(NULL, "��Ϣ��ʾ", "��δ���س������ݣ��޷����棡");
+	// 	QMessageBox::information(NULL, "信息提示", "还未加载场景数据，无法保存！");
 	// 	return;
 	// }
 
 
-	//��֯���������������
-	//λ��
+	//组织界面上输入的数据
+	//位置
 	bool verify;
 	QString str = pModelEdit[0]->text();
 	float  locationX = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "λ��X��������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "位置X必须是数值，请重新输入");
 	}
 	if (locationX > 180 || locationX < -180)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "λ��X��Χ����������180");
+		QMessageBox::information(NULL, "信息提示", "位置X范围必须是正负180");
 	}
 	str = pModelEdit[1]->text();
 	float locationY = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "λ��Y��������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "位置Y必须是数值，请重新输入");
 	}
 	if (locationY > 180 || locationY < -180)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "λ��Y��Χ����������180");
+		QMessageBox::information(NULL, "信息提示", "位置Y范围必须是正负180");
 	}
 	str = pModelEdit[2]->text();
 	float locationZ = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "λ��Z��������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "位置Z必须是数值，请重新输入");
 	}
 	if (locationZ > 180 || locationZ < -180)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "λ��Z��Χ����������180");
+		QMessageBox::information(NULL, "信息提示", "位置Z范围必须是正负180");
 	}
-	//�ٶ� 
+	//速度 
 	str = pModelEdit[3]->text();
 	float speed = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "�ٶȱ�������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "速度必须是数值，请重新输入");
 	}
-	//����XYZ
+	//方向XYZ
 	str = pModelEdit[4]->text();
 	float angleToX = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "����X��������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "方向X必须是数值，请重新输入");
 	}
 	if (angleToX > 180 || angleToX < -180)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "����X��Χ����������180");
+		QMessageBox::information(NULL, "信息提示", "方向X范围必须是正负180");
 	}
 	str = pModelEdit[5]->text();
 	float angleToY = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "����Y��������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "方向Y必须是数值，请重新输入");
 	}
 	if (angleToY > 180 || angleToY < -180)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "����Y��Χ����������180");
+		QMessageBox::information(NULL, "信息提示", "方向Y范围必须是正负180");
 	}
 	str = pModelEdit[6]->text();
 	float angleToZ = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "����Z��������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "方向Z必须是数值，请重新输入");
 	}
 	if (angleToZ > 180 || angleToZ < -180)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "����Z��Χ����������180");
+		QMessageBox::information(NULL, "信息提示", "方向Z范围必须是正负180");
 	}
-	//����Kg	  
+	//当量Kg	  
 	str = pArmHeadEdit[0]->text();
 	float tnt = str.toFloat(&verify);
 
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "TNT���������������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "TNT当量输入必须是数值，请重新输入");
 	}
-	//��Ƭ����	  
+	//弹片数量	  
 	str = pArmHeadEdit[1]->text();
 	int fragNum = str.toInt(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "λ��X�����������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "位置X输入必须是数值，请重新输入");
 	}
-	//��Ƭ����g 
+	//弹片质量g 
 	str = pArmHeadEdit[2]->text();
 	float fragQuality = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "��Ƭ������������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "弹片质量必须是数值，请重新输入");
 	}
-	// �ֲ��� ����ɢ��  
+	// 分布角 主飞散角  
 
 	str = pArmHeadEdit[3]->text();
 	float majorScatteringAngle = str.toFloat(&verify);
 
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "����ɢ�Ǳ�������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "主飞散角必须是数值，请重新输入");
 	}
 	if (majorScatteringAngle > 90 || majorScatteringAngle < -90)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "����ɢ�Ƿ�Χ����������90");
+		QMessageBox::information(NULL, "信息提示", "主飞散角范围必须是正负90");
 	}
-	// �ֲ��� ����ɢ��  
+	// 分布角 副飞散角  
 	str = pArmHeadEdit[4]->text();
 	float secondScatteringAngle = str.toFloat(&verify);
 
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "����ɢ�Ǳ�������ֵ������������");
+		QMessageBox::information(NULL, "信息提示", "副飞散角必须是数值，请重新输入");
 	}
 	if (secondScatteringAngle > 90 || secondScatteringAngle < -90)
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "����ɢ�Ƿ�Χ����������90");
+		QMessageBox::information(NULL, "信息提示", "副飞散角范围必须是正负90");
 	}
 	return;
 }
@@ -1045,21 +1040,21 @@ void ParaModel::drawWall(const std::vector<float>& points) {
 
 #pragma endregion
 
-#pragma region ��ʼ������
+#pragma region 初始化数据
 
 
 
 int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 {
-	// 0-6 ������ǽ�Ŵ�
-	QString sType = "��������ǽ�Ŵ�";
+	// 0-6 柱梁板墙门窗
+	QString sType = "线柱梁板墙门窗";
 	oUnit.nUnitIdx = listInfo[0].toInt();
 	int nType = sType.indexOf(listInfo[1]);
 	if (nType < 0)
 		return 1;
 	oUnit.nUnitType = nType;
-	// ����������   ������״ 0-2 ���� Բ�� �����
-	QString sShapeType = "����Բ�ζ����";
+	// 柱和梁类型   截面形状 0-2 矩形 圆形 多边形
+	QString sShapeType = "矩形圆形多边形";
 	int i = 0;
 	if (nType < 2)
 	{
@@ -1091,10 +1086,10 @@ int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 			break;
 		}
 	}
-	// ǽ�Ͱ�����
+	// 墙和板类型
 	if (nType == 2 || nType == 3)
 		oUnit.oShape.nThickNess = listInfo[2].toInt();
-	// �źʹ�
+	// 门和窗
 	else
 	{
 		oUnit.oShape.nShapeType = 0;
@@ -1103,12 +1098,12 @@ int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 	}
 	return 0;
 }
-// ��ʼ��·�� 
+// 初始化路径 
 int ParaModel::InitPath()
 {
-	// Exe�ļ�����·��
+	// Exe文件完整路径
 	oPath.sExePath = qApp->applicationFilePath().toLocal8Bit().data();
-	// Exe�ļ�����Ŀ¼
+	// Exe文件所在目录
 	oPath.sExeDir = qApp->applicationDirPath().toLocal8Bit().data();
 
 	oPath.sBoomLibDir = oPath.sExeDir + "/BoomLib";
@@ -1117,20 +1112,20 @@ int ParaModel::InitPath()
 	oPath.sTmpDir = oPath.sExeDir + "/Tmp";
 	oPath.sParaLibDir = oPath.sExeDir + "/ParaLib";
 
-	QString sLog = "���ϵͳ·����ʼ��";
+	QString sLog = "完成系统路径初始化";
 	MyLogOutput(sLog);
 
 	return 1;
 }
-// ��ʼ������������ 
+// 初始化基本构件库 
 int ParaModel::InitUnitLib()
 {
 	QString Path = QString::fromStdString(oPath.sExeDir + "/buildinglib.txt");
 	QFile file(Path);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		QMessageBox::information(NULL, "��Ϣ��ʾ", "ϵͳ�������������ʧ�ܣ�");
-		MyLogOutput("ϵͳ�������������ʧ�ܣ�");
+		QMessageBox::information(NULL, "信息提示", "系统基本构建库解析失败！");
+		MyLogOutput("系统基本构建库解析失败！");
 		return 0;
 	}
 
@@ -1154,7 +1149,7 @@ int ParaModel::InitUnitLib()
 		basic.nUnitIdx = list[0].toInt();
 		QString shapeName = list[1];
 
-#pragma region UnitTypeʶ��
+#pragma region UnitType识别
 		basic.nUnitType = GetUnitTypeCode(list[1]);
 		if (basic.nUnitType == 3)
 		{
@@ -1174,13 +1169,13 @@ int ParaModel::InitUnitLib()
 		}
 #pragma endregion
 
-#pragma region ��״ʶ��
+#pragma region 形状识别
 
 		shape.nShapeType = GetShapeTypeCode(list[2]);
 		if (shape.nShapeType == 1)
 		{
 			int unitType = GetUnitTypeCode(list[1]);
-			if (unitType > 4) //������źʹ������
+			if (unitType > 4) //如果是门和窗的情况
 			{
 				shapeName = list[3] + "-" + list[4] + " " + shapeName;
 				shape.nShapeRange[0] = list[3].toInt();
@@ -1222,21 +1217,21 @@ int ParaModel::InitUnitLib()
 	}
 	return 1;
 }
-// ��ʼ��ƽ��ͼ��
+// 初始化平面图库
 int ParaModel::InitPlaneDrawLib()
 {
 	return 0;
 }
-// ��ʼ������������ģ��
+// 初始化参数化生成模板
 int ParaModel::InitParaTmpl()
 {
 	return 0;
 }
 #pragma endregion
 
-#pragma region ����ʶ���������
+#pragma region 数据识别帮助方法
 
-//��ȡϵͳ�������еĹ���
+//获取系统构建库中的构建
 BasicUnit ParaModel::GetBaseUnit(int idx)
 {
 	for (size_t i = 0; i < vBaseUnit.size(); i++)
@@ -1248,7 +1243,8 @@ BasicUnit ParaModel::GetBaseUnit(int idx)
 	return b;
 }
 
-//��ȡ���ع������еĹ���
+
+//获取加载构建集中的构建
 TopoUnit ParaModel::GetTopoUnit(int idx)
 {
 	for (size_t i = 0; i < vModelTmpl.size(); i++)
@@ -1259,7 +1255,7 @@ TopoUnit ParaModel::GetTopoUnit(int idx)
 	TopoUnit b;
 	return b;
 }
-//���ݹ������Ͳ�����ɫ
+//根据构件类型查找颜色
 QColor ParaModel::ColorHelper(int nUnitType)
 {
 	if (nUnitType == 1)
@@ -1288,82 +1284,83 @@ QColor ParaModel::ColorHelper(int nUnitType)
 	}
 	return QColor(72, 104, 146);
 }
-//���ݹ�������id���Ҷ�Ӧ��������
+//根据构件类型id查找对应的中文名
 QString ParaModel::GetUnitType(int nUnitType)
 {
 	if (nUnitType == 1)
 	{
-		return "��";
+		return "柱";
 	}
 	else if (nUnitType == 2)
 	{
-		return "��";
+		return "梁";
 	}
 	else if (nUnitType == 3)
 	{
-		return "��";
+		return "板";
 	}
 	else if (nUnitType == 4)
 	{
-		return  "ǽ";
+		return  "墙";
 	}
 	else if (nUnitType == 5)
 	{
-		return "��";
+		return "门";
 	}
 	else if (nUnitType == 6)
 	{
-		return "��";
+		return "窗";
 	}
 	return "";
 }
-//���ݹ������������Ҷ�Ӧ��id
+//根据构件中文名查找对应的id
 int ParaModel::GetUnitTypeCode(QString unitTypeStr)
 {
-	if (unitTypeStr.compare("��") == 0)
+	if (unitTypeStr.compare("柱") == 0)
 	{
 		return 1;
 	}
-	else if (unitTypeStr.compare("��") == 0)
+	else if (unitTypeStr.compare("梁") == 0)
 	{
 		return 2;
 	}
-	else if (unitTypeStr.compare("��") == 0)
+	else if (unitTypeStr.compare("板") == 0)
 	{
 		return 3;
 	}
-	else if (unitTypeStr.compare("ǽ") == 0)
+	else if (unitTypeStr.compare("墙") == 0)
 	{
 		return 4;
 	}
-	else if (unitTypeStr.compare("��") == 0)
+	else if (unitTypeStr.compare("门") == 0)
 	{
 		return 5;
 	}
-	else if (unitTypeStr.compare("��") == 0)
+	else if (unitTypeStr.compare("窗") == 0)
 	{
 		return 6;
 	}
 	return 0;
 }
-//������״���������Ҷ�Ӧ��id
+//根据形状中文名查找对应的id
 int ParaModel::GetShapeTypeCode(QString shapeTypeStr)
 {
-	if (shapeTypeStr.compare("����") == 0)
+	if (shapeTypeStr.compare("矩形") == 0)
 	{
 		return 1;
 	}
-	else if (shapeTypeStr.compare("Բ��") == 0)
+	else if (shapeTypeStr.compare("圆形") == 0)
 	{
 		return 2;
 	}
-	else if (shapeTypeStr.compare("�����") == 0)
+	else if (shapeTypeStr.compare("多边形") == 0)
 	{
 		return 3;
 	}
 	return 0;
 }
-//查找画布中的元素
+
+//更新画布中单独的元素
 QList<QGraphicsItem*> ParaModel::SelectSceneItem(int nUnitIdx)
 {
 	bool isWall = false;
@@ -1379,9 +1376,10 @@ QList<QGraphicsItem*> ParaModel::SelectSceneItem(int nUnitIdx)
 	}
 	return returnList;
 }
+
 #pragma endregion
 
-#pragma region �ͷ���Դ
+#pragma region 释放资源
 
 ParaModel::~ParaModel()
 {
@@ -1389,10 +1387,10 @@ ParaModel::~ParaModel()
 	ReleaseSysModel();
 }
 
-// �ͷŸ��ֽ�����Դ
+// 释放各种界面资源
 void ParaModel::ReleaseUISource()
 {
-	// �ͷŸ�����Դ
+	// 释放各种资源
 	FREEPTR(pTipBar);
 	FREEPTR(myLogOutLabel);
 	FREEPTR(graphicsViewMain);
@@ -1405,7 +1403,7 @@ void ParaModel::ReleaseUISource()
 }
 
 
-// �ͷ�ϵͳģ�Ϳ�
+// 释放系统模型库
 void ParaModel::ReleaseSysModel()
 {
 
@@ -1413,33 +1411,33 @@ void ParaModel::ReleaseSysModel()
 }
 #pragma endregion
 
-#pragma region ��������
+#pragma region 画布操作
 
-//�����ƶ�Ԫ��
+//画布移动元素
 void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 
 {
 	int a = nUnitType;
 	int v = nUnitIdx;
-	SimpleShape oShape = viewShape[nUnitIdx]; 
-	int nMoveXY[2]; 
+	SimpleShape oShape = viewShape[nUnitIdx];
+	int nMoveXY[2];
 	// 发送绝对位置信息时 按 相对左下角计算位移
 // 	nMoveXY[0] = pos.x() - pSceneOffset - (oShape.nCen[0] - oShape.nWH[0] / 2); 
 // 	nMoveXY[1] = pos.y() - pSceneOffset - (oShape.nCen[1] - oShape.nWH[1] / 2); 
 	// 发送位移时 直接赋值
-	nMoveXY[0] = pos.x() ; 
-	nMoveXY[1] = pos.y() ; 
+	nMoveXY[0] = pos.x();
+	nMoveXY[1] = pos.y();
 
 	// 计算移动后的新坐标
-	pCalShapeData->MoveBaseUnit(nUnitIdx, nMoveXY, vModelTmpl, viewShape); 
-	
+	pCalShapeData->MoveBaseUnit(nUnitIdx, nMoveXY, vModelTmpl, viewShape);
+
 	// 转为绘图坐标
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
-// 		if (viewShape[i].unitIdx != nUnitIdx)
-// 			continue;
+		if (viewShape[i].unitIdx != nUnitIdx)
+			continue;
 		//绘制柱、墙、门、窗
 		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
 		{
@@ -1452,9 +1450,16 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 				{
 					int coordX = viewShape[i].nCen[0] + pSceneOffset;
 					int coordY = viewShape[i].nCen[1] + pSceneOffset;
-
-					proxyWidget->m_leftup =  QPointF(coordX, coordY );
-					proxyWidget->m_edge = QPointF(viewShape[i].nWH[0], viewShape[i].nWH[1]);
+					proxyWidget = new BRectangle(
+						coordX, coordY,
+						viewShape[i].nWH[0], viewShape[i].nWH[1],
+						BGraphicsItem::ItemType::Rectangle);
+					proxyWidget->isAuxiliary = false;
+					proxyWidget->nUnitType = viewShape[i].unitType;
+					proxyWidget->nUnitIdx = viewShape[i].unitIdx;
+					proxyWidget->setBrush(ColorHelper(viewShape[i].unitType));
+					connect(proxyWidget, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+					connect(proxyWidget, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
 				}
 				else
 				{
@@ -1464,15 +1469,13 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 		}
 	}
 
-	int nCen[2]; 
+	int nCen[2];
 	nCen[0] = nMoveXY[0] + vModelTmpl[nUnitIdx].nCenPos[0];
 	nCen[1] = nMoveXY[1] + vModelTmpl[nUnitIdx].nCenPos[2];
-	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y()); 
-	myLogOutLabel->setText(sInfo); 
-// 	QString sInfo1 = QString("%1 %2").arg(nCen[0]).arg(nCen[1]); 
-// 	myLogOutLabel->setText(sInfo1); 
-
-{ 
+	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y());
+	myLogOutLabel->setText(sInfo);
+	// 	QString sInfo1 = QString("%1 %2").arg(nCen[0]).arg(nCen[1]); 
+	// 	myLogOutLabel->setText(sInfo1); 
 	if (MainDockState != 3)
 	{
 		graphicsViewMain->hide();
@@ -1481,31 +1484,32 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 
 	return;
 }
-//�����˵����
+//画布菜单点击
 void ParaModel::SceneMenuClickAction(int nUnitType, int nUnitIdx)
 {
 	SelectUnitIdx = nUnitIdx;
 	SelectUnitType = nUnitType;
 	ShowUnitSelectWindow();
-	//����x�˵����ڵ�������ѡ�еĹ���������idxֵ
 	return;
 }
-//���»�������
+//更新画布内容
 void ParaModel::AddSceneData()
 {
 	if (if_data == 0)
 		return;
 	if (vModelTmpl.size() == 0)
 		return;
-
+	//清除画布
 	SceneMainClear();
+
 	DimDataConvert* d = new DimDataConvert();
+	VSHAPE viewShape;
 	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
-	//�������ݻ���ͼ��
+	//根据数据绘制图形
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
-		//��������ǽ���š���
+		//绘制柱、墙、门、窗
 		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
 		{
 			int coordX = viewShape[i].nCen[0] + pSceneOffset;
@@ -1523,15 +1527,15 @@ void ParaModel::AddSceneData()
 			pSceneMain.addItem(viewItem);
 		}
 	}
-	//���ر�׼��
+	//加载标准线
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
-		//�����ǰҪ��Ⱦ����ǿ
+		//如果当前要渲染的是强
 		if (viewShape[i].unitType == 4)
 		{
 			int coordX = viewShape[i].nCen[0] + pSceneOffset;
 			int coordY = viewShape[i].nCen[1] + pSceneOffset;
-			//�ж�ǽ�ĽǶȼӱ�׼��
+			//判断墙的角度加标准线
 			if (vModelTmpl[viewShape[i].unitIdx].nUnitAngle == 0)
 			{
 				BRectangle* divideLine = new BRectangle(
@@ -1574,7 +1578,7 @@ void ParaModel::AddSceneData()
 		graphicsViewMain->show();
 	}
 }
-//���»����е�����Ԫ��
+//更新画布中单独的元素
 void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height)
 {
 	bool isWall = false;
@@ -1586,8 +1590,8 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 		{
 			if (!proxyWidget->isAuxiliary)
 			{
-// 				proxyWidget->m_leftup = QPointF(pSceneOffset + x, pSceneOffset + y);
-// 				proxyWidget->m_edge = QPointF(pSceneOffset + x + width, pSceneOffset + y + height);
+				// 				proxyWidget->m_leftup = QPointF(pSceneOffset + x, pSceneOffset + y);
+				// 				proxyWidget->m_edge = QPointF(pSceneOffset + x + width, pSceneOffset + y + height);
 			}
 			else
 			{
@@ -1635,7 +1639,7 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 		graphicsViewMain->show();
 	}
 }
-//�����������
+//清除画布数据
 void ParaModel::SceneMainClear()
 {
 	pSceneMain.clear();

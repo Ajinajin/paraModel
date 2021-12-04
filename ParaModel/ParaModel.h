@@ -33,129 +33,134 @@ class SARibbonCategory;
 class ParaModel : public SARibbonMainWindow
 {
 	Q_OBJECT
-		//���캯��
+		//构造函数
 public:
 	explicit ParaModel(QWidget* parent = 0);
 	~ParaModel();
 
 private:
-	QStatusBar* winStatus;							//״̬��
-	QLabel* pTipBar;								// ״̬����������ʾ
-	QLineEdit* pModelEdit[7];						// ս�������Ա༭�� ���� ��Ƭ���� ��Ƭ���� �ֲ��Ƕ�1 �ֲ��Ƕ�2
-	QLineEdit* pArmHeadEdit[5];						// �㷨��Ϣ
-	QTreeWidget* pModelTreeWidget;					// ϵͳģ���� 
-	QTreeWidget* pModelUnitTreeWidget;					// ϵͳģ����
-	QDockWidget* MainDockWidget;					// ������ʾ����
-	BQGraphicsView* graphicsViewX;					// ��άģ��X��ͼ
-	BQGraphicsView* graphicsViewY;					// ��άģ��Y��ͼ
-	BQGraphicsView* graphicsViewZ;					// ��άģ��Z��ͼ
-	BQGraphicsView* graphicsViewMain;				// ��άģ����ά��ͼ
-	BQGraphicsView* graphicsViewOgl;				// ��λģ��չʾ��ͼ
+	QStatusBar* winStatus;							//状态栏
+	QLabel* pTipBar;								// 状态栏中文字显示
+	QLineEdit* pModelEdit[7];						// 战斗部属性编辑框 当量 弹片数量 弹片质量 分布角度1 分布角度2
+	QLineEdit* pArmHeadEdit[5];						// 算法信息
+	QTreeWidget* pModelTreeWidget;					// 系统模型树
+	QTreeWidget* pModelUnitTreeWidget;				// 可替换的模型树
+	QDockWidget* MainDockWidget;					// 界面显示窗口
+	BQGraphicsView* graphicsViewX;					// 二维模型X视图
+	BQGraphicsView* graphicsViewY;					// 二维模型Y视图
+	BQGraphicsView* graphicsViewZ;					// 二维模型Z视图
+	BQGraphicsView* graphicsViewMain;				// 二维模型三维视图
+	BQGraphicsView* graphicsViewOgl;				// 三位模型展示视图
 
-	BQGraphicsScene pSceneX;						// ��άģ��X��ͼ����
-	BQGraphicsScene pSceneY;						// ��άģ��Y��ͼ����
-	BQGraphicsScene pSceneZ;						// ��άģ��Z��ͼ����
-	BQGraphicsScene pSceneMain;						// ��άģ��Z��ͼ����Ļ������
-	
-	ParaOGLManager* paraOglmanager;					// ��ά��ʾ������
-	ParaOGLManager* paraOglmanagerMain;				// ��ά��ʾ���ڴ���Ļ����
+	BQGraphicsScene pSceneX;						// 二维模型X视图画布
+	BQGraphicsScene pSceneY;						// 二维模型Y视图画布
+	BQGraphicsScene pSceneZ;						// 二维模型Z视图画布
+	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布
 
-	int if_data;									//0��δ�������ݡ�1��������
-	SysPath oPath;									//ϵͳ·��
+	ParaOGLManager* paraOglmanager;					// 三维显示窗口类
+	ParaOGLManager* paraOglmanagerMain;				// 三维显示窗口大屏幕主类
+
+	int if_data;									//0是未加载数据。1是有数据
+	SysPath oPath;									//系统路径
 	int pSceneOffset;
 
-	QTextEdit* myLogOutLabel;						// ��־����������ı�
-	int MainDockState;								// 0��X��ͼ 1��Y��ͼ 2��Z��ͼ 3����ά��ͼ
+	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
+	int MainDockState;								// 0是X视图 1是Y视图 2是Z视图 3是三维视图
 
-    // mainLabel��ʾ��ͼ��
-    QMenu* popMenu_In_ListWidget_;					/*�����˵���ʹ���޷�ɾ��*/  
+	// mainLabel显示的图像
+	QMenu* popMenu_In_ListWidget_;					/*弹出菜单被使用无法删除*/
 
-public:
-	VSHAPE viewShape;
-	VUNITTABLE vBaseUnit;					// ϵͳ����������
-	VTOPOTABLE vModelTmpl;					// ��ǰ���Ƽ����õ�ƽ��ͼ
-	VBUILDTOPO vBuildTopo;					// ϵͳƽ��ͼ��
-	int InitPath();							// ��ʼ��·��
-	int InitUnitLib();						// ��ʼ������������ 
-	int InitPlaneDrawLib();					// ��ʼ��ƽ��ͼ��
-	int InitParaTmpl();						// ��ʼ������������ģ��
 	int SelectUnitIdx;
 	int SelectUnitType;
+
+
+public:
+	VUNITTABLE vBaseUnit;					// 系统基本构件库
+	VTOPOTABLE vModelTmpl;					// 当前绘制计算用的平面图
+	VBUILDTOPO vBuildTopo;					// 系统平面图库
+	int InitPath();							// 初始化路径
+	int InitUnitLib();						// 初始化基本构件库 
+	int InitPlaneDrawLib();					// 初始化平面图库
+	int InitParaTmpl();						// 初始化参数化生成模板
+
 private:
-	//��ʼ������
+	//初始化窗口
 	void InitWindow();
-	//��ʼ����������
+	//初始化内容区域
 	void InitCentralWidget();
-	//��ʼ���м��������
+	//初始化中间独立窗口
 	void InitOglManagerWidget(QDockWidget* from);
-	//��ʼ����־����
+	//初始化日志窗口
 	void InitLogWidget(QDockWidget* from);
-	//��ʼ���Ѽ��ص�ģ�ʹ���
+	//初始化已加载的模型窗口
 	void InitLoadModelWidget(QDockWidget* from);
-	//��ʼ��ϵͳģ�ʹ���
+	//初始化系统模型窗口
 	void InitSysWidget(QDockWidget* from);
-	//��ʼ�����Դ���
+	//初始化属性窗口
 	void InitPropertyWidget(QDockWidget* from);
 
-	//��ʼ��״̬��������ʾ
+	//初始化状态栏文字提示
 	void InitStatusWidget();
 
-	//��ʼ��Ribbon
+	//初始化Ribbon
 	void InitSARibbon();
-	//��ʼ��Ribbon�е��ļ��˵�
+	//初始化Ribbon中的文件菜单
 	void InitCategoryMain(SARibbonCategory* page);
 
-	//��ʼ����������
+	//初始化弹出窗口
 	void InitTipWindow();
-	//
+
+	//构件选择窗口
 	void ShowUnitSelectWindow();
 
-	//��ȡϵͳ�������еĹ���
+	//获取系统构建库中的构建
 	BasicUnit GetBaseUnit(int idx);
-	//��ȡ���ع������еĹ���
+	//获取加载构建集中的构建
 	TopoUnit GetTopoUnit(int idx);
-	//���ݻ��ƹ������ʶ����ɫ
+	//根据绘制构件类别识别颜色
 	QColor ColorHelper(int nUnitType);
-	//���ݹ���������ת���ɶ�Ӧ���ַ�����
+	//根据构件类别编码转换成对应的字符描述
 	QString GetUnitType(int nUnitType);
-	//���ݹ��������ַ�����ת���ɶ�Ӧ��������
+	//根据构建类别的字符描述转换成对应的类别编码
 	int GetUnitTypeCode(QString unitTypeStr);
-	//���ݹ�����״���ַ�����ת���ɶ�Ӧ��������
+	//根据构建形状的字符描述转换成对应的类别编码
 	int GetShapeTypeCode(QString shapeTypeStr);
+	//获取画布上选中的item
 	QList<QGraphicsItem*> SelectSceneItem(int nUnitIdx);
-	// �ͷŸ��ֽ�����Դ
+
+	// 释放各种界面资源
 	void ReleaseUISource();
-	// �ͷ�ϵͳģ�Ϳ�
+	// 释放系统模型库
 	void ReleaseSysModel();
 
-	//�������
+	//清除画布
 	void SceneMainClear();
 	void SceneXClear();
 	void SceneYClear();
 	void SceneZClear();
-	//���»���Ԫ��
+	//更新画布元素
 	void UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height);
 public:
 	VSHAPE viewShape;
 	DimDataConvert* pCalShapeData;
 public slots:
-	void MyLogOutput(QString myLogout);         //�����־
-	void ApplyDataAction();		//����������������� 
-    void drawWall(const std::vector<float>& points);
+	void MyLogOutput(QString myLogout);         //输出日志
+	void ApplyDataAction();		//保存属性输入的数据 
+	void drawWall(const std::vector<float>& points);
 
 
-	void GraphicsViewXFocus(bool b); // �����Բ�ͼX
-	void GraphicsViewYFocus(bool b); // �����Բ�ͼY
-	void GraphicsViewZFocus(bool b); // �����Բ�ͼZ
+	void GraphicsViewXFocus(bool b); // 加载旁侧图X
+	void GraphicsViewYFocus(bool b); // 加载旁侧图Y
+	void GraphicsViewZFocus(bool b); // 加载旁侧图Z
 
-	void GraphicsViewOgl(bool b);	//opengl�Բ�ͼ
-	void updateOGL();				//������ά��������
-	void AddSceneData();				//���»�������
+	void GraphicsViewOgl(bool b);	//opengl旁侧图
+	void updateOGL();				//更新三维窗口内容
+	void AddSceneData();				//更新画布内容
 
 	void NewFileAction();
 	void OpenFileAction();
 	void CloseFileAction();
 
-	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//�����ƶ�Ԫ��
-	void SceneMenuClickAction(int nUnitType, int nUnitIdx);	//�����˵����
+	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//画布移动元素
+	void SceneMenuClickAction(int nUnitType, int nUnitIdx);	//画布菜单点击
 };
