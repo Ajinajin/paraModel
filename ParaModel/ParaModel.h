@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
@@ -23,6 +23,7 @@
 #include "SARibbonMainWindow.h"
 #include <ParaType.h>
 
+#include "DimDataConvert.h"
 
 class QMenu;
 class QListWidget;
@@ -32,127 +33,129 @@ class SARibbonCategory;
 class ParaModel : public SARibbonMainWindow
 {
 	Q_OBJECT
-		//¹¹Ôìº¯Êý
+		//ï¿½ï¿½ï¿½ìº¯ï¿½ï¿½
 public:
 	explicit ParaModel(QWidget* parent = 0);
 	~ParaModel();
 
 private:
-	QStatusBar* winStatus;							//×´Ì¬À¸
-	QLabel* pTipBar;								// ×´Ì¬À¸ÖÐÎÄ×ÖÏÔÊ¾
-	QLineEdit* pModelEdit[7];						// Õ½¶·²¿ÊôÐÔ±à¼­¿ò µ±Á¿ µ¯Æ¬ÊýÁ¿ µ¯Æ¬ÖÊÁ¿ ·Ö²¼½Ç¶È1 ·Ö²¼½Ç¶È2
-	QLineEdit* pArmHeadEdit[5];						// Ëã·¨ÐÅÏ¢
-	QTreeWidget* pModelTreeWidget;					// ÏµÍ³Ä£ÐÍÊ÷ 
-	QTreeWidget* pModelUnitTreeWidget;					// ÏµÍ³Ä£ÐÍÊ÷
-	QDockWidget* MainDockWidget;					// ½çÃæÏÔÊ¾´°¿Ú
-	BQGraphicsView* graphicsViewX;					// ¶þÎ¬Ä£ÐÍXÊÓÍ¼
-	BQGraphicsView* graphicsViewY;					// ¶þÎ¬Ä£ÐÍYÊÓÍ¼
-	BQGraphicsView* graphicsViewZ;					// ¶þÎ¬Ä£ÐÍZÊÓÍ¼
-	BQGraphicsView* graphicsViewMain;				// ¶þÎ¬Ä£ÐÍÈýÎ¬ÊÓÍ¼
-	BQGraphicsView* graphicsViewOgl;				// ÈýÎ»Ä£ÐÍÕ¹Ê¾ÊÓÍ¼
+	QStatusBar* winStatus;							//×´Ì¬ï¿½ï¿½
+	QLabel* pTipBar;								// ×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
+	QLineEdit* pModelEdit[7];						// Õ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô±à¼­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ¬ï¿½ï¿½ï¿½ï¿½ ï¿½Ö²ï¿½ï¿½Ç¶ï¿½1 ï¿½Ö²ï¿½ï¿½Ç¶ï¿½2
+	QLineEdit* pArmHeadEdit[5];						// ï¿½ã·¨ï¿½ï¿½Ï¢
+	QTreeWidget* pModelTreeWidget;					// ÏµÍ³Ä£ï¿½ï¿½ï¿½ï¿½ 
+	QTreeWidget* pModelUnitTreeWidget;					// ÏµÍ³Ä£ï¿½ï¿½ï¿½ï¿½
+	QDockWidget* MainDockWidget;					// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½
+	BQGraphicsView* graphicsViewX;					// ï¿½ï¿½Î¬Ä£ï¿½ï¿½Xï¿½ï¿½Í¼
+	BQGraphicsView* graphicsViewY;					// ï¿½ï¿½Î¬Ä£ï¿½ï¿½Yï¿½ï¿½Í¼
+	BQGraphicsView* graphicsViewZ;					// ï¿½ï¿½Î¬Ä£ï¿½ï¿½Zï¿½ï¿½Í¼
+	BQGraphicsView* graphicsViewMain;				// ï¿½ï¿½Î¬Ä£ï¿½ï¿½ï¿½ï¿½Î¬ï¿½ï¿½Í¼
+	BQGraphicsView* graphicsViewOgl;				// ï¿½ï¿½Î»Ä£ï¿½ï¿½Õ¹Ê¾ï¿½ï¿½Í¼
 
-	BQGraphicsScene pSceneX;						// ¶þÎ¬Ä£ÐÍXÊÓÍ¼»­²¼
-	BQGraphicsScene pSceneY;						// ¶þÎ¬Ä£ÐÍYÊÓÍ¼»­²¼
-	BQGraphicsScene pSceneZ;						// ¶þÎ¬Ä£ÐÍZÊÓÍ¼»­²¼
-	BQGraphicsScene pSceneMain;						// ¶þÎ¬Ä£ÐÍZÊÓÍ¼´óÆÁÄ»Ö÷»­²¼
+	BQGraphicsScene pSceneX;						// ï¿½ï¿½Î¬Ä£ï¿½ï¿½Xï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
+	BQGraphicsScene pSceneY;						// ï¿½ï¿½Î¬Ä£ï¿½ï¿½Yï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
+	BQGraphicsScene pSceneZ;						// ï¿½ï¿½Î¬Ä£ï¿½ï¿½Zï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
+	BQGraphicsScene pSceneMain;						// ï¿½ï¿½Î¬Ä£ï¿½ï¿½Zï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	
-	ParaOGLManager* paraOglmanager;					// ÈýÎ¬ÏÔÊ¾´°¿ÚÀà
-	ParaOGLManager* paraOglmanagerMain;				// ÈýÎ¬ÏÔÊ¾´°¿Ú´óÆÁÄ»Ö÷Àà
+	ParaOGLManager* paraOglmanager;					// ï¿½ï¿½Î¬ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	ParaOGLManager* paraOglmanagerMain;				// ï¿½ï¿½Î¬ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½
 
-	int if_data;									//0ÊÇÎ´¼ÓÔØÊý¾Ý¡£1ÊÇÓÐÊý¾Ý
-	SysPath oPath;									//ÏµÍ³Â·¾¶
+	int if_data;									//0ï¿½ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¡ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	SysPath oPath;									//ÏµÍ³Â·ï¿½ï¿½
 	int pSceneOffset;
 
-	QTextEdit* myLogOutLabel;						// ÈÕÖ¾´°¿ÚÊä³öµÄÎÄ±¾
-	int MainDockState;								// 0ÊÇXÊÓÍ¼ 1ÊÇYÊÓÍ¼ 2ÊÇZÊÓÍ¼ 3ÊÇÈýÎ¬ÊÓÍ¼
+	QTextEdit* myLogOutLabel;						// ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½
+	int MainDockState;								// 0ï¿½ï¿½Xï¿½ï¿½Í¼ 1ï¿½ï¿½Yï¿½ï¿½Í¼ 2ï¿½ï¿½Zï¿½ï¿½Í¼ 3ï¿½ï¿½ï¿½ï¿½Î¬ï¿½ï¿½Í¼
 
-    // mainLabelÏÔÊ¾µÄÍ¼Ïñ
-    QMenu* popMenu_In_ListWidget_;					/*µ¯³ö²Ëµ¥±»Ê¹ÓÃÎÞ·¨É¾³ý*/  
+    // mainLabelï¿½ï¿½Ê¾ï¿½ï¿½Í¼ï¿½ï¿½
+    QMenu* popMenu_In_ListWidget_;					/*ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½Þ·ï¿½É¾ï¿½ï¿½*/  
 
 public:
 	VSHAPE viewShape;
-	VUNITTABLE vBaseUnit;					// ÏµÍ³»ù±¾¹¹¼þ¿â
-	VTOPOTABLE vModelTmpl;					// µ±Ç°»æÖÆ¼ÆËãÓÃµÄÆ½ÃæÍ¼
-	VBUILDTOPO vBuildTopo;					// ÏµÍ³Æ½ÃæÍ¼¿â
-	int InitPath();							// ³õÊ¼»¯Â·¾¶
-	int InitUnitLib();						// ³õÊ¼»¯»ù±¾¹¹¼þ¿â 
-	int InitPlaneDrawLib();					// ³õÊ¼»¯Æ½ÃæÍ¼¿â
-	int InitParaTmpl();						// ³õÊ¼»¯²ÎÊý»¯Éú³ÉÄ£°å
+	VUNITTABLE vBaseUnit;					// ÏµÍ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	VTOPOTABLE vModelTmpl;					// ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Æ¼ï¿½ï¿½ï¿½ï¿½Ãµï¿½Æ½ï¿½ï¿½Í¼
+	VBUILDTOPO vBuildTopo;					// ÏµÍ³Æ½ï¿½ï¿½Í¼ï¿½ï¿½
+	int InitPath();							// ï¿½ï¿½Ê¼ï¿½ï¿½Â·ï¿½ï¿½
+	int InitUnitLib();						// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
+	int InitPlaneDrawLib();					// ï¿½ï¿½Ê¼ï¿½ï¿½Æ½ï¿½ï¿½Í¼ï¿½ï¿½
+	int InitParaTmpl();						// ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½
 	int SelectUnitIdx;
 	int SelectUnitType;
 private:
-	//³õÊ¼»¯´°¿Ú
+	//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void InitWindow();
-	//³õÊ¼»¯ÄÚÈÝÇøÓò
+	//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void InitCentralWidget();
-	//³õÊ¼»¯ÖÐ¼ä¶ÀÁ¢´°¿Ú
+	//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ð¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void InitOglManagerWidget(QDockWidget* from);
-	//³õÊ¼»¯ÈÕÖ¾´°¿Ú
+	//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½ï¿½ï¿½
 	void InitLogWidget(QDockWidget* from);
-	//³õÊ¼»¯ÒÑ¼ÓÔØµÄÄ£ÐÍ´°¿Ú
+	//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Ñ¼ï¿½ï¿½Øµï¿½Ä£ï¿½Í´ï¿½ï¿½ï¿½
 	void InitLoadModelWidget(QDockWidget* from);
-	//³õÊ¼»¯ÏµÍ³Ä£ÐÍ´°¿Ú
+	//ï¿½ï¿½Ê¼ï¿½ï¿½ÏµÍ³Ä£ï¿½Í´ï¿½ï¿½ï¿½
 	void InitSysWidget(QDockWidget* from);
-	//³õÊ¼»¯ÊôÐÔ´°¿Ú
+	//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½
 	void InitPropertyWidget(QDockWidget* from);
 
-	//³õÊ¼»¯×´Ì¬À¸ÎÄ×ÖÌáÊ¾
+	//ï¿½ï¿½Ê¼ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
 	void InitStatusWidget();
 
-	//³õÊ¼»¯Ribbon
+	//ï¿½ï¿½Ê¼ï¿½ï¿½Ribbon
 	void InitSARibbon();
-	//³õÊ¼»¯RibbonÖÐµÄÎÄ¼þ²Ëµ¥
+	//ï¿½ï¿½Ê¼ï¿½ï¿½Ribbonï¿½Ðµï¿½ï¿½Ä¼ï¿½ï¿½Ëµï¿½
 	void InitCategoryMain(SARibbonCategory* page);
 
-	//³õÊ¼»¯µ¯³ö´°¿Ú
+	//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void InitTipWindow();
 	//
 	void ShowUnitSelectWindow();
 
-	//»ñÈ¡ÏµÍ³¹¹½¨¿âÖÐµÄ¹¹½¨
+	//ï¿½ï¿½È¡ÏµÍ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ¹ï¿½ï¿½ï¿½
 	BasicUnit GetBaseUnit(int idx);
-	//»ñÈ¡¼ÓÔØ¹¹½¨¼¯ÖÐµÄ¹¹½¨
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ø¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ¹ï¿½ï¿½ï¿½
 	TopoUnit GetTopoUnit(int idx);
-	//¸ù¾Ý»æÖÆ¹¹¼þÀà±ðÊ¶±ðÑÕÉ«
+	//ï¿½ï¿½ï¿½Ý»ï¿½ï¿½Æ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¶ï¿½ï¿½ï¿½ï¿½É«
 	QColor ColorHelper(int nUnitType);
-	//¸ù¾Ý¹¹¼þÀà±ð±àÂë×ª»»³É¶ÔÓ¦µÄ×Ö·ûÃèÊö
+	//ï¿½ï¿½ï¿½Ý¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½É¶ï¿½Ó¦ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½
 	QString GetUnitType(int nUnitType);
-	//¸ù¾Ý¹¹½¨Àà±ðµÄ×Ö·ûÃèÊö×ª»»³É¶ÔÓ¦µÄÀà±ð±àÂë
+	//ï¿½ï¿½ï¿½Ý¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½É¶ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	int GetUnitTypeCode(QString unitTypeStr);
-	//¸ù¾Ý¹¹½¨ÐÎ×´µÄ×Ö·ûÃèÊö×ª»»³É¶ÔÓ¦µÄÀà±ð±àÂë
+	//ï¿½ï¿½ï¿½Ý¹ï¿½ï¿½ï¿½ï¿½ï¿½×´ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½É¶ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	int GetShapeTypeCode(QString shapeTypeStr);
 	QList<QGraphicsItem*> SelectSceneItem(int nUnitIdx);
-	// ÊÍ·Å¸÷ÖÖ½çÃæ×ÊÔ´
+	// ï¿½Í·Å¸ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´
 	void ReleaseUISource();
-	// ÊÍ·ÅÏµÍ³Ä£ÐÍ¿â
+	// ï¿½Í·ï¿½ÏµÍ³Ä£ï¿½Í¿ï¿½
 	void ReleaseSysModel();
 
-	//Çå³ý»­²¼
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	void SceneMainClear();
 	void SceneXClear();
 	void SceneYClear();
 	void SceneZClear();
-	//¸üÐÂ»­²¼ÔªËØ
+	//ï¿½ï¿½ï¿½Â»ï¿½ï¿½ï¿½Ôªï¿½ï¿½
 	void UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height);
-
+public:
+	VSHAPE viewShape;
+	DimDataConvert* pCalShapeData;
 public slots:
-	void MyLogOutput(QString myLogout);         //Êä³öÈÕÖ¾
-	void ApplyDataAction();		//±£´æÊôÐÔÊäÈëµÄÊý¾Ý 
+	void MyLogOutput(QString myLogout);         //ï¿½ï¿½ï¿½ï¿½ï¿½Ö¾
+	void ApplyDataAction();		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
     void drawWall(const std::vector<float>& points);
 
 
-	void GraphicsViewXFocus(bool b); // ¼ÓÔØÅÔ²àÍ¼X
-	void GraphicsViewYFocus(bool b); // ¼ÓÔØÅÔ²àÍ¼Y
-	void GraphicsViewZFocus(bool b); // ¼ÓÔØÅÔ²àÍ¼Z
+	void GraphicsViewXFocus(bool b); // ï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Í¼X
+	void GraphicsViewYFocus(bool b); // ï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Í¼Y
+	void GraphicsViewZFocus(bool b); // ï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½Í¼Z
 
-	void GraphicsViewOgl(bool b);	//openglÅÔ²àÍ¼
-	void updateOGL();				//¸üÐÂÈýÎ¬´°¿ÚÄÚÈÝ
-	void AddSceneData();				//¸üÐÂ»­²¼ÄÚÈÝ
+	void GraphicsViewOgl(bool b);	//openglï¿½Ô²ï¿½Í¼
+	void updateOGL();				//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	void AddSceneData();				//ï¿½ï¿½ï¿½Â»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	void NewFileAction();
 	void OpenFileAction();
 	void CloseFileAction();
 
-	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//»­²¼ÒÆ¶¯ÔªËØ
-	void SceneMenuClickAction(int nUnitType, int nUnitIdx);	//»­²¼²Ëµ¥µã»÷
+	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½Ôªï¿½ï¿½
+	void SceneMenuClickAction(int nUnitType, int nUnitIdx);	//ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½
 };
