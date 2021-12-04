@@ -42,7 +42,8 @@ private:
 	QLabel* pTipBar;								// 状态栏中文字显示
 	QLineEdit* pModelEdit[7];						// 战斗部属性编辑框 当量 弹片数量 弹片质量 分布角度1 分布角度2
 	QLineEdit* pArmHeadEdit[5];						// 算法信息
-	QTreeWidget* pModelTreeWidget;					// 系统模型树
+	QTreeWidget* pModelTreeWidget;					// 系统模型树 
+	QTreeWidget* pModelUnitTreeWidget;					// 系统模型树
 	QDockWidget* MainDockWidget;					// 界面显示窗口
 	BQGraphicsView* graphicsViewX;					// 二维模型X视图
 	BQGraphicsView* graphicsViewY;					// 二维模型Y视图
@@ -69,6 +70,7 @@ private:
     QMenu* popMenu_In_ListWidget_;					/*弹出菜单被使用无法删除*/  
 
 public:
+	VSHAPE viewShape;
 	VUNITTABLE vBaseUnit;					// 系统基本构件库
 	VTOPOTABLE vModelTmpl;					// 当前绘制计算用的平面图
 	VBUILDTOPO vBuildTopo;					// 系统平面图库
@@ -76,7 +78,8 @@ public:
 	int InitUnitLib();						// 初始化基本构件库 
 	int InitPlaneDrawLib();					// 初始化平面图库
 	int InitParaTmpl();						// 初始化参数化生成模板
-
+	int SelectUnitIdx;
+	int SelectUnitType;
 private:
 	//初始化窗口
 	void InitWindow();
@@ -103,6 +106,8 @@ private:
 
 	//初始化弹出窗口
 	void InitTipWindow();
+	//
+	void ShowUnitSelectWindow();
 
 	//获取系统构建库中的构建
 	BasicUnit GetBaseUnit(int idx);
@@ -116,7 +121,7 @@ private:
 	int GetUnitTypeCode(QString unitTypeStr);
 	//根据构建形状的字符描述转换成对应的类别编码
 	int GetShapeTypeCode(QString shapeTypeStr);
-
+	QList<QGraphicsItem*> SelectSceneItem(int nUnitIdx);
 	// 释放各种界面资源
 	void ReleaseUISource();
 	// 释放系统模型库
@@ -142,12 +147,12 @@ public slots:
 
 	void GraphicsViewOgl(bool b);	//opengl旁侧图
 	void updateOGL();				//更新三维窗口内容
-	void updateScene();				//更新画布内容
+	void AddSceneData();				//更新画布内容
 
 	void NewFileAction();
 	void OpenFileAction();
 	void CloseFileAction();
 
 	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//画布移动元素
-	void SceneMenuClickAction(int nUnitType, int nUnitIdx, int clickType);	//画布菜单点击
+	void SceneMenuClickAction(int nUnitType, int nUnitIdx);	//画布菜单点击
 };

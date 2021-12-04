@@ -283,6 +283,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	width_spinBox->setStyleSheet("QSpinBox{ width:120px; height:30px; font-size:16px; font-weight:bold; }");
 	width_spinBox->setRange(0, 10000);
 	width_spinBox->setPrefix("X: ");
+	width_spinBox->setDisabled(true);
 	width_spinBox->setSuffix(" mm");
 	width_spinBox->setSingleStep(1);
 	width_spinBox->setValue(2 * abs(m_center.x()));
@@ -294,6 +295,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	height_spinBox->setStyleSheet("QSpinBox{ width:120px; height:30px; font-size:16px; font-weight:bold; }");
 	height_spinBox->setRange(0, 10000);
 	height_spinBox->setPrefix("Y: ");
+	height_spinBox->setDisabled(true);
 	height_spinBox->setSuffix(" mm");
 	height_spinBox->setSingleStep(1);
 	height_spinBox->setValue(2 * abs(m_edge.y()));
@@ -302,16 +304,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 		});
 
 
-	QPushButton* pApplyBtn = new QPushButton(QString::fromStdString(u8"确认"));
-	pApplyBtn->setFixedWidth(100);
-
-	connect(pApplyBtn, &QPushButton::clicked, this, [=]() {
-		//发送信号 确认修改后的值
-		int x = width_spinBox->value();
-		int y = height_spinBox->value();
-		emit SceneItemMove(nUnitType, nUnitIdx, QPointF(x, y));
-	});
-
+	
 
 	QWidgetAction* width_widgetAction = new QWidgetAction(menu);
 	width_widgetAction->setDefaultWidget(width_spinBox);
@@ -322,11 +315,19 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	menu->addAction(height_widgetAction);
 
 
-	QWidgetAction* applyBtn_widgetAction = new QWidgetAction(menu);
-	applyBtn_widgetAction->setDefaultWidget(pApplyBtn);
-	menu->addAction(applyBtn_widgetAction);
+	//QPushButton* pApplyBtn = new QPushButton(QString::fromStdString(u8"确认"));
+	//pApplyBtn->setFixedWidth(100);
+
+	//connect(pApplyBtn, &QPushButton::clicked, this, [=]() {
+	//	//发送信号 确认修改后的值 
+	//	emit SceneMenuClick(nUnitType, nUnitIdx, 1);
+	//	});
 
 
+	//QWidgetAction* applyBtn_widgetAction = new QWidgetAction(menu);
+	//applyBtn_widgetAction->setDefaultWidget(pApplyBtn);
+	//menu->addAction(applyBtn_widgetAction);
+	 
 	QAction* act = new QAction(this);
 	act->setObjectName((u8"更换构件"));
 	act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
@@ -334,7 +335,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	act->setCheckable(true); 
 	connect(act, &QAction::triggered, this, [=]() {
 		//发送信号 提示点击了更换
-		emit SceneMenuClick(nUnitType, nUnitIdx, 1);
+		emit SceneMenuClick(nUnitType, nUnitIdx);
 		});
 	menu->addAction(act);
 

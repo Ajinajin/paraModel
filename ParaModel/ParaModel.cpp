@@ -196,12 +196,11 @@ void ParaModel::InitPropertyWidget(QDockWidget* from)
 //初始化系统模型窗口
 void ParaModel::InitSysWidget(QDockWidget* from)
 {
+	//读取文件夹下的模型文件 将模型文件名称变成树结构存放到 pModelTreeWidget 中
+	//双击时加载模型文件名称对应的文件
 	QWidget* mytreewidget = new QWidget();
 	pModelTreeWidget = new QTreeWidget(mytreewidget);
 	pModelTreeWidget->setHeaderHidden(true);
-	from->setWidget(mytreewidget);
-	from->setFixedWidth(300);
-	from->setWindowTitle("模型组件/属性列表");
 
 
 	QTreeWidgetItem* rootItemPillar = new QTreeWidgetItem(pModelTreeWidget);
@@ -324,6 +323,10 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 		msg = item->text(0) + "构件加载完成";
 		MyLogOutput(msg);
 		});
+
+	from->setWidget(mytreewidget);
+	from->setFixedWidth(300);
+	from->setWindowTitle("模型组件/属性列表");
 	from->setWidget(pModelTreeWidget);
 	pModelTreeWidget->expandAll();
 }
@@ -597,7 +600,99 @@ void ParaModel::InitWindow()
 //初始化弹出窗口
 void ParaModel::InitTipWindow()
 {
+}
+//弹出构件菜单窗口
+void ParaModel::ShowUnitSelectWindow()
+{
+	QWidget* unitSelectWidget = new QWidget();
+	unitSelectWidget->setFixedWidth(300);
+	unitSelectWidget->setFixedHeight(700);
+	QTreeWidget* pTreeWidget = new QTreeWidget(unitSelectWidget);
+	pTreeWidget->setFixedWidth(300);
+	pTreeWidget->setFixedHeight(700);
+	pTreeWidget->setHeaderHidden(true);
 
+
+	for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
+	{
+		if (iter->nUnitType == SelectUnitType)
+		{
+			QTreeWidgetItem* rootItem = new QTreeWidgetItem(pTreeWidget);
+			rootItem->setText(0, iter->oShape.nShapeName);
+			rootItem->setData(0, Qt::UserRole, iter->nUnitIdx);
+		}
+	} 
+	//树按钮响应
+	connect(pTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column) {
+		if (if_data == 0)
+		{
+			MyLogOutput("当前无画布信息，请新建或者打开后在操作");
+			return;
+		}
+
+		QVariant variant = item->data(0, Qt::UserRole);
+		int nUnitIdx = variant.value<int>();
+		QString msg;
+		for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
+		{
+			if (iter->nUnitIdx != nUnitIdx)
+				continue;
+
+			if (iter->oShape.nShapeType == 1)
+			{
+
+				//板墙门窗 宽度为1
+				int wThickNess = 0;
+				int hThickNess = 0;
+				if (iter->nUnitType > 2)
+				{
+					wThickNess = 1;
+					hThickNess = 20;
+				}
+				BRectangle* m_rectangle = new BRectangle(
+					pSceneOffset + iter->oShape.nShapeRange[0], pSceneOffset + iter->oShape.nShapeRange[1],
+					wThickNess + iter->oShape.nShapeRange[2], hThickNess + iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
+				m_rectangle->wallwidth = iter->oShape.nThickNess;
+				m_rectangle->nUnitType = iter->nUnitType;
+				m_rectangle->nUnitIdx = iter->nUnitIdx;
+				m_rectangle->setBrush(ColorHelper(iter->nUnitType));
+				pSceneMain.addItem(m_rectangle);
+			}
+			else if (iter->oShape.nShapeType == 2)
+			{
+
+				BCircle* m_ellipse = new BCircle(pSceneOffset + iter->oShape.nCen[0], pSceneOffset + iter->oShape.nCen[1],
+					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
+				m_ellipse->setBrush(ColorHelper(iter->nUnitType));
+				m_ellipse->nUnitType = iter->nUnitType;
+				m_ellipse->nUnitIdx = iter->nUnitIdx;
+				pSceneMain.addItem(m_ellipse);
+			}
+			else if (iter->oShape.nShapeType == 3)
+			{
+				vector<float> point;
+				for (size_t i = 0; i < iter->oShape.vPolyPt.size(); i++)
+				{
+					point.push_back(iter->oShape.vPolyPt[i] + 100);
+				}
+				drawWall(point);
+
+				//setBtnEnabled(false);
+				/*BPolygon* m_polygon = new BPolygon(BGraphicsItem::ItemType::Polygon);
+				m_polygon->is_create_finished = true;*/
+				//m_polygon->paint();
+				//pSceneMain.addItem(m_polygon);
+
+			}
+		}
+		msg = item->text(0) + "构件加载完成";
+		MyLogOutput(msg);
+		});
+	unitSelectWidget->setWindowModality(Qt::ApplicationModal);
+	unitSelectWidget->setWindowFlags(Qt::WindowCloseButtonHint);
+	unitSelectWidget->setWindowTitle("请选择构件");
+	unitSelectWidget->setWindowIcon(QIcon(":/qss/res/qss/White/icon2.png"));
+	unitSelectWidget->show();
 }
 #pragma endregion
 
@@ -640,6 +735,7 @@ void ParaModel::CloseFileAction()
 
 	MyLogOutput("清除数据成功");
 }
+
 void ParaModel::OpenFileAction()
 {
 	if (if_data == 1)
@@ -737,7 +833,7 @@ void ParaModel::OpenFileAction()
 		}
 	}
 	if_data = 1;
-	ParaModel::updateScene();
+	ParaModel::AddSceneData();
 }
 
 void ParaModel::GraphicsViewXFocus(bool b)
@@ -1148,7 +1244,6 @@ BasicUnit ParaModel::GetBaseUnit(int idx)
 	return b;
 }
 
-
 //获取加载构建集中的构建
 TopoUnit ParaModel::GetTopoUnit(int idx)
 {
@@ -1264,6 +1359,22 @@ int ParaModel::GetShapeTypeCode(QString shapeTypeStr)
 	}
 	return 0;
 }
+//查找画布中的元素
+QList<QGraphicsItem*> ParaModel::SelectSceneItem(int nUnitIdx)
+{
+	bool isWall = false;
+	QList<QGraphicsItem*> itemList = pSceneMain.items();
+	QList<QGraphicsItem*> returnList;
+	for (size_t i = 0; i < itemList.size(); i++)
+	{
+		BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
+		if (proxyWidget->nUnitIdx == nUnitIdx)
+		{
+			returnList.append(proxyWidget);
+		}
+	}
+	return returnList;
+}
 #pragma endregion
 
 #pragma region 释放资源
@@ -1302,7 +1413,39 @@ void ParaModel::ReleaseSysModel()
 
 //画布移动元素
 void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
-{ 
+{
+	for (size_t i = 0; i < viewShape.size(); i++)
+	{
+		if (viewShape[i].unitIdx != nUnitIdx)
+			continue;
+		//绘制柱、墙、门、窗
+		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
+		{
+			//在画布中重新找到该元素
+			QList<QGraphicsItem*> viewItem = SelectSceneItem(viewShape[i].unitIdx);
+			for (size_t i = 0; i < viewItem.size(); i++)
+			{
+				BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(viewItem[i]);
+				if (!proxyWidget->isAuxiliary)
+				{
+					proxyWidget = new BRectangle(
+						pos.x(), pos.y(),
+						viewShape[i].nWH[0], viewShape[i].nWH[1],
+						BGraphicsItem::ItemType::Rectangle);
+					proxyWidget->isAuxiliary = false;
+					proxyWidget->nUnitType = viewShape[i].unitType;
+					proxyWidget->nUnitIdx = viewShape[i].unitIdx;
+					proxyWidget->setBrush(ColorHelper(viewShape[i].unitType));
+					connect(proxyWidget, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+					connect(proxyWidget, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
+				}
+				else
+				{
+					//删除标准线
+				}
+			}
+		}
+	}
 	if (MainDockState != 3)
 	{
 		graphicsViewMain->hide();
@@ -1311,21 +1454,24 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 	return;
 }
 //画布菜单点击
-void ParaModel::SceneMenuClickAction(int nUnitType, int nUnitIdx, int clickType)
+void ParaModel::SceneMenuClickAction(int nUnitType, int nUnitIdx)
 {
+	SelectUnitIdx = nUnitIdx;
+	SelectUnitType = nUnitType;
+	ShowUnitSelectWindow();
+	//弹出x菜单，在点击后更换选中的构建的中心idx值
 	return;
 }
 //更新画布内容
-void ParaModel::updateScene()
+void ParaModel::AddSceneData()
 {
 	if (if_data == 0)
 		return;
 	if (vModelTmpl.size() == 0)
 		return;
 
-
+	SceneMainClear();
 	DimDataConvert* d = new DimDataConvert();
-	VSHAPE viewShape;
 	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 	//根据数据绘制图形
 	for (size_t i = 0; i < viewShape.size(); i++)
