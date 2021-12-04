@@ -502,7 +502,7 @@ int MovDoorWndInWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLaye
 		//(vPlaneDraw[(vLayerTopo[(vLayerTopo[24]).nAdjUnitIdx[0]]).nAdjUnitIdx[0]]).nWH/2
 		int nBottom = 0;
 		int doorW = table[vLayerTopo[nMoveUnitIdx].nCenUnitIdx].oShape.nShapeRange[0] / 2; //元素的中心点
-		int PillarH = (vPlaneDraw[(vLayerTopo[(vLayerTopo[24]).nAdjUnitIdx[0]]).nAdjUnitIdx[0]]).nWH[1] / 2; //柱子的高度 / 2;
+		int PillarH = (vPlaneDraw[(vLayerTopo[(vLayerTopo[nMoveUnitIdx]).nAdjUnitIdx[0]]).nAdjUnitIdx[0]]).nWH[1] / 2; //柱子的高度 / 2;
 		int nUp = vPlaneDraw[nInsWallIdx].nWH[1] - doorW- PillarH;
 		// 按墙方向更改门窗位置
 		int nNewY = vLayerTopo[nMoveUnitIdx].nCenPos[1] + (nMoveY * -1) ;

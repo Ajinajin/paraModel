@@ -1534,30 +1534,30 @@ void ParaModel::RefreshScene()
 	AddSceneData();
 
 
-	for (size_t i = 0; i < viewShape.size(); i++)
-	{
-		//绘制柱、墙、门、窗
-		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
-		{
-			//在画布中重新找到该元素
-			QList<QGraphicsItem*> viewItem = SelectSceneItem(viewShape[i].unitIdx);
-			for (size_t i = 0; i < viewItem.size(); i++)
-			{
-				BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(viewItem[i]);
-				if (!proxyWidget->isAuxiliary)
-				{
-					int coordX = viewShape[i].nCen[0];
-					int coordY = viewShape[i].nCen[1];
-					proxyWidget->setX(coordX);
-					proxyWidget->setY(coordY);
-				}
-				else
-				{
-					//删除标准线
-				}
-			}
-		}
-	}
+	//for (size_t i = 0; i < viewShape.size(); i++)
+	//{
+	//	//绘制柱、墙、门、窗
+	//	if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
+	//	{
+	//		//在画布中重新找到该元素
+	//		QList<QGraphicsItem*> viewItem = SelectSceneItem(viewShape[i].unitIdx);
+	//		for (size_t i = 0; i < viewItem.size(); i++)
+	//		{
+	//			BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(viewItem[i]);
+	//			if (!proxyWidget->isAuxiliary)
+	//			{
+	//				int coordX = viewShape[i].nCen[0];
+	//				int coordY = viewShape[i].nCen[1];
+	//				proxyWidget->setX(coordX);
+	//				proxyWidget->setY(coordY);
+	//			}
+	//			else
+	//			{
+	//				//删除标准线
+	//			}
+	//		}
+	//	}
+	//}
 	return;
 }
 //画布移动元素
