@@ -447,7 +447,7 @@ void ParaModel::updateOGL()
 	paraOglmanagerMain->oglTopTable = this->vModelTmpl;
 	paraOglmanagerMain->oglUnitTable = this->vBaseUnit;
 
-	ParaModel::RefreshScene();
+	//ParaModel::RefreshScene();
 
 }
 
@@ -768,7 +768,7 @@ void ParaModel::ShowAllUnitSelectWindow()
 		QVariant variant = item->data(0, Qt::UserRole);
 		int nUnitIdx1 = variant.value<int>();
 
-		int a = moveXY[0] + moveXY[1]+1;
+		int a = moveXY[0] + moveXY[1] + 1;
 		//
 
 
@@ -992,6 +992,7 @@ void ParaModel::MyLogOutput(QString myLogout)
 // 数据修改后更新
 void ParaModel::ApplyDataAction()
 {
+	RefreshScene();
 	// 场景未 没有数据
 	// if (pEnvir2 == NULL)
 	// {
@@ -1464,7 +1465,7 @@ QList<QGraphicsItem*> ParaModel::SelectSceneItem(int nUnitIdx)
 		if (proxyWidget->nUnitIdx == nUnitIdx)
 		{
 			if (proxyWidget->nOriPos[0] >= 0)
-			{ 
+			{
 				returnList.append(proxyWidget);
 			}
 		}
@@ -1515,8 +1516,18 @@ void ParaModel::RefreshScene()
 		return;
 	if (viewShape.size() == 0)
 		return;
+
+	// 计算移动后的新坐标
+	pCalShapeData->MoveBaseUnit(SelectUnitIdx, nMoveXY, vModelTmpl, viewShape, vBaseUnit);
+	nMoveXY[0] = 0;
+	nMoveXY[1] = 0;
+	// 转为绘图坐标
+	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
+	AddSceneData();
+
+
 	for (size_t i = 0; i < viewShape.size(); i++)
-	{ 
+	{
 		//绘制柱、墙、门、窗
 		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
 		{
@@ -1544,38 +1555,18 @@ void ParaModel::RefreshScene()
 //画布移动元素
 void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 {
-	int a = nUnitType;
-	int v = nUnitIdx;
-	SimpleShape oShape = viewShape[nUnitIdx];
-	int nMoveXY[2];
 	// 发送绝对位置信息时 按 相对左下角计算位移
 // 	nMoveXY[0] = pos.x() - pSceneOffset - (oShape.nCen[0] - oShape.nWH[0] / 2); 
 // 	nMoveXY[1] = pos.y() - pSceneOffset - (oShape.nCen[1] - oShape.nWH[1] / 2); 
 	// 发送位移时 直接赋值
 	//如果构件是水平的修改x
 	//如果构件是垂直的修改y
-	
+	SelectUnitIdx = nUnitIdx;
+	SelectUnitType = nUnitType;
 	nMoveXY[0] = pos.x();
 	nMoveXY[1] = pos.y();
-
-
-
-	// 计算移动后的新坐标
-	pCalShapeData->MoveBaseUnit(nUnitIdx, nMoveXY, vModelTmpl, viewShape);
-
-	// 转为绘图坐标
-	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
-
-
-	int nCen[2];
-	nCen[0] = nMoveXY[0] + vModelTmpl[nUnitIdx].nCenPos[0];
-	nCen[1] = nMoveXY[1] + vModelTmpl[nUnitIdx].nCenPos[2];
-
 	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y());
 	myLogOutLabel->setText(sInfo);
-	// 	QString sInfo1 = QString("%1 %2").arg(nCen[0]).arg(nCen[1]); 
-	// 	myLogOutLabel->setText(sInfo1); 
-	 
 
 	return;
 }
@@ -1617,7 +1608,8 @@ void ParaModel::AddSceneData()
 	//清除画布
 	SceneMainClear();
 
-	DimDataConvert* d = new DimDataConvert(); 
+	DimDataConvert* d = new DimDataConvert();
+
 	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
 	//根据数据绘制图形

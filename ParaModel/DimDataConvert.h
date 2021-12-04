@@ -27,6 +27,6 @@ public:
 	int DelBaseUnit(PixelPos oInsPos, VTOPOTABLE& vLayerTopp, int nRealDel = 1); 
 
 	// 平面图中移动选中单元构件
-	int MoveBaseUnit(int nSelUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw); 
+	int MoveBaseUnit(int nSelUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw,VUNITTABLE table);
 
 };

@@ -47,7 +47,7 @@ int DimDataConvert::CalPlaneColShape(TopoUnit oUnit, SimpleShape& oShape, VUNITT
 }
 
 // 基于柱子基础上计算墙
-int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
+int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	// 得到墙的关联柱
 	int nAdjNum = 10;
@@ -75,14 +75,14 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& 
 	SimpleShape oColShape1 = vPlaneDraw[nAdjColIdx[1]];
 	int nXDis = oColShape0.nCen[0] - oColShape1.nCen[0];
 	int nYDis = oColShape0.nCen[1] - oColShape1.nCen[1];
-	nXDis *= nXDis; 
-	nYDis *= nYDis; 
+	nXDis *= nXDis;
+	nYDis *= nYDis;
 	if (nXDis > nYDis)
 		oUnit.nUnitAngle = 0;
 	else
-		oUnit.nUnitAngle = 90; 
+		oUnit.nUnitAngle = 90;
 
-	vLayerTopo[nUnitIdx].nUnitAngle = oUnit.nUnitAngle; 
+	vLayerTopo[nUnitIdx].nUnitAngle = oUnit.nUnitAngle;
 	// 水平墙
 	SimpleShape oWallShape;
 	int nWH[2], nCen[2];
@@ -149,31 +149,46 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& 
 }
 
 // 基于墙基础上计算门窗
-int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
+int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	// 得到门窗的关联墙
 	int nWallIdx = vLayerTopo[nUnitIdx].nAdjUnitIdx[0];
 	if (nWallIdx < 0)
 		return 1;
 
-	vLayerTopo[nUnitIdx].nUnitAngle = vLayerTopo[nWallIdx].nUnitAngle; 
+	vLayerTopo[nUnitIdx].nUnitAngle = vLayerTopo[nWallIdx].nUnitAngle;
 	// 水平墙 
 	int nCen[2];
 	int nWH[2];
 	if (vLayerTopo[nWallIdx].nUnitAngle == 0)
 	{
-		nCen[0] = vPlaneDraw[nWallIdx].nCen[0];
-		nCen[1] = vPlaneDraw[nWallIdx].nCen[1];
-		nWH[0] = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[1]; // 窗户宽度 查系统表得到
+		nWH[0] = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[0]; // 窗户宽度 查系统表得到
 		nWH[1] = vPlaneDraw[nWallIdx].nWH[1] + 10; // 窗户厚度 之前没给定 设置为墙厚+10
+		//墙的中心点
+		//前一个柱子的中心点+宽度/2 得到墙的左下角 + 门的相对位置 + 门元素的中心点
+		int nPillarCen = vPlaneDraw[vLayerTopo[nWallIdx].nAdjUnitIdx[0]].nCen[0];//前一个柱子的中心点
+		int nPillarWH = vPlaneDraw[vLayerTopo[nWallIdx].nAdjUnitIdx[0]].nWH[0] / 2;///前一个柱子宽度/2
+		int doorW = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[0] / 2; //门元素的中心点
+		int doorPosition = vLayerTopo[nUnitIdx].nCenPos[0]; //基准点的放置位置
+		nCen[0] = nPillarCen + nPillarWH + doorPosition + doorW;
+		nCen[1] = vPlaneDraw[nWallIdx].nCen[1];
 	}
 	// 垂直墙
 	else
 	{
-		nCen[0] = vPlaneDraw[nWallIdx].nCen[0];
-		nCen[1] = vPlaneDraw[nWallIdx].nWH[1] - table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[1];
 		nWH[0] = vPlaneDraw[nWallIdx].nWH[0] + 10; // 窗户厚度 之前没给定 设置为墙厚+10
 		nWH[1] = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[0]; // 窗户宽度 查系统表得到
+
+		//墙的中心点位置
+		//第二个柱子的中心点Y-高度/2 得到墙的上位置 - 门的相对位置 - 门元素的中心点
+		nCen[0] = vPlaneDraw[nWallIdx].nCen[0];
+
+		int nPillarCen = vPlaneDraw[vLayerTopo[nWallIdx].nAdjUnitIdx[1]].nCen[1];//第二一个柱子的中心点Y
+		int nPillarWH = vPlaneDraw[vLayerTopo[nWallIdx].nAdjUnitIdx[1]].nWH[1] / 2;///第二个一个柱子高度/2
+		int doorPosition = vLayerTopo[nUnitIdx].nCenPos[0];//门的相对位置
+		int doorW = table[vLayerTopo[nUnitIdx].nCenUnitIdx].oShape.nShapeRange[0] / 2;//门元素的中心点
+
+		nCen[1] = nPillarCen - nPillarWH - doorPosition - doorW;
 	}
 	SimpleShape oDoorWndShape;
 	GenRectShape(nCen, nWH, oDoorWndShape);
@@ -187,7 +202,7 @@ int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAP
 }
 
 // 拓扑结构数据转为现实数据 只考虑矩形截面
-int DimDataConvert::CalPlaneData(VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
+int DimDataConvert::CalPlaneData(VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	int nRe = 0;
 	// 只处理柱 墙 门窗
@@ -215,7 +230,7 @@ int DimDataConvert::CalPlaneData(VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VU
 	{
 		oCurUnit = vLayerTopo[i];
 		if (oCurUnit.nUnitType == 4)
-		{ 
+		{
 			CalWallShape(i, vLayerTopo, vPlaneDraw, table);
 		}
 	}
@@ -237,7 +252,7 @@ int DimDataConvert::CalPlaneData(VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VU
 // 平面图中可选择 墙门窗 立面图中可选择柱门窗
 
 // 在墙上插入门窗
-int AddDoorWndInWall(BasicUnit oDoorWnd, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE& vTable, VTOPOTABLE& vLayerTopo, VSHAPE & vPlaneDraw)
+int AddDoorWndInWall(BasicUnit oDoorWnd, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE& vTable, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw)
 {
 	vTable.push_back(oDoorWnd);
 
@@ -301,7 +316,7 @@ int UpdateNewAdj(int nNewAdj, int nAllOldAdj[12], VTOPOTABLE const& vLayerTopo, 
 	return 0;
 }
 // 在墙上插入柱子 待完善
-int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE& vTable, VTOPOTABLE& vLayerTopo, VSHAPE & vPlaneDraw)
+int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE& vTable, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw)
 {
 	vTable.push_back(oCol);
 
@@ -359,12 +374,12 @@ int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE& 
 	vLayerTopo[nNewColIdx].nAdjUnitIdx[2] = nBeamIdx;
 	vLayerTopo[nNewColIdx].nAdjUnitIdx[3] = nNewBeamIdx;
 	// 更新墙拓扑结构
-	UpdateNewAdj(nNewColIdx, vLayerTopo[nInsWallIdx].nAdjUnitIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx,vLayerTopo, 0);
-	UpdateNewAdj(nNewBeamIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx,vLayerTopo, 1);
+	UpdateNewAdj(nNewColIdx, vLayerTopo[nInsWallIdx].nAdjUnitIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx, vLayerTopo, 0);
+	UpdateNewAdj(nNewBeamIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx, vLayerTopo, 1);
 
 	// 更新梁拓扑结构
-	UpdateNewAdj(nNewColIdx, vLayerTopo[nBeamIdx].nAdjUnitIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx,vLayerTopo, 0);
-	UpdateNewAdj(nNewWallIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx,vLayerTopo, 1);
+	UpdateNewAdj(nNewColIdx, vLayerTopo[nBeamIdx].nAdjUnitIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx, vLayerTopo, 0);
+	UpdateNewAdj(nNewWallIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx, vLayerTopo, 1);
 
 	return 0;
 }
@@ -380,7 +395,7 @@ int AddWallInCols(BasicUnit oAddUnit, int nAdjCol[2], VTOPOTABLE& vLayerTopo)
 }
 
 // 在当前拓扑图中增加构件
-int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos,VUNITTABLE & vTable, VTOPOTABLE& vLayerTopo,VSHAPE vPlaneDraw)
+int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE& vTable, VTOPOTABLE& vLayerTopo, VSHAPE vPlaneDraw)
 {
 	int nRe = 0;
 	// 判断插入点是否在墙线范围内 返回墙在拓扑图的Idx 或者 虚墙区域关联的两个柱子
@@ -392,11 +407,11 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos,VUNITTABLE 
 		return 1;
 	// 判断待插入构件是否是门窗
 	if (oAddUnit.nUnitType > 4)
-		nRe = AddDoorWndInWall(oAddUnit, nInsWallIdx, oInsPos,vTable, vLayerTopo,vPlaneDraw);
+		nRe = AddDoorWndInWall(oAddUnit, nInsWallIdx, oInsPos, vTable, vLayerTopo, vPlaneDraw);
 
 	// 插入柱子
 	else if (oAddUnit.nUnitType == 1)
-		nRe = AddColInWall(oAddUnit, nInsWallIdx, oInsPos,vTable, vLayerTopo,vPlaneDraw);
+		nRe = AddColInWall(oAddUnit, nInsWallIdx, oInsPos, vTable, vLayerTopo, vPlaneDraw);
 
 	// 插入墙
 	else if (oAddUnit.nUnitType == 4 && nAdjCol[0] >= 0)
@@ -446,29 +461,39 @@ int ModifyBaseUnitProp(void* pValue, VTOPOTABLE& vLayerTopp)
 }
 
 // 移动门窗
-int MovDoorWndInWall(int nMoveUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo,VSHAPE& vPlaneDraw)
+int MovDoorWndInWall(int nMoveUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	// 门窗只能在墙范围内沿墙方向移动
 	// 得到包含门窗的墙
 	int nInsWallIdx = vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0];
 
 	// 符合移动条件 移动方向一致且值不为0
-	if (nMoveXY[0] != 0 && vLayerTopo[nInsWallIdx].nUnitAngle == 0 )
+	if (nMoveXY[0] != 0 && vLayerTopo[nInsWallIdx].nUnitAngle == 0)
 	{
-		// 计算门窗移动的合规范围
-		int nLeft; 
-		nLeft = vPlaneDraw[nMoveUnitIdx].nWH[0] / 2 ;
-		int nRight = vPlaneDraw[nInsWallIdx].nWH[0] - nLeft; 
+		// 计算门窗移动的合规范围 nCenPos[0]是相對位置
+		//不能小于0;
+		//不能大于墻的寬度-元素的中心點;
+		//如果超过等于极限值
+		 
+		int nLeft= 0;
+		 
+
+		int doorW = table[vLayerTopo[nMoveUnitIdx].nCenUnitIdx].oShape.nShapeRange[0] / 2; //元素的中心点
+		int nWallWH = vPlaneDraw[vLayerTopo[nInsWallIdx].nTopoIdx].nWH[0] ;					//墻的寬度
+		int nRight = vPlaneDraw[vLayerTopo[nInsWallIdx].nTopoIdx].nWH[0] - doorW;
+		
+		
 		// 按墙方向更改门窗位置
-		int nNewX = vLayerTopo[nMoveUnitIdx].nCenPos[0] + nMoveXY[0]; 
+		int nNewX = vLayerTopo[nMoveUnitIdx].nCenPos[0] + nMoveXY[0];
+		
 		if (nNewX < nLeft)
 			nNewX = nLeft;
-		else if (nNewX > nRight)
-			nNewX = nRight; 
-		vLayerTopo[nMoveUnitIdx].nCenPos[0] = nNewX;
 
+		else if (nNewX > nRight)
+			nNewX = nRight;
+		vLayerTopo[nMoveUnitIdx].nCenPos[0] = nNewX;
 	}
-	else if (nMoveXY[1] != 0 && vLayerTopo[nInsWallIdx].nUnitAngle == 90 )
+	else if (nMoveXY[1] != 0 && vLayerTopo[nInsWallIdx].nUnitAngle == 90)
 	{
 		// 计算门窗移动的合规范围
 		int nBottom;
@@ -524,7 +549,7 @@ int GetColAdjWall(int nSelWallIdx, VTOPOTABLE const& vLayerTopo, VVINT& vvAdjWal
 		for (int j = 0; j < 12; j++)
 		{
 			nCurAdj = oColUnit.nAdjUnitIdx[j];
-			if( nCurAdj > 0 )
+			if (nCurAdj > 0)
 			{
 				if (nCurAdj != nSelWallIdx && vLayerTopo[nCurAdj].nUnitType == 4)
 					vColAndWall.push_back(nCurAdj);
@@ -585,7 +610,7 @@ int CalWallMoveRange(int nWallIdx, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, i
 	// 得到所有关联墙的范围
 	VPIXELPOS vAllCor;
 	int nVVNum = vvAdjColWall.size();
-	int i = 0; 
+	int i = 0;
 	int j = 0;
 	int nVAdjNum = 0;
 	int nAllRange[2][2];
@@ -656,18 +681,18 @@ int MovWall(int nMoveUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo, VSHAPE& vP
 	return 0;
 }
 // 平面图中移动选中单元构件
-int DimDataConvert::MoveBaseUnit(int nSelUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo,VSHAPE& vPlaneDraw)
+int DimDataConvert::MoveBaseUnit(int nSelUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	int nRe = 0;
 	// 平面图中 墙门窗可动 判断是否是墙门窗
 	int nUnitType = vLayerTopo[nSelUnitIdx].nUnitType;
 	// 判断待移动构件是否是门窗
 	if (nUnitType > 4)
-		nRe = MovDoorWndInWall(nSelUnitIdx, nMoveXY, vLayerTopo,vPlaneDraw);
+		nRe = MovDoorWndInWall(nSelUnitIdx, nMoveXY, vLayerTopo, vPlaneDraw, table);
 
 	// 移动墙
 	else if (nUnitType == 4)
-		nRe = MovWall(nSelUnitIdx, nMoveXY, vLayerTopo,vPlaneDraw);
+		nRe = MovWall(nSelUnitIdx, nMoveXY, vLayerTopo, vPlaneDraw);
 
 	return 0;
 }
