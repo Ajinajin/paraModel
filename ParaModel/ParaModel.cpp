@@ -1,4 +1,4 @@
-#include <QTextCodec>
+ï»¿#include <QTextCodec>
 
 #include "ParaModel.h"
 #include <qtreeview.h>
@@ -41,27 +41,27 @@
 	 }\
 
 #pragma region 
-//³õÊ¼»¯ÊôĞÔ´°¿Ú
+//åˆå§‹åŒ–å±æ€§çª—å£
 void ParaModel::InitPropertyWidget(QDockWidget* from)
 {
 
 	from->setMaximumWidth(300);
 	from->setMaximumHeight(390);
-	from->setWindowTitle("ÊôĞÔ´°¿Ú");
-	// µ±Ç°Ñ¡Ôñµ¯µÄÊôĞÔ
-	QLabel* lbl1 = new QLabel("ÊôĞÔ");
-	QLabel* lblvalue = new QLabel("Öµ");
-	QLabel* lbl2 = new QLabel("Î»ÖÃXYZ");
+	from->setWindowTitle("å±æ€§çª—å£");
+	// å½“å‰é€‰æ‹©å¼¹çš„å±æ€§
+	QLabel* lbl1 = new QLabel("å±æ€§");
+	QLabel* lblvalue = new QLabel("å€¼");
+	QLabel* lbl2 = new QLabel("ä½ç½®XYZ");
 	pModelEdit[0] = new QLineEdit;
 	pModelEdit[1] = new QLineEdit;
 	pModelEdit[2] = new QLineEdit;
 	pModelEdit[0]->setText("0");
 	pModelEdit[1]->setText("0");
 	pModelEdit[2]->setText("0");
-	QLabel* lbl3 = new QLabel("ËÙ¶È");
+	QLabel* lbl3 = new QLabel("é€Ÿåº¦");
 	pModelEdit[3] = new QLineEdit;
 	pModelEdit[3]->setText("1000");
-	QLabel* lbl4 = new QLabel("·½ÏòXYZ");
+	QLabel* lbl4 = new QLabel("æ–¹å‘XYZ");
 	pModelEdit[4] = new QLineEdit;
 	pModelEdit[5] = new QLineEdit;
 	pModelEdit[6] = new QLineEdit;
@@ -69,17 +69,17 @@ void ParaModel::InitPropertyWidget(QDockWidget* from)
 	pModelEdit[5]->setText("-1");
 	pModelEdit[6]->setText("0");
 
-	// µ±Ç°Ñ¡Ôñµ¯µÄÕ½¶·²¿
-	QLabel* lbl5 = new QLabel("µ±Á¿Kg");
+	// å½“å‰é€‰æ‹©å¼¹çš„æˆ˜æ–—éƒ¨
+	QLabel* lbl5 = new QLabel("å½“é‡Kg");
 	pArmHeadEdit[0] = new QLineEdit;
 	pArmHeadEdit[0]->setText("100");
-	QLabel* lbl6 = new QLabel("µ¯Æ¬ÊıÁ¿");
+	QLabel* lbl6 = new QLabel("å¼¹ç‰‡æ•°é‡");
 	pArmHeadEdit[1] = new QLineEdit;
 	pArmHeadEdit[1]->setText("1000");
-	QLabel* lbl7 = new QLabel(QWidget::tr("µ¯Æ¬ÖÊÁ¿g"));
+	QLabel* lbl7 = new QLabel(QWidget::tr("å¼¹ç‰‡è´¨é‡g"));
 	pArmHeadEdit[2] = new QLineEdit;
 	pArmHeadEdit[2]->setText("20");
-	QLabel* lbl8 = new QLabel(QWidget::tr("·Ö²¼½Ç"));
+	QLabel* lbl8 = new QLabel(QWidget::tr("åˆ†å¸ƒè§’"));
 	pArmHeadEdit[3] = new QLineEdit;
 	pArmHeadEdit[4] = new QLineEdit;
 	pArmHeadEdit[3]->setText("60");
@@ -100,14 +100,14 @@ void ParaModel::InitPropertyWidget(QDockWidget* from)
 	lbl2->setFixedWidth(56);
 	lbl3->setFixedWidth(56);
 	lbl4->setFixedWidth(56);
-	//Í¨¹ıÕâ¸ö°ÑÆäËû¼·ÔÚÒ»Æğ
+	//é€šè¿‡è¿™ä¸ªæŠŠå…¶ä»–æŒ¤åœ¨ä¸€èµ·
 	//QLabel* lbl9 = new QLabel(QWidget::tr(""));
 	//lbl9->hide();
 	//myVBoxLayout->setAlignment(Qt::AlignTop);
 	// 	mygridLayout->setRowStretch(1, 1);
 	// 	mygridLayout->setRowStretch(5, 10);
 	//myVBoxLayout->setMargin(15);
-	//×îĞ¡¿í¶È
+	//æœ€å°å®½åº¦
 	// 	mygridLayout->setColumnMinimumWidth(4, 10); 
 	//myVBoxLayout->addWidget(temp);
 	//myHBoxLayout->addWidget(lbl1);
@@ -180,7 +180,7 @@ void ParaModel::InitPropertyWidget(QDockWidget* from)
 	myLayout->addWidget(temp);
 
 
-	QPushButton* pApplyBtn = new QPushButton("Ó¦ÓÃ", this);
+	QPushButton* pApplyBtn = new QPushButton("åº”ç”¨", this);
 	pApplyBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
 	pApplyBtn->setFixedWidth(100);
 	temp = new QWidget();
@@ -193,7 +193,7 @@ void ParaModel::InitPropertyWidget(QDockWidget* from)
 	connect(pApplyBtn, &QPushButton::clicked, this, &ParaModel::ApplyDataAction);
 }
 
-//³õÊ¼»¯ÏµÍ³Ä£ĞÍ´°¿Ú
+//åˆå§‹åŒ–ç³»ç»Ÿæ¨¡å‹çª—å£
 void ParaModel::InitSysWidget(QDockWidget* from)
 {
 	QWidget* mytreewidget = new QWidget();
@@ -201,27 +201,27 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 	pModelTreeWidget->setHeaderHidden(true);
 	from->setWidget(mytreewidget);
 	from->setFixedWidth(300);
-	from->setWindowTitle("Ä£ĞÍ×é¼ş/ÊôĞÔÁĞ±í");
+	from->setWindowTitle("æ¨¡å‹ç»„ä»¶/å±æ€§åˆ—è¡¨");
 
 
 	QTreeWidgetItem* rootItemPillar = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemPillar->setText(0, "Öù");
+	rootItemPillar->setText(0, "æŸ±");
 	QTreeWidgetItem* rootItemBeam = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemBeam->setText(0, "Áº");
+	rootItemBeam->setText(0, "æ¢");
 	QTreeWidgetItem* rootItemBoard = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemBoard->setText(0, "°å");
+	rootItemBoard->setText(0, "æ¿");
 	QTreeWidgetItem* rootItemWall = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemWall->setText(0, "Ç½");
+	rootItemWall->setText(0, "å¢™");
 	QTreeWidgetItem* rootItemDoor = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemDoor->setText(0, "ÃÅ");
+	rootItemDoor->setText(0, "é—¨");
 	QTreeWidgetItem* rootItemWindow = new QTreeWidgetItem(pModelTreeWidget);
-	rootItemWindow->setText(0, "´°");
+	rootItemWindow->setText(0, "çª—");
 
 	for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
 	{
 
 		QTreeWidgetItem* childItem;
-#pragma region nUnitType¸³Öµ
+#pragma region nUnitTypeèµ‹å€¼
 		if (iter->nUnitType == 1)
 		{
 			childItem = new QTreeWidgetItem(rootItemPillar);
@@ -247,23 +247,23 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 			childItem = new QTreeWidgetItem(rootItemWindow);
 		}
 #pragma endregion
-		//¾ØĞÎ 1 Ô² 2 ¶à±ßĞÎ3
+		//çŸ©å½¢ 1 åœ† 2 å¤šè¾¹å½¢3
 
 		childItem->setText(0, iter->oShape.nShapeName);
 
 		childItem->setData(0, Qt::UserRole, iter->nUnitIdx);
 	}
 
-	//Ê÷°´Å¥ÏìÓ¦
+	//æ ‘æŒ‰é’®å“åº”
 	connect(pModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column) {
 		if (if_data == 0)
 		{
-			MyLogOutput("µ±Ç°ÎŞ»­²¼ĞÅÏ¢£¬ÇëĞÂ½¨»òÕß´ò¿ªºóÔÚ²Ù×÷");
+			MyLogOutput("å½“å‰æ— ç”»å¸ƒä¿¡æ¯ï¼Œè¯·æ–°å»ºæˆ–è€…æ‰“å¼€ååœ¨æ“ä½œ");
 			return;
 		}
 
 		QTreeWidgetItem* parent = item->parent();
-		if (NULL == parent) //×¢Òâ£º×î¶¥¶ËÏîÊÇÃ»ÓĞ¸¸½ÚµãµÄ£¬Ë«»÷ÕâĞ©ÏîÊ±×¢Òâ(ÏİÚå)
+		if (NULL == parent) //æ³¨æ„ï¼šæœ€é¡¶ç«¯é¡¹æ˜¯æ²¡æœ‰çˆ¶èŠ‚ç‚¹çš„ï¼ŒåŒå‡»è¿™äº›é¡¹æ—¶æ³¨æ„(é™·é˜±)
 			return;
 
 		QVariant variant = item->data(0, Qt::UserRole);
@@ -277,7 +277,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 			if (iter->oShape.nShapeType == 1)
 			{
 
-				//°åÇ½ÃÅ´° ¿í¶ÈÎª1
+				//æ¿å¢™é—¨çª— å®½åº¦ä¸º1
 				int wThickNess = 0;
 				int hThickNess = 0;
 				if (iter->nUnitType > 2)
@@ -321,14 +321,14 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 
 			}
 		}
-		msg = item->text(0) + "¹¹¼ş¼ÓÔØÍê³É";
+		msg = item->text(0) + "æ„ä»¶åŠ è½½å®Œæˆ";
 		MyLogOutput(msg);
 		});
 	from->setWidget(pModelTreeWidget);
 	pModelTreeWidget->expandAll();
 }
 
-//³õÊ¼»¯ÒÑ¼ÓÔØµÄÄ£ĞÍ´°¿Ú
+//åˆå§‹åŒ–å·²åŠ è½½çš„æ¨¡å‹çª—å£
 void ParaModel::InitLoadModelWidget(QDockWidget* from)
 {
 	graphicsViewX = new BQGraphicsView();
@@ -352,8 +352,8 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 	connect(graphicsViewOgl, &BQGraphicsView::GraphicsViewFocus, this, &ParaModel::GraphicsViewOgl);
 
 
-	from->setWindowTitle("ÈıÊÓÍ¼+ÈıÎ¬");
-	//layout²¼¾Ö
+	from->setWindowTitle("ä¸‰è§†å›¾+ä¸‰ç»´");
+	//layoutå¸ƒå±€
 
 	QGridLayout* myLayout = new QGridLayout();
 	QWidget* temp = new QWidget();
@@ -365,7 +365,7 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 	myLayout->addWidget(graphicsViewZ, 1, 0);
 
 
-	//ÓÒÏÂ½ÇĞ¡ÈıÎ¬´°¿Ú
+	//å³ä¸‹è§’å°ä¸‰ç»´çª—å£
 
 	paraOglmanager = new ParaOGLManager();
 	graphicsViewOgl->setViewport(paraOglmanager);
@@ -378,18 +378,18 @@ void ParaModel::InitLoadModelWidget(QDockWidget* from)
 
 }
 
-//³õÊ¼»¯ÈÕÖ¾´°¿Ú
+//åˆå§‹åŒ–æ—¥å¿—çª—å£
 void ParaModel::InitLogWidget(QDockWidget* from)
 {
 	from->setMaximumHeight(100);
 	from->setFixedHeight(100);
-	from->setWindowTitle("ĞÅÏ¢Êä³ö");
+	from->setWindowTitle("ä¿¡æ¯è¾“å‡º");
 	if (myLogOutLabel == nullptr)
 		myLogOutLabel = new QTextEdit();
 	from->setWidget(myLogOutLabel);
 }
 
-//³õÊ¼»¯OpenGL´°¿Ú
+//åˆå§‹åŒ–OpenGLçª—å£
 void ParaModel::InitOglManagerWidget(QDockWidget* from)
 {
 	MainDockWidget = from;
@@ -399,10 +399,10 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 	graphicsViewMain->setScene(&pSceneMain);
 	pSceneMain.setBackgroundBrush(Qt::darkGray);
 
-	MainDockWidget->setWindowTitle("µ±Ç°±à¼­ÊÓÍ¼ £¨ÈıÎ¬£©");
+	MainDockWidget->setWindowTitle("å½“å‰ç¼–è¾‘è§†å›¾ ï¼ˆä¸‰ç»´ï¼‰");
 
 
-	//ÖĞ¼ä´óÆÁÈıÎ»´°¿Ú
+	//ä¸­é—´å¤§å±ä¸‰ä½çª—å£
 
 	MainDockState = 3;
 	paraOglmanagerMain = new ParaOGLManager();
@@ -412,7 +412,7 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 
 	QTimer* timer = new QTimer(this);
 	connect(timer, &QTimer::timeout, this, &ParaModel::updateOGL);
-	//Ã¿20msË¢ĞÂÒ»´ÎOpenGL½çÃæ 50FPS
+	//æ¯20msåˆ·æ–°ä¸€æ¬¡OpenGLç•Œé¢ 50FPS
 	timer->start(20);
 
 
@@ -422,14 +422,14 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 	//timerSceneMain->start(20);
 }
 
-//¸üĞÂOpenGL´°¿Ú
+//æ›´æ–°OpenGLçª—å£
 void ParaModel::updateOGL()
 {
 	paraOglmanager->update();
 	paraOglmanagerMain->update();
 
 
-	//Á½¸öÈıÎ¬´°¿ÚÒªÍ¬²½
+	//ä¸¤ä¸ªä¸‰ç»´çª—å£è¦åŒæ­¥
 	paraOglmanager->camera = paraOglmanagerMain->camera;
 	paraOglmanager->isFirstMouse = paraOglmanagerMain->isFirstMouse;
 	paraOglmanager->lastX = paraOglmanagerMain->lastX;
@@ -437,7 +437,7 @@ void ParaModel::updateOGL()
 	paraOglmanager->rotateRaw = paraOglmanagerMain->rotateRaw;
 	paraOglmanager->rotatePitch = paraOglmanagerMain->rotatePitch;
 
-	//´«ÈëËùÓĞµÄ½¨ÖşÊı¾İ
+	//ä¼ å…¥æ‰€æœ‰çš„å»ºç­‘æ•°æ®
 
 	paraOglmanager->oglTopTable = this->vModelTmpl;
 	paraOglmanager->oglUnitTable = this->vBaseUnit;
@@ -449,10 +449,10 @@ void ParaModel::updateOGL()
 
 }
 
-//³õÊ¼»¯ÄÚÈİÇøÓò
+//åˆå§‹åŒ–å†…å®¹åŒºåŸŸ
 void ParaModel::InitCentralWidget()
 {
-	//É¾³ıÖĞÑë´°Ìå
+	//åˆ é™¤ä¸­å¤®çª—ä½“
 	QWidget* p = takeCentralWidget();
 	if (p)
 		delete p;
@@ -487,7 +487,7 @@ void ParaModel::InitCentralWidget()
 
 }
 
-//³õÊ¼»¯×´Ì¬À¸ÎÄ×ÖÌáÊ¾
+//åˆå§‹åŒ–çŠ¶æ€æ æ–‡å­—æç¤º
 void ParaModel::InitStatusWidget()
 {
 	winStatus = new QStatusBar();
@@ -500,92 +500,92 @@ void ParaModel::InitStatusWidget()
 }
 
 
-//³õÊ¼»¯RibbonÖĞµÄÎÄ¼ş²Ëµ¥
+//åˆå§‹åŒ–Ribbonä¸­çš„æ–‡ä»¶èœå•
 void ParaModel::InitCategoryMain(SARibbonCategory* page)
 {
-	SARibbonPannel* pannel = page->addPannel(("ÎÄ¼ş"));
+	SARibbonPannel* pannel = page->addPannel(("æ–‡ä»¶"));
 
 	QAction* act = new QAction(this);
-	act->setObjectName(("ĞÂ½¨"));
+	act->setObjectName(("æ–°å»º"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("ĞÂ½¨"));
+	act->setText(("æ–°å»º"));
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+N")));
 	act->setCheckable(true);
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::NewFileAction);
 
 	act = new QAction(this);
-	act->setObjectName(("´ò¿ª"));
+	act->setObjectName(("æ‰“å¼€"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("´ò¿ª"));
+	act->setText(("æ‰“å¼€"));
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+O")));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::OpenFileAction);
 
 	act = new QAction(this);
-	act->setObjectName(("±£´æ"));
+	act->setObjectName(("ä¿å­˜"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("±£´æ"));
+	act->setText(("ä¿å­˜"));
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
 	pannel->addLargeAction(act);
 	//connect(act, &QAction::triggered, this, &ParaModel::SaveFileAction);
 
 
 	act = new QAction(this);
-	act->setObjectName(("Áí´æÎª"));
+	act->setObjectName(("å¦å­˜ä¸º"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("Áí´æÎª"));
+	act->setText(("å¦å­˜ä¸º"));
 	pannel->addLargeAction(act);
 	//connect(act, &QAction::triggered, this, &ParaModel::SaveasFileAction);
 
 
 	act = new QAction(this);
-	act->setObjectName(("¹Ø±Õ"));
+	act->setObjectName(("å…³é—­"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("¹Ø±Õ"));
+	act->setText(("å…³é—­"));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::CloseFileAction);
 }
-//³õÊ¼»¯Ribbon
+//åˆå§‹åŒ–Ribbon
 void ParaModel::InitSARibbon()
 {
 	SARibbonBar* ribbon = ribbonBar();
 
-	//Ó¦ÓÃ°´Å¥ µ±Ç°Òş²Ø
+	//åº”ç”¨æŒ‰é’® å½“å‰éšè—
 	ribbon->applicationButton()->hide();
-	ribbon->applicationButton()->setText(("Ê×Ò³"));
+	ribbon->applicationButton()->setText(("é¦–é¡µ"));
 
-	//³õÊ¼»¯ÎÄ¼şribbon
+	//åˆå§‹åŒ–æ–‡ä»¶ribbon
 	SARibbonCategory* categoryMain = new SARibbonCategory();
-	categoryMain->setCategoryName(("Ö÷²Ëµ¥"));
+	categoryMain->setCategoryName(("ä¸»èœå•"));
 	categoryMain->setObjectName(("categoryMain"));
 	ribbon->addCategoryPage(categoryMain);
 	InitCategoryMain(categoryMain);
 
-	//³õÊ¼»¯¶¥²¿¿ì½İ²Ëµ¥
+	//åˆå§‹åŒ–é¡¶éƒ¨å¿«æ·èœå•
 	//InitQuickAccess(ribbon);
 }
 
-//³õÊ¼»¯´°¿Ú
+//åˆå§‹åŒ–çª—å£
 void ParaModel::InitWindow()
 {
-	setWindowTitle(("²ÎÊı»¯Ä£ĞÍ"));
-	//ÉèÖÃ½çÃæRibbon
+	setWindowTitle(("å‚æ•°åŒ–æ¨¡å‹"));
+	//è®¾ç½®ç•Œé¢Ribbon
 	InitSARibbon();
 	ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyle::OfficeStyleTwoRow);
 
-	//³õÊ¼»¯½çÃæÄÚÈİ
+	//åˆå§‹åŒ–ç•Œé¢å†…å®¹
 	InitCentralWidget();
 
-	//³õÊ¼»¯½çÃæ×´Ì¬À¸
+	//åˆå§‹åŒ–ç•Œé¢çŠ¶æ€æ 
 	InitStatusWidget();
-	//ÉèÖÃ×îĞ¡¿í¶È
+	//è®¾ç½®æœ€å°å®½åº¦
 	setMinimumWidth(1000);
-	//´°¿Ú×î´ó»¯
+	//çª—å£æœ€å¤§åŒ–
 	showMaximized();
-	//´°¿ÚÍ¼±ê
+	//çª—å£å›¾æ ‡
 	setWindowIcon(QIcon(":/qss/res/qss/White/icon2.png"));
-	//½øÖÆÊó±êÍÏ¶¯
+	//è¿›åˆ¶é¼ æ ‡æ‹–åŠ¨
 	//SAFramelessHelper* helper = framelessHelper();
 	//helper->setRubberBandOnResize(false);
 	//QElapsedTimer cost;
@@ -594,10 +594,101 @@ void ParaModel::InitWindow()
 
 }
 
-//³õÊ¼»¯µ¯³ö´°¿Ú
+//åˆå§‹åŒ–å¼¹å‡ºçª—å£
 void ParaModel::InitTipWindow()
 {
 
+}
+//æ˜¾ç¤ºé€‰æ‹©æ„ä»¶çª—å£
+void ParaModel::ShowUnitSelectWindow()
+{
+	QWidget* unitSelectWidget = new QWidget();
+	unitSelectWidget->setFixedWidth(300);
+	unitSelectWidget->setFixedHeight(700);
+	QTreeWidget* pTreeWidget = new QTreeWidget(unitSelectWidget);
+	pTreeWidget->setFixedWidth(300);
+	pTreeWidget->setFixedHeight(700);
+	pTreeWidget->setHeaderHidden(true);
+
+	for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
+	{
+		if (iter->nUnitType == SelectUnitType)
+		{
+			QTreeWidgetItem* rootItem = new QTreeWidgetItem(pTreeWidget);
+			rootItem->setText(0, iter->oShape.nShapeName);
+			rootItem->setData(0, Qt::UserRole, iter->nUnitIdx);
+		}
+	}
+	//æ ‘æŒ‰é’®å“åº”
+	connect(pTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column) {
+		if (if_data == 0)
+		{
+			MyLogOutput("å½“å‰æ— ç”»å¸ƒä¿¡æ¯ï¼Œè¯·æ–°å»ºæˆ–è€…æ‰“å¼€ååœ¨æ“ä½œ");
+			return;
+		}
+
+		QVariant variant = item->data(0, Qt::UserRole);
+		int nUnitIdx = variant.value<int>();
+		QString msg;
+		for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
+		{
+			if (iter->nUnitIdx != nUnitIdx)
+				continue;
+
+			if (iter->oShape.nShapeType == 1)
+			{
+
+				int wThickNess = 0;
+				int hThickNess = 0;
+				if (iter->nUnitType > 2)
+				{
+					wThickNess = 1;
+					hThickNess = 20;
+				}
+				BRectangle* m_rectangle = new BRectangle(
+					pSceneOffset + iter->oShape.nShapeRange[0], pSceneOffset + iter->oShape.nShapeRange[1],
+					wThickNess + iter->oShape.nShapeRange[2], hThickNess + iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
+				m_rectangle->wallwidth = iter->oShape.nThickNess;
+				m_rectangle->nUnitType = iter->nUnitType;
+				m_rectangle->nUnitIdx = iter->nUnitIdx;
+				m_rectangle->setBrush(ColorHelper(iter->nUnitType));
+				pSceneMain.addItem(m_rectangle);
+			}
+			else if (iter->oShape.nShapeType == 2)
+			{
+
+				BCircle* m_ellipse = new BCircle(pSceneOffset + iter->oShape.nCen[0], pSceneOffset + iter->oShape.nCen[1],
+					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
+				m_ellipse->setBrush(ColorHelper(iter->nUnitType));
+				m_ellipse->nUnitType = iter->nUnitType;
+				m_ellipse->nUnitIdx = iter->nUnitIdx;
+				pSceneMain.addItem(m_ellipse);
+			}
+			else if (iter->oShape.nShapeType == 3)
+			{
+				vector<float> point;
+				for (size_t i = 0; i < iter->oShape.vPolyPt.size(); i++)
+				{
+					point.push_back(iter->oShape.vPolyPt[i] + 100);
+				}
+				drawWall(point);
+
+				//setBtnEnabled(false);
+				/*BPolygon* m_polygon = new BPolygon(BGraphicsItem::ItemType::Polygon);
+				m_polygon->is_create_finished = true;*/
+				//m_polygon->paint();
+				//pSceneMain.addItem(m_polygon);
+
+			}
+		}
+		msg = item->text(0) + "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½";
+		MyLogOutput(msg);
+		});
+	unitSelectWidget->setWindowModality(Qt::ApplicationModal);
+	unitSelectWidget->setWindowFlags(Qt::WindowCloseButtonHint);
+	unitSelectWidget->setWindowTitle("ï¿½ï¿½Ñ¡ï¿½ñ¹¹¼ï¿½");
+	unitSelectWidget->setWindowIcon(QIcon(":/qss/res/qss/White/icon2.png"));
+	unitSelectWidget->show();
 }
 #pragma endregion
 
@@ -606,27 +697,27 @@ ParaModel::ParaModel(QWidget* parent)
 {
 	myLogOutLabel = new QTextEdit();
 	pSceneOffset = 700;
-	//³õÊ¼»¯ÏµÍ³Â·¾¶
+	//åˆå§‹åŒ–ç³»ç»Ÿè·¯å¾„
 	InitPath();
-	//³õÊ¼»¯ÏµÍ³Êı¾İ
+	//åˆå§‹åŒ–ç³»ç»Ÿæ•°æ®
 	InitUnitLib();
 
-	//³õÊ¼»¯½çÃæ
+	//åˆå§‹åŒ–ç•Œé¢
 	InitWindow();
 	InitTipWindow();
 }
 
-#pragma region ½çÃæ½»»¥
+#pragma region ç•Œé¢äº¤äº’
 void ParaModel::NewFileAction()
 {
 	if (if_data == 1)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "µ±Ç°ÒÑÓĞ¼ÓÔØÊı¾İ£¬Çë¹Ø±ÕºóÔÚĞÂ½¨");
-		MyLogOutput("µ±Ç°ÒÑÓĞ¼ÓÔØÊı¾İ£¬Çë¹Ø±ÕºóÔÚĞÂ½¨");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "å½“å‰å·²æœ‰åŠ è½½æ•°æ®ï¼Œè¯·å…³é—­ååœ¨æ–°å»º");
+		MyLogOutput("å½“å‰å·²æœ‰åŠ è½½æ•°æ®ï¼Œè¯·å…³é—­ååœ¨æ–°å»º");
 		return;
 	}
 	if_data = 1;
-	MyLogOutput("ĞÂ½¨³¡¾°ÎÄ¼ş³É¹¦");
+	MyLogOutput("æ–°å»ºåœºæ™¯æ–‡ä»¶æˆåŠŸ");
 }
 
 void ParaModel::CloseFileAction()
@@ -638,19 +729,19 @@ void ParaModel::CloseFileAction()
 	SceneYClear();
 	SceneZClear();
 
-	MyLogOutput("Çå³ıÊı¾İ³É¹¦");
+	MyLogOutput("æ¸…é™¤æ•°æ®æˆåŠŸ");
 }
 void ParaModel::OpenFileAction()
 {
 	if (if_data == 1)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "µ±Ç°ÒÑÓĞ¼ÓÔØÊı¾İ£¬Çë¹Ø±ÕºóÔÚ´ò¿ª");
-		MyLogOutput("µ±Ç°ÒÑÓĞ¼ÓÔØÊı¾İ£¬Çë¹Ø±ÕºóÔÚ´ò¿ª");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "å½“å‰å·²æœ‰åŠ è½½æ•°æ®ï¼Œè¯·å…³é—­ååœ¨æ‰“å¼€");
+		MyLogOutput("å½“å‰å·²æœ‰åŠ è½½æ•°æ®ï¼Œè¯·å…³é—­ååœ¨æ‰“å¼€");
 		return;
 	}
 
 	QFileDialog* f = new QFileDialog(this);
-	f->setWindowTitle("Ñ¡ÔñÊı¾İÎÄ¼ş*.txt");
+	f->setWindowTitle("é€‰æ‹©æ•°æ®æ–‡ä»¶*.txt");
 	f->setNameFilter("*.txt");
 	f->setViewMode(QFileDialog::Detail);
 	QString filePath;
@@ -661,12 +752,12 @@ void ParaModel::OpenFileAction()
 	{
 		return;
 	}
-	// »ñÈ¡ÎÄ¼şÄÚÈİ
+	// è·å–æ–‡ä»¶å†…å®¹
 	QFile file(filePath);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "Êı¾İ¼ÓÔØÊ§°Ü,Çë¼ì²éÎÄ¼ş¡£");
-		MyLogOutput("Êı¾İ¼ÓÔØÊ§°Ü,Çë¼ì²éÎÄ¼ş¡£");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "æ•°æ®åŠ è½½å¤±è´¥,è¯·æ£€æŸ¥æ–‡ä»¶ã€‚");
+		MyLogOutput("æ•°æ®åŠ è½½å¤±è´¥,è¯·æ£€æŸ¥æ–‡ä»¶ã€‚");
 		return;
 	}
 	QTextStream readStream(&file);
@@ -741,12 +832,12 @@ void ParaModel::OpenFileAction()
 	pCalShapeData = new DimDataConvert();
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
-	ParaModel::updateScene();
+	ParaModel::AddSceneData();
 }
 
 void ParaModel::GraphicsViewXFocus(bool b)
 {
-	MainDockWidget->setWindowTitle("µ±Ç°±à¼­ÊÓÍ¼ £¨¶şÎ¬X£©");
+	MainDockWidget->setWindowTitle("å½“å‰ç¼–è¾‘è§†å›¾ ï¼ˆäºŒç»´Xï¼‰");
 	if (MainDockState == 3)
 	{
 		MainDockWidget->setWidget(graphicsViewMain);
@@ -758,7 +849,7 @@ void ParaModel::GraphicsViewXFocus(bool b)
 
 void ParaModel::GraphicsViewYFocus(bool b)
 {
-	MainDockWidget->setWindowTitle("µ±Ç°±à¼­ÊÓÍ¼ £¨¶şÎ¬Y£©");
+	MainDockWidget->setWindowTitle("å½“å‰ç¼–è¾‘è§†å›¾ ï¼ˆäºŒç»´Yï¼‰");
 	if (MainDockState == 3)
 	{
 		MainDockWidget->setWidget(graphicsViewMain);
@@ -771,7 +862,7 @@ void ParaModel::GraphicsViewYFocus(bool b)
 
 void ParaModel::GraphicsViewZFocus(bool b)
 {
-	MainDockWidget->setWindowTitle("µ±Ç°±à¼­ÊÓÍ¼ £¨¶şÎ¬Z£©");
+	MainDockWidget->setWindowTitle("å½“å‰ç¼–è¾‘è§†å›¾ ï¼ˆäºŒç»´Zï¼‰");
 	if (MainDockState == 3)
 	{
 		MainDockWidget->setWidget(graphicsViewMain);
@@ -785,7 +876,7 @@ void ParaModel::GraphicsViewZFocus(bool b)
 
 void ParaModel::GraphicsViewOgl(bool b)
 {
-	MainDockWidget->setWindowTitle("µ±Ç°±à¼­ÊÓÍ¼ £¨ÈıÎ¬Ä£ĞÍ£©");
+	MainDockWidget->setWindowTitle("å½“å‰ç¼–è¾‘è§†å›¾ ï¼ˆä¸‰ç»´æ¨¡å‹ï¼‰");
 	if (MainDockState != 3)
 	{
 		MainDockState = 3;
@@ -806,134 +897,134 @@ void ParaModel::MyLogOutput(QString myLogout)
 	}
 }
 
-// Êı¾İĞŞ¸Äºó¸üĞÂ
+// æ•°æ®ä¿®æ”¹åæ›´æ–°
 void ParaModel::ApplyDataAction()
 {
-	// ³¡¾°Î´ Ã»ÓĞÊı¾İ
+	// åœºæ™¯æœª æ²¡æœ‰æ•°æ®
 	// if (pEnvir2 == NULL)
 	// {
-	// 	QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "»¹Î´¼ÓÔØ³¡¾°Êı¾İ£¬ÎŞ·¨±£´æ£¡");
+	// 	QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "è¿˜æœªåŠ è½½åœºæ™¯æ•°æ®ï¼Œæ— æ³•ä¿å­˜ï¼");
 	// 	return;
 	// }
 
 
-	//×éÖ¯½çÃæÉÏÊäÈëµÄÊı¾İ
-	//Î»ÖÃ
+	//ç»„ç»‡ç•Œé¢ä¸Šè¾“å…¥çš„æ•°æ®
+	//ä½ç½®
 	bool verify;
 	QString str = pModelEdit[0]->text();
 	float  locationX = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "Î»ÖÃX±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "ä½ç½®Xå¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
 	if (locationX > 180 || locationX < -180)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "Î»ÖÃX·¶Î§±ØĞëÊÇÕı¸º180");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "ä½ç½®XèŒƒå›´å¿…é¡»æ˜¯æ­£è´Ÿ180");
 	}
 	str = pModelEdit[1]->text();
 	float locationY = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "Î»ÖÃY±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "ä½ç½®Yå¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
 	if (locationY > 180 || locationY < -180)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "Î»ÖÃY·¶Î§±ØĞëÊÇÕı¸º180");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "ä½ç½®YèŒƒå›´å¿…é¡»æ˜¯æ­£è´Ÿ180");
 	}
 	str = pModelEdit[2]->text();
 	float locationZ = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "Î»ÖÃZ±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "ä½ç½®Zå¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
 	if (locationZ > 180 || locationZ < -180)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "Î»ÖÃZ·¶Î§±ØĞëÊÇÕı¸º180");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "ä½ç½®ZèŒƒå›´å¿…é¡»æ˜¯æ­£è´Ÿ180");
 	}
-	//ËÙ¶È 
+	//é€Ÿåº¦ 
 	str = pModelEdit[3]->text();
 	float speed = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "ËÙ¶È±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "é€Ÿåº¦å¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
-	//·½ÏòXYZ
+	//æ–¹å‘XYZ
 	str = pModelEdit[4]->text();
 	float angleToX = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "·½ÏòX±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "æ–¹å‘Xå¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
 	if (angleToX > 180 || angleToX < -180)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "·½ÏòX·¶Î§±ØĞëÊÇÕı¸º180");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "æ–¹å‘XèŒƒå›´å¿…é¡»æ˜¯æ­£è´Ÿ180");
 	}
 	str = pModelEdit[5]->text();
 	float angleToY = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "·½ÏòY±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "æ–¹å‘Yå¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
 	if (angleToY > 180 || angleToY < -180)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "·½ÏòY·¶Î§±ØĞëÊÇÕı¸º180");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "æ–¹å‘YèŒƒå›´å¿…é¡»æ˜¯æ­£è´Ÿ180");
 	}
 	str = pModelEdit[6]->text();
 	float angleToZ = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "·½ÏòZ±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "æ–¹å‘Zå¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
 	if (angleToZ > 180 || angleToZ < -180)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "·½ÏòZ·¶Î§±ØĞëÊÇÕı¸º180");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "æ–¹å‘ZèŒƒå›´å¿…é¡»æ˜¯æ­£è´Ÿ180");
 	}
-	//µ±Á¿Kg	  
+	//å½“é‡Kg	  
 	str = pArmHeadEdit[0]->text();
 	float tnt = str.toFloat(&verify);
 
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "TNTµ±Á¿ÊäÈë±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "TNTå½“é‡è¾“å…¥å¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
-	//µ¯Æ¬ÊıÁ¿	  
+	//å¼¹ç‰‡æ•°é‡	  
 	str = pArmHeadEdit[1]->text();
 	int fragNum = str.toInt(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "Î»ÖÃXÊäÈë±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "ä½ç½®Xè¾“å…¥å¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
-	//µ¯Æ¬ÖÊÁ¿g 
+	//å¼¹ç‰‡è´¨é‡g 
 	str = pArmHeadEdit[2]->text();
 	float fragQuality = str.toFloat(&verify);
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "µ¯Æ¬ÖÊÁ¿±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "å¼¹ç‰‡è´¨é‡å¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
-	// ·Ö²¼½Ç Ö÷·ÉÉ¢½Ç  
+	// åˆ†å¸ƒè§’ ä¸»é£æ•£è§’  
 
 	str = pArmHeadEdit[3]->text();
 	float majorScatteringAngle = str.toFloat(&verify);
 
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "Ö÷·ÉÉ¢½Ç±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "ä¸»é£æ•£è§’å¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
 	if (majorScatteringAngle > 90 || majorScatteringAngle < -90)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "Ö÷·ÉÉ¢½Ç·¶Î§±ØĞëÊÇÕı¸º90");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "ä¸»é£æ•£è§’èŒƒå›´å¿…é¡»æ˜¯æ­£è´Ÿ90");
 	}
-	// ·Ö²¼½Ç ¸±·ÉÉ¢½Ç  
+	// åˆ†å¸ƒè§’ å‰¯é£æ•£è§’  
 	str = pArmHeadEdit[4]->text();
 	float secondScatteringAngle = str.toFloat(&verify);
 
 	if (!verify)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "¸±·ÉÉ¢½Ç±ØĞëÊÇÊıÖµ£¬ÇëÖØĞÂÊäÈë");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "å‰¯é£æ•£è§’å¿…é¡»æ˜¯æ•°å€¼ï¼Œè¯·é‡æ–°è¾“å…¥");
 	}
 	if (secondScatteringAngle > 90 || secondScatteringAngle < -90)
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "¸±·ÉÉ¢½Ç·¶Î§±ØĞëÊÇÕı¸º90");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "å‰¯é£æ•£è§’èŒƒå›´å¿…é¡»æ˜¯æ­£è´Ÿ90");
 	}
 	return;
 }
@@ -949,21 +1040,21 @@ void ParaModel::drawWall(const std::vector<float>& points) {
 
 #pragma endregion
 
-#pragma region ³õÊ¼»¯Êı¾İ
+#pragma region åˆå§‹åŒ–æ•°æ®
 
 
 
 int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 {
-	// 0-6 ÖùÁº°åÇ½ÃÅ´°
-	QString sType = "ÏßÖùÁº°åÇ½ÃÅ´°";
+	// 0-6 æŸ±æ¢æ¿å¢™é—¨çª—
+	QString sType = "çº¿æŸ±æ¢æ¿å¢™é—¨çª—";
 	oUnit.nUnitIdx = listInfo[0].toInt();
 	int nType = sType.indexOf(listInfo[1]);
 	if (nType < 0)
 		return 1;
 	oUnit.nUnitType = nType;
-	// ÖùºÍÁºÀàĞÍ   ½ØÃæĞÎ×´ 0-2 ¾ØĞÎ Ô²ĞÎ ¶à±ßĞÎ
-	QString sShapeType = "¾ØĞÎÔ²ĞÎ¶à±ßĞÎ";
+	// æŸ±å’Œæ¢ç±»å‹   æˆªé¢å½¢çŠ¶ 0-2 çŸ©å½¢ åœ†å½¢ å¤šè¾¹å½¢
+	QString sShapeType = "çŸ©å½¢åœ†å½¢å¤šè¾¹å½¢";
 	int i = 0;
 	if (nType < 2)
 	{
@@ -995,10 +1086,10 @@ int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 			break;
 		}
 	}
-	// Ç½ºÍ°åÀàĞÍ
+	// å¢™å’Œæ¿ç±»å‹
 	if (nType == 2 || nType == 3)
 		oUnit.oShape.nThickNess = listInfo[2].toInt();
-	// ÃÅºÍ´°
+	// é—¨å’Œçª—
 	else
 	{
 		oUnit.oShape.nShapeType = 0;
@@ -1007,12 +1098,12 @@ int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 	}
 	return 0;
 }
-// ³õÊ¼»¯Â·¾¶ 
+// åˆå§‹åŒ–è·¯å¾„ 
 int ParaModel::InitPath()
 {
-	// ExeÎÄ¼şÍêÕûÂ·¾¶
+	// Exeæ–‡ä»¶å®Œæ•´è·¯å¾„
 	oPath.sExePath = qApp->applicationFilePath().toLocal8Bit().data();
-	// ExeÎÄ¼şËùÔÚÄ¿Â¼
+	// Exeæ–‡ä»¶æ‰€åœ¨ç›®å½•
 	oPath.sExeDir = qApp->applicationDirPath().toLocal8Bit().data();
 
 	oPath.sBoomLibDir = oPath.sExeDir + "/BoomLib";
@@ -1021,20 +1112,20 @@ int ParaModel::InitPath()
 	oPath.sTmpDir = oPath.sExeDir + "/Tmp";
 	oPath.sParaLibDir = oPath.sExeDir + "/ParaLib";
 
-	QString sLog = "Íê³ÉÏµÍ³Â·¾¶³õÊ¼»¯";
+	QString sLog = "å®Œæˆç³»ç»Ÿè·¯å¾„åˆå§‹åŒ–";
 	MyLogOutput(sLog);
 
 	return 1;
 }
-// ³õÊ¼»¯»ù±¾¹¹¼ş¿â 
+// åˆå§‹åŒ–åŸºæœ¬æ„ä»¶åº“ 
 int ParaModel::InitUnitLib()
 {
 	QString Path = QString::fromStdString(oPath.sExeDir + "/buildinglib.txt");
 	QFile file(Path);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		QMessageBox::information(NULL, "ĞÅÏ¢ÌáÊ¾", "ÏµÍ³»ù±¾¹¹½¨¿â½âÎöÊ§°Ü£¡");
-		MyLogOutput("ÏµÍ³»ù±¾¹¹½¨¿â½âÎöÊ§°Ü£¡");
+		QMessageBox::information(NULL, "ä¿¡æ¯æç¤º", "ç³»ç»ŸåŸºæœ¬æ„å»ºåº“è§£æå¤±è´¥ï¼");
+		MyLogOutput("ç³»ç»ŸåŸºæœ¬æ„å»ºåº“è§£æå¤±è´¥ï¼");
 		return 0;
 	}
 
@@ -1058,7 +1149,7 @@ int ParaModel::InitUnitLib()
 		basic.nUnitIdx = list[0].toInt();
 		QString shapeName = list[1];
 
-#pragma region UnitTypeÊ¶±ğ
+#pragma region UnitTypeè¯†åˆ«
 		basic.nUnitType = GetUnitTypeCode(list[1]);
 		if (basic.nUnitType == 3)
 		{
@@ -1078,13 +1169,13 @@ int ParaModel::InitUnitLib()
 		}
 #pragma endregion
 
-#pragma region ĞÎ×´Ê¶±ğ
+#pragma region å½¢çŠ¶è¯†åˆ«
 
 		shape.nShapeType = GetShapeTypeCode(list[2]);
 		if (shape.nShapeType == 1)
 		{
 			int unitType = GetUnitTypeCode(list[1]);
-			if (unitType > 4) //Èç¹ûÊÇÃÅºÍ´°µÄÇé¿ö
+			if (unitType > 4) //å¦‚æœæ˜¯é—¨å’Œçª—çš„æƒ…å†µ
 			{
 				shapeName = list[3] + "-" + list[4] + " " + shapeName;
 				shape.nShapeRange[0] = list[3].toInt();
@@ -1126,21 +1217,21 @@ int ParaModel::InitUnitLib()
 	}
 	return 1;
 }
-// ³õÊ¼»¯Æ½ÃæÍ¼¿â
+// åˆå§‹åŒ–å¹³é¢å›¾åº“
 int ParaModel::InitPlaneDrawLib()
 {
 	return 0;
 }
-// ³õÊ¼»¯²ÎÊı»¯Éú³ÉÄ£°å
+// åˆå§‹åŒ–å‚æ•°åŒ–ç”Ÿæˆæ¨¡æ¿
 int ParaModel::InitParaTmpl()
 {
 	return 0;
 }
 #pragma endregion
 
-#pragma region Êı¾İÊ¶±ğ°ïÖú·½·¨
+#pragma region æ•°æ®è¯†åˆ«å¸®åŠ©æ–¹æ³•
 
-//»ñÈ¡ÏµÍ³¹¹½¨¿âÖĞµÄ¹¹½¨
+//è·å–ç³»ç»Ÿæ„å»ºåº“ä¸­çš„æ„å»º
 BasicUnit ParaModel::GetBaseUnit(int idx)
 {
 	for (size_t i = 0; i < vBaseUnit.size(); i++)
@@ -1153,7 +1244,7 @@ BasicUnit ParaModel::GetBaseUnit(int idx)
 }
 
 
-//»ñÈ¡¼ÓÔØ¹¹½¨¼¯ÖĞµÄ¹¹½¨
+//è·å–åŠ è½½æ„å»ºé›†ä¸­çš„æ„å»º
 TopoUnit ParaModel::GetTopoUnit(int idx)
 {
 	for (size_t i = 0; i < vModelTmpl.size(); i++)
@@ -1164,7 +1255,7 @@ TopoUnit ParaModel::GetTopoUnit(int idx)
 	TopoUnit b;
 	return b;
 }
-//¸ù¾İ¹¹¼şÀàĞÍ²éÕÒÑÕÉ«
+//æ ¹æ®æ„ä»¶ç±»å‹æŸ¥æ‰¾é¢œè‰²
 QColor ParaModel::ColorHelper(int nUnitType)
 {
 	if (nUnitType == 1)
@@ -1193,83 +1284,83 @@ QColor ParaModel::ColorHelper(int nUnitType)
 	}
 	return QColor(72, 104, 146);
 }
-//¸ù¾İ¹¹¼şÀàĞÍid²éÕÒ¶ÔÓ¦µÄÖĞÎÄÃû
+//æ ¹æ®æ„ä»¶ç±»å‹idæŸ¥æ‰¾å¯¹åº”çš„ä¸­æ–‡å
 QString ParaModel::GetUnitType(int nUnitType)
 {
 	if (nUnitType == 1)
 	{
-		return "Öù";
+		return "æŸ±";
 	}
 	else if (nUnitType == 2)
 	{
-		return "Áº";
+		return "æ¢";
 	}
 	else if (nUnitType == 3)
 	{
-		return "°å";
+		return "æ¿";
 	}
 	else if (nUnitType == 4)
 	{
-		return  "Ç½";
+		return  "å¢™";
 	}
 	else if (nUnitType == 5)
 	{
-		return "ÃÅ";
+		return "é—¨";
 	}
 	else if (nUnitType == 6)
 	{
-		return "´°";
+		return "çª—";
 	}
 	return "";
 }
-//¸ù¾İ¹¹¼şÖĞÎÄÃû²éÕÒ¶ÔÓ¦µÄid
+//æ ¹æ®æ„ä»¶ä¸­æ–‡åæŸ¥æ‰¾å¯¹åº”çš„id
 int ParaModel::GetUnitTypeCode(QString unitTypeStr)
 {
-	if (unitTypeStr.compare("Öù") == 0)
+	if (unitTypeStr.compare("æŸ±") == 0)
 	{
 		return 1;
 	}
-	else if (unitTypeStr.compare("Áº") == 0)
+	else if (unitTypeStr.compare("æ¢") == 0)
 	{
 		return 2;
 	}
-	else if (unitTypeStr.compare("°å") == 0)
+	else if (unitTypeStr.compare("æ¿") == 0)
 	{
 		return 3;
 	}
-	else if (unitTypeStr.compare("Ç½") == 0)
+	else if (unitTypeStr.compare("å¢™") == 0)
 	{
 		return 4;
 	}
-	else if (unitTypeStr.compare("ÃÅ") == 0)
+	else if (unitTypeStr.compare("é—¨") == 0)
 	{
 		return 5;
 	}
-	else if (unitTypeStr.compare("´°") == 0)
+	else if (unitTypeStr.compare("çª—") == 0)
 	{
 		return 6;
 	}
 	return 0;
 }
-//¸ù¾İĞÎ×´ÖĞÎÄÃû²éÕÒ¶ÔÓ¦µÄid
+//æ ¹æ®å½¢çŠ¶ä¸­æ–‡åæŸ¥æ‰¾å¯¹åº”çš„id
 int ParaModel::GetShapeTypeCode(QString shapeTypeStr)
 {
-	if (shapeTypeStr.compare("¾ØĞÎ") == 0)
+	if (shapeTypeStr.compare("çŸ©å½¢") == 0)
 	{
 		return 1;
 	}
-	else if (shapeTypeStr.compare("Ô²ĞÎ") == 0)
+	else if (shapeTypeStr.compare("åœ†å½¢") == 0)
 	{
 		return 2;
 	}
-	else if (shapeTypeStr.compare("¶à±ßĞÎ") == 0)
+	else if (shapeTypeStr.compare("å¤šè¾¹å½¢") == 0)
 	{
 		return 3;
 	}
 	return 0;
 }
 
-//¸üĞÂ»­²¼ÖĞµ¥¶ÀµÄÔªËØ
+//æ›´æ–°ç”»å¸ƒä¸­å•ç‹¬çš„å…ƒç´ 
 QList<QGraphicsItem*> ParaModel::SelectSceneItem(int nUnitIdx)
 {
 	bool isWall = false;
@@ -1288,7 +1379,7 @@ QList<QGraphicsItem*> ParaModel::SelectSceneItem(int nUnitIdx)
 
 #pragma endregion
 
-#pragma region ÊÍ·Å×ÊÔ´
+#pragma region é‡Šæ”¾èµ„æº
 
 ParaModel::~ParaModel()
 {
@@ -1296,10 +1387,10 @@ ParaModel::~ParaModel()
 	ReleaseSysModel();
 }
 
-// ÊÍ·Å¸÷ÖÖ½çÃæ×ÊÔ´
+// é‡Šæ”¾å„ç§ç•Œé¢èµ„æº
 void ParaModel::ReleaseUISource()
 {
-	// ÊÍ·Å¸÷ÖÖ×ÊÔ´
+	// é‡Šæ”¾å„ç§èµ„æº
 	FREEPTR(pTipBar);
 	FREEPTR(myLogOutLabel);
 	FREEPTR(graphicsViewMain);
@@ -1312,7 +1403,7 @@ void ParaModel::ReleaseUISource()
 }
 
 
-// ÊÍ·ÅÏµÍ³Ä£ĞÍ¿â
+// é‡Šæ”¾ç³»ç»Ÿæ¨¡å‹åº“
 void ParaModel::ReleaseSysModel()
 {
 
@@ -1320,36 +1411,36 @@ void ParaModel::ReleaseSysModel()
 }
 #pragma endregion
 
-#pragma region »­²¼²Ù×÷
+#pragma region ç”»å¸ƒæ“ä½œ
 
-//»­²¼ÒÆ¶¯ÔªËØ
+//ç”»å¸ƒç§»åŠ¨å…ƒç´ 
 void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 {
 	int a = nUnitType;
 	int v = nUnitIdx;
-	SimpleShape oShape = viewShape[nUnitIdx]; 
-	int nMoveXY[2]; 
-	// ·¢ËÍ¾ø¶ÔÎ»ÖÃĞÅÏ¢Ê± °´ Ïà¶Ô×óÏÂ½Ç¼ÆËãÎ»ÒÆ
+	SimpleShape oShape = viewShape[nUnitIdx];
+	int nMoveXY[2];
+	// å‘é€ç»å¯¹ä½ç½®ä¿¡æ¯æ—¶ æŒ‰ ç›¸å¯¹å·¦ä¸‹è§’è®¡ç®—ä½ç§»
 // 	nMoveXY[0] = pos.x() - pSceneOffset - (oShape.nCen[0] - oShape.nWH[0] / 2); 
 // 	nMoveXY[1] = pos.y() - pSceneOffset - (oShape.nCen[1] - oShape.nWH[1] / 2); 
-	// ·¢ËÍÎ»ÒÆÊ± Ö±½Ó¸³Öµ
-	nMoveXY[0] = pos.x() ; 
-	nMoveXY[1] = pos.y() ; 
+	// å‘é€ä½ç§»æ—¶ ç›´æ¥èµ‹å€¼
+	nMoveXY[0] = pos.x();
+	nMoveXY[1] = pos.y();
 
-	// ¼ÆËãÒÆ¶¯ºóµÄĞÂ×ø±ê
-	pCalShapeData->MoveBaseUnit(nUnitIdx, nMoveXY, vModelTmpl, viewShape); 
-	
-	// ×ªÎª»æÍ¼×ø±ê
+	// è®¡ç®—ç§»åŠ¨åçš„æ–°åæ ‡
+	pCalShapeData->MoveBaseUnit(nUnitIdx, nMoveXY, vModelTmpl, viewShape);
+
+	// è½¬ä¸ºç»˜å›¾åæ ‡
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
-// 		if (viewShape[i].unitIdx != nUnitIdx)
-// 			continue;
-		//»æÖÆÖù¡¢Ç½¡¢ÃÅ¡¢´°
+		if (viewShape[i].unitIdx != nUnitIdx)
+			continue;
+		//ç»˜åˆ¶æŸ±ã€å¢™ã€é—¨ã€çª—
 		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
 		{
-			//ÔÚ»­²¼ÖĞÖØĞÂÕÒµ½¸ÃÔªËØ
+			//åœ¨ç”»å¸ƒä¸­é‡æ–°æ‰¾åˆ°è¯¥å…ƒç´ 
 			QList<QGraphicsItem*> viewItem = SelectSceneItem(viewShape[i].unitIdx);
 			for (size_t i = 0; i < viewItem.size(); i++)
 			{
@@ -1358,27 +1449,32 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 				{
 					int coordX = viewShape[i].nCen[0] + pSceneOffset;
 					int coordY = viewShape[i].nCen[1] + pSceneOffset;
-
-					proxyWidget->m_leftup =  QPointF(coordX, coordY );
-					proxyWidget->m_edge = QPointF(viewShape[i].nWH[0], viewShape[i].nWH[1]);
+					proxyWidget = new BRectangle(
+						coordX, coordY,
+						viewShape[i].nWH[0], viewShape[i].nWH[1],
+						BGraphicsItem::ItemType::Rectangle);
+					proxyWidget->isAuxiliary = false;
+					proxyWidget->nUnitType = viewShape[i].unitType;
+					proxyWidget->nUnitIdx = viewShape[i].unitIdx;
+					proxyWidget->setBrush(ColorHelper(viewShape[i].unitType));
+					connect(proxyWidget, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+					connect(proxyWidget, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
 				}
 				else
 				{
-					//É¾³ı±ê×¼Ïß
+					//åˆ é™¤æ ‡å‡†çº¿
 				}
 			}
 		}
 	}
 
-	int nCen[2]; 
+	int nCen[2];
 	nCen[0] = nMoveXY[0] + vModelTmpl[nUnitIdx].nCenPos[0];
 	nCen[1] = nMoveXY[1] + vModelTmpl[nUnitIdx].nCenPos[2];
-	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y()); 
-	myLogOutLabel->setText(sInfo); 
-// 	QString sInfo1 = QString("%1 %2").arg(nCen[0]).arg(nCen[1]); 
-// 	myLogOutLabel->setText(sInfo1); 
-
- 
+	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y());
+	myLogOutLabel->setText(sInfo);
+	// 	QString sInfo1 = QString("%1 %2").arg(nCen[0]).arg(nCen[1]); 
+	// 	myLogOutLabel->setText(sInfo1); 
 	if (MainDockState != 3)
 	{
 		graphicsViewMain->hide();
@@ -1387,29 +1483,32 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 
 	return;
 }
-//»­²¼²Ëµ¥µã»÷
-void ParaModel::SceneMenuClickAction(int nUnitType, int nUnitIdx, int clickType)
+//ç”»å¸ƒèœå•ç‚¹å‡»
+void ParaModel::SceneMenuClickAction(int nUnitType, int nUnitIdx)
 {
+	SelectUnitIdx = nUnitIdx;
+	SelectUnitType = nUnitType;
+	ShowUnitSelectWindow();
 	return;
 }
-//¸üĞÂ»­²¼ÄÚÈİ
-void ParaModel::updateScene()
+//æ›´æ–°ç”»å¸ƒå†…å®¹
+void ParaModel::AddSceneData()
 {
 	if (if_data == 0)
 		return;
 	if (vModelTmpl.size() == 0)
 		return;
-
-
+	//æ¸…é™¤ç”»å¸ƒ
+	SceneMainClear();
 
 	DimDataConvert* d = new DimDataConvert();
 	VSHAPE viewShape;
 	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
-	//¸ù¾İÊı¾İ»æÖÆÍ¼ĞÎ
+	//æ ¹æ®æ•°æ®ç»˜åˆ¶å›¾å½¢
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
-		//»æÖÆÖù¡¢Ç½¡¢ÃÅ¡¢´°
+		//ç»˜åˆ¶æŸ±ã€å¢™ã€é—¨ã€çª—
 		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
 		{
 			int coordX = viewShape[i].nCen[0] + pSceneOffset;
@@ -1427,15 +1526,15 @@ void ParaModel::updateScene()
 			pSceneMain.addItem(viewItem);
 		}
 	}
-	//¼ÓÔØ±ê×¼Ïß
+	//åŠ è½½æ ‡å‡†çº¿
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
-		//Èç¹ûµ±Ç°ÒªäÖÈ¾µÄÊÇÇ¿
+		//å¦‚æœå½“å‰è¦æ¸²æŸ“çš„æ˜¯å¼º
 		if (viewShape[i].unitType == 4)
 		{
 			int coordX = viewShape[i].nCen[0] + pSceneOffset;
 			int coordY = viewShape[i].nCen[1] + pSceneOffset;
-			//ÅĞ¶ÏÇ½µÄ½Ç¶È¼Ó±ê×¼Ïß
+			//åˆ¤æ–­å¢™çš„è§’åº¦åŠ æ ‡å‡†çº¿
 			if (vModelTmpl[viewShape[i].unitIdx].nUnitAngle == 0)
 			{
 				BRectangle* divideLine = new BRectangle(
@@ -1478,7 +1577,7 @@ void ParaModel::updateScene()
 		graphicsViewMain->show();
 	}
 }
-//¸üĞÂ»­²¼ÖĞµ¥¶ÀµÄÔªËØ
+//æ›´æ–°ç”»å¸ƒä¸­å•ç‹¬çš„å…ƒç´ 
 void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height)
 {
 	bool isWall = false;
@@ -1490,8 +1589,8 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 		{
 			if (!proxyWidget->isAuxiliary)
 			{
-// 				proxyWidget->m_leftup = QPointF(pSceneOffset + x, pSceneOffset + y);
-// 				proxyWidget->m_edge = QPointF(pSceneOffset + x + width, pSceneOffset + y + height);
+				// 				proxyWidget->m_leftup = QPointF(pSceneOffset + x, pSceneOffset + y);
+				// 				proxyWidget->m_edge = QPointF(pSceneOffset + x + width, pSceneOffset + y + height);
 			}
 			else
 			{
@@ -1539,7 +1638,7 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 		graphicsViewMain->show();
 	}
 }
-//Çå³ı»­²¼Êı¾İ
+//æ¸…é™¤ç”»å¸ƒæ•°æ®
 void ParaModel::SceneMainClear()
 {
 	pSceneMain.clear();

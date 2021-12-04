@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
@@ -33,125 +33,134 @@ class SARibbonCategory;
 class ParaModel : public SARibbonMainWindow
 {
 	Q_OBJECT
-		//¹¹Ôìº¯Êı
+		//æ„é€ å‡½æ•°
 public:
 	explicit ParaModel(QWidget* parent = 0);
 	~ParaModel();
 
 private:
-	QStatusBar* winStatus;							//×´Ì¬À¸
-	QLabel* pTipBar;								// ×´Ì¬À¸ÖĞÎÄ×ÖÏÔÊ¾
-	QLineEdit* pModelEdit[7];						// Õ½¶·²¿ÊôĞÔ±à¼­¿ò µ±Á¿ µ¯Æ¬ÊıÁ¿ µ¯Æ¬ÖÊÁ¿ ·Ö²¼½Ç¶È1 ·Ö²¼½Ç¶È2
-	QLineEdit* pArmHeadEdit[5];						// Ëã·¨ĞÅÏ¢
-	QTreeWidget* pModelTreeWidget;					// ÏµÍ³Ä£ĞÍÊ÷
-	QDockWidget* MainDockWidget;					// ½çÃæÏÔÊ¾´°¿Ú
-	BQGraphicsView* graphicsViewX;					// ¶şÎ¬Ä£ĞÍXÊÓÍ¼
-	BQGraphicsView* graphicsViewY;					// ¶şÎ¬Ä£ĞÍYÊÓÍ¼
-	BQGraphicsView* graphicsViewZ;					// ¶şÎ¬Ä£ĞÍZÊÓÍ¼
-	BQGraphicsView* graphicsViewMain;				// ¶şÎ¬Ä£ĞÍÈıÎ¬ÊÓÍ¼
-	BQGraphicsView* graphicsViewOgl;				// ÈıÎ»Ä£ĞÍÕ¹Ê¾ÊÓÍ¼
+	QStatusBar* winStatus;							//çŠ¶æ€æ 
+	QLabel* pTipBar;								// çŠ¶æ€æ ä¸­æ–‡å­—æ˜¾ç¤º
+	QLineEdit* pModelEdit[7];						// æˆ˜æ–—éƒ¨å±æ€§ç¼–è¾‘æ¡† å½“é‡ å¼¹ç‰‡æ•°é‡ å¼¹ç‰‡è´¨é‡ åˆ†å¸ƒè§’åº¦1 åˆ†å¸ƒè§’åº¦2
+	QLineEdit* pArmHeadEdit[5];						// ç®—æ³•ä¿¡æ¯
+	QTreeWidget* pModelTreeWidget;					// ç³»ç»Ÿæ¨¡å‹æ ‘
+	QTreeWidget* pModelUnitTreeWidget;				// å¯æ›¿æ¢çš„æ¨¡å‹æ ‘
+	QDockWidget* MainDockWidget;					// ç•Œé¢æ˜¾ç¤ºçª—å£
+	BQGraphicsView* graphicsViewX;					// äºŒç»´æ¨¡å‹Xè§†å›¾
+	BQGraphicsView* graphicsViewY;					// äºŒç»´æ¨¡å‹Yè§†å›¾
+	BQGraphicsView* graphicsViewZ;					// äºŒç»´æ¨¡å‹Zè§†å›¾
+	BQGraphicsView* graphicsViewMain;				// äºŒç»´æ¨¡å‹ä¸‰ç»´è§†å›¾
+	BQGraphicsView* graphicsViewOgl;				// ä¸‰ä½æ¨¡å‹å±•ç¤ºè§†å›¾
 
-	BQGraphicsScene pSceneX;						// ¶şÎ¬Ä£ĞÍXÊÓÍ¼»­²¼
-	BQGraphicsScene pSceneY;						// ¶şÎ¬Ä£ĞÍYÊÓÍ¼»­²¼
-	BQGraphicsScene pSceneZ;						// ¶şÎ¬Ä£ĞÍZÊÓÍ¼»­²¼
-	BQGraphicsScene pSceneMain;						// ¶şÎ¬Ä£ĞÍZÊÓÍ¼´óÆÁÄ»Ö÷»­²¼
-	
-	ParaOGLManager* paraOglmanager;					// ÈıÎ¬ÏÔÊ¾´°¿ÚÀà
-	ParaOGLManager* paraOglmanagerMain;				// ÈıÎ¬ÏÔÊ¾´°¿Ú´óÆÁÄ»Ö÷Àà
+	BQGraphicsScene pSceneX;						// äºŒç»´æ¨¡å‹Xè§†å›¾ç”»å¸ƒ
+	BQGraphicsScene pSceneY;						// äºŒç»´æ¨¡å‹Yè§†å›¾ç”»å¸ƒ
+	BQGraphicsScene pSceneZ;						// äºŒç»´æ¨¡å‹Zè§†å›¾ç”»å¸ƒ
+	BQGraphicsScene pSceneMain;						// äºŒç»´æ¨¡å‹Zè§†å›¾å¤§å±å¹•ä¸»ç”»å¸ƒ
 
-	int if_data;									//0ÊÇÎ´¼ÓÔØÊı¾İ¡£1ÊÇÓĞÊı¾İ
-	SysPath oPath;									//ÏµÍ³Â·¾¶
+	ParaOGLManager* paraOglmanager;					// ä¸‰ç»´æ˜¾ç¤ºçª—å£ç±»
+	ParaOGLManager* paraOglmanagerMain;				// ä¸‰ç»´æ˜¾ç¤ºçª—å£å¤§å±å¹•ä¸»ç±»
+
+	int if_data;									//0æ˜¯æœªåŠ è½½æ•°æ®ã€‚1æ˜¯æœ‰æ•°æ®
+	SysPath oPath;									//ç³»ç»Ÿè·¯å¾„
 	int pSceneOffset;
 
-	QTextEdit* myLogOutLabel;						// ÈÕÖ¾´°¿ÚÊä³öµÄÎÄ±¾
-	int MainDockState;								// 0ÊÇXÊÓÍ¼ 1ÊÇYÊÓÍ¼ 2ÊÇZÊÓÍ¼ 3ÊÇÈıÎ¬ÊÓÍ¼
+	QTextEdit* myLogOutLabel;						// æ—¥å¿—çª—å£è¾“å‡ºçš„æ–‡æœ¬
+	int MainDockState;								// 0æ˜¯Xè§†å›¾ 1æ˜¯Yè§†å›¾ 2æ˜¯Zè§†å›¾ 3æ˜¯ä¸‰ç»´è§†å›¾
 
-    // mainLabelÏÔÊ¾µÄÍ¼Ïñ
-    QMenu* popMenu_In_ListWidget_;					/*µ¯³ö²Ëµ¥±»Ê¹ÓÃÎŞ·¨É¾³ı*/  
+	// mainLabelæ˜¾ç¤ºçš„å›¾åƒ
+	QMenu* popMenu_In_ListWidget_;					/*å¼¹å‡ºèœå•è¢«ä½¿ç”¨æ— æ³•åˆ é™¤*/
+
+	int SelectUnitIdx;
+	int SelectUnitType;
+
 
 public:
-	VUNITTABLE vBaseUnit;					// ÏµÍ³»ù±¾¹¹¼ş¿â
-	VTOPOTABLE vModelTmpl;					// µ±Ç°»æÖÆ¼ÆËãÓÃµÄÆ½ÃæÍ¼
-	VBUILDTOPO vBuildTopo;					// ÏµÍ³Æ½ÃæÍ¼¿â
-	int InitPath();							// ³õÊ¼»¯Â·¾¶
-	int InitUnitLib();						// ³õÊ¼»¯»ù±¾¹¹¼ş¿â 
-	int InitPlaneDrawLib();					// ³õÊ¼»¯Æ½ÃæÍ¼¿â
-	int InitParaTmpl();						// ³õÊ¼»¯²ÎÊı»¯Éú³ÉÄ£°å
+	VUNITTABLE vBaseUnit;					// ç³»ç»ŸåŸºæœ¬æ„ä»¶åº“
+	VTOPOTABLE vModelTmpl;					// å½“å‰ç»˜åˆ¶è®¡ç®—ç”¨çš„å¹³é¢å›¾
+	VBUILDTOPO vBuildTopo;					// ç³»ç»Ÿå¹³é¢å›¾åº“
+	int InitPath();							// åˆå§‹åŒ–è·¯å¾„
+	int InitUnitLib();						// åˆå§‹åŒ–åŸºæœ¬æ„ä»¶åº“ 
+	int InitPlaneDrawLib();					// åˆå§‹åŒ–å¹³é¢å›¾åº“
+	int InitParaTmpl();						// åˆå§‹åŒ–å‚æ•°åŒ–ç”Ÿæˆæ¨¡æ¿
 
 private:
-	//³õÊ¼»¯´°¿Ú
+	//åˆå§‹åŒ–çª—å£
 	void InitWindow();
-	//³õÊ¼»¯ÄÚÈİÇøÓò
+	//åˆå§‹åŒ–å†…å®¹åŒºåŸŸ
 	void InitCentralWidget();
-	//³õÊ¼»¯ÖĞ¼ä¶ÀÁ¢´°¿Ú
+	//åˆå§‹åŒ–ä¸­é—´ç‹¬ç«‹çª—å£
 	void InitOglManagerWidget(QDockWidget* from);
-	//³õÊ¼»¯ÈÕÖ¾´°¿Ú
+	//åˆå§‹åŒ–æ—¥å¿—çª—å£
 	void InitLogWidget(QDockWidget* from);
-	//³õÊ¼»¯ÒÑ¼ÓÔØµÄÄ£ĞÍ´°¿Ú
+	//åˆå§‹åŒ–å·²åŠ è½½çš„æ¨¡å‹çª—å£
 	void InitLoadModelWidget(QDockWidget* from);
-	//³õÊ¼»¯ÏµÍ³Ä£ĞÍ´°¿Ú
+	//åˆå§‹åŒ–ç³»ç»Ÿæ¨¡å‹çª—å£
 	void InitSysWidget(QDockWidget* from);
-	//³õÊ¼»¯ÊôĞÔ´°¿Ú
+	//åˆå§‹åŒ–å±æ€§çª—å£
 	void InitPropertyWidget(QDockWidget* from);
 
-	//³õÊ¼»¯×´Ì¬À¸ÎÄ×ÖÌáÊ¾
+	//åˆå§‹åŒ–çŠ¶æ€æ æ–‡å­—æç¤º
 	void InitStatusWidget();
 
-	//³õÊ¼»¯Ribbon
+	//åˆå§‹åŒ–Ribbon
 	void InitSARibbon();
-	//³õÊ¼»¯RibbonÖĞµÄÎÄ¼ş²Ëµ¥
+	//åˆå§‹åŒ–Ribbonä¸­çš„æ–‡ä»¶èœå•
 	void InitCategoryMain(SARibbonCategory* page);
 
-	//³õÊ¼»¯µ¯³ö´°¿Ú
+	//åˆå§‹åŒ–å¼¹å‡ºçª—å£
 	void InitTipWindow();
 
-	//»ñÈ¡ÏµÍ³¹¹½¨¿âÖĞµÄ¹¹½¨
+	//æ„ä»¶é€‰æ‹©çª—å£
+	void ShowUnitSelectWindow();
+
+	//è·å–ç³»ç»Ÿæ„å»ºåº“ä¸­çš„æ„å»º
 	BasicUnit GetBaseUnit(int idx);
-	//»ñÈ¡¼ÓÔØ¹¹½¨¼¯ÖĞµÄ¹¹½¨
+	//è·å–åŠ è½½æ„å»ºé›†ä¸­çš„æ„å»º
 	TopoUnit GetTopoUnit(int idx);
-	//¸ù¾İ»æÖÆ¹¹¼şÀà±ğÊ¶±ğÑÕÉ«
+	//æ ¹æ®ç»˜åˆ¶æ„ä»¶ç±»åˆ«è¯†åˆ«é¢œè‰²
 	QColor ColorHelper(int nUnitType);
-	//¸ù¾İ¹¹¼şÀà±ğ±àÂë×ª»»³É¶ÔÓ¦µÄ×Ö·ûÃèÊö
+	//æ ¹æ®æ„ä»¶ç±»åˆ«ç¼–ç è½¬æ¢æˆå¯¹åº”çš„å­—ç¬¦æè¿°
 	QString GetUnitType(int nUnitType);
-	//¸ù¾İ¹¹½¨Àà±ğµÄ×Ö·ûÃèÊö×ª»»³É¶ÔÓ¦µÄÀà±ğ±àÂë
+	//æ ¹æ®æ„å»ºç±»åˆ«çš„å­—ç¬¦æè¿°è½¬æ¢æˆå¯¹åº”çš„ç±»åˆ«ç¼–ç 
 	int GetUnitTypeCode(QString unitTypeStr);
-	//¸ù¾İ¹¹½¨ĞÎ×´µÄ×Ö·ûÃèÊö×ª»»³É¶ÔÓ¦µÄÀà±ğ±àÂë
+	//æ ¹æ®æ„å»ºå½¢çŠ¶çš„å­—ç¬¦æè¿°è½¬æ¢æˆå¯¹åº”çš„ç±»åˆ«ç¼–ç 
 	int GetShapeTypeCode(QString shapeTypeStr);
+	//è·å–ç”»å¸ƒä¸Šé€‰ä¸­çš„item
 	QList<QGraphicsItem*> SelectSceneItem(int nUnitIdx);
 
-	// ÊÍ·Å¸÷ÖÖ½çÃæ×ÊÔ´
+	// é‡Šæ”¾å„ç§ç•Œé¢èµ„æº
 	void ReleaseUISource();
-	// ÊÍ·ÅÏµÍ³Ä£ĞÍ¿â
+	// é‡Šæ”¾ç³»ç»Ÿæ¨¡å‹åº“
 	void ReleaseSysModel();
 
-	//Çå³ı»­²¼
+	//æ¸…é™¤ç”»å¸ƒ
 	void SceneMainClear();
 	void SceneXClear();
 	void SceneYClear();
 	void SceneZClear();
-	//¸üĞÂ»­²¼ÔªËØ
+	//æ›´æ–°ç”»å¸ƒå…ƒç´ 
 	void UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height);
 public:
 	VSHAPE viewShape;
 	DimDataConvert* pCalShapeData;
 public slots:
-	void MyLogOutput(QString myLogout);         //Êä³öÈÕÖ¾
-	void ApplyDataAction();		//±£´æÊôĞÔÊäÈëµÄÊı¾İ 
-    void drawWall(const std::vector<float>& points);
+	void MyLogOutput(QString myLogout);         //è¾“å‡ºæ—¥å¿—
+	void ApplyDataAction();		//ä¿å­˜å±æ€§è¾“å…¥çš„æ•°æ® 
+	void drawWall(const std::vector<float>& points);
 
 
-	void GraphicsViewXFocus(bool b); // ¼ÓÔØÅÔ²àÍ¼X
-	void GraphicsViewYFocus(bool b); // ¼ÓÔØÅÔ²àÍ¼Y
-	void GraphicsViewZFocus(bool b); // ¼ÓÔØÅÔ²àÍ¼Z
+	void GraphicsViewXFocus(bool b); // åŠ è½½æ—ä¾§å›¾X
+	void GraphicsViewYFocus(bool b); // åŠ è½½æ—ä¾§å›¾Y
+	void GraphicsViewZFocus(bool b); // åŠ è½½æ—ä¾§å›¾Z
 
-	void GraphicsViewOgl(bool b);	//openglÅÔ²àÍ¼
-	void updateOGL();				//¸üĞÂÈıÎ¬´°¿ÚÄÚÈİ
-	void updateScene();				//¸üĞÂ»­²¼ÄÚÈİ
+	void GraphicsViewOgl(bool b);	//openglæ—ä¾§å›¾
+	void updateOGL();				//æ›´æ–°ä¸‰ç»´çª—å£å†…å®¹
+	void AddSceneData();				//æ›´æ–°ç”»å¸ƒå†…å®¹
 
 	void NewFileAction();
 	void OpenFileAction();
 	void CloseFileAction();
 
-	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//»­²¼ÒÆ¶¯ÔªËØ
-	void SceneMenuClickAction(int nUnitType, int nUnitIdx, int clickType);	//»­²¼²Ëµ¥µã»÷
+	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//ç”»å¸ƒç§»åŠ¨å…ƒç´ 
+	void SceneMenuClickAction(int nUnitType, int nUnitIdx);	//ç”»å¸ƒèœå•ç‚¹å‡»
 };

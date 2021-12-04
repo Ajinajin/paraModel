@@ -30,6 +30,7 @@ public:
 	int nUnitIdx;				//构件id
 	bool isAuxiliary;			//是否辅助线
 
+
 	ItemType m_type;
 	QPointF getCenter() { return m_center; }
 	void setCenter(QPointF p) { m_center = p; }
@@ -54,7 +55,7 @@ protected:
 	QPen m_pen_noSelected;
 signals:
 	void SceneItemMove(int nUnitType, int nUnitIdx, QPointF pos);
-	void SceneMenuClick(int nUnitType, int nUnitIdx, int clickType);
+	void SceneMenuClick(int nUnitType, int nUnitIdx);
 };
 
 //------------------------------------------------------------------------------
