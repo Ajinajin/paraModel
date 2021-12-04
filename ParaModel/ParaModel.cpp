@@ -1002,6 +1002,7 @@ void ParaModel::MyLogOutput(QString myLogout)
 // 数据修改后更新
 void ParaModel::ApplyDataAction()
 {
+	RefreshScene();
 	// 场景未 没有数据
 	// if (pEnvir2 == NULL)
 	// {
@@ -1474,7 +1475,7 @@ QList<QGraphicsItem*> ParaModel::SelectSceneItem(int nUnitIdx)
 		if (proxyWidget->nUnitIdx == nUnitIdx)
 		{
 			if (proxyWidget->nOriPos[0] >= 0)
-			{ 
+			{
 				returnList.append(proxyWidget);
 			}
 		}
@@ -1525,60 +1526,57 @@ void ParaModel::RefreshScene()
 		return;
 	if (viewShape.size() == 0)
 		return;
-	for (size_t i = 0; i < viewShape.size(); i++)
-	{ 
-		//绘制柱、墙、门、窗
-		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
-		{
-			//在画布中重新找到该元素
-			QList<QGraphicsItem*> viewItem = SelectSceneItem(viewShape[i].unitIdx);
-			for (size_t i = 0; i < viewItem.size(); i++)
-			{
-				BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(viewItem[i]);
-				if (!proxyWidget->isAuxiliary)
-				{
-					int coordX = viewShape[i].nCen[0];
-					int coordY = viewShape[i].nCen[1];
-					proxyWidget->setX(coordX);
-					proxyWidget->setY(coordY);
-				}
-				else
-				{
-					//删除标准线
-				}
-			}
-		}
-	}
+
+	// 计算移动后的新坐标
+	pCalShapeData->MoveBaseUnit(SelectUnitIdx, nMoveXY[0], nMoveXY[1], vModelTmpl, viewShape, vBaseUnit);
+	nMoveXY[0] = 0;
+	nMoveXY[1] = 0;
+	// 转为绘图坐标
+	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
+	AddSceneData();
+
+
+	//for (size_t i = 0; i < viewShape.size(); i++)
+	//{
+	//	//绘制柱、墙、门、窗
+	//	if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
+	//	{
+	//		//在画布中重新找到该元素
+	//		QList<QGraphicsItem*> viewItem = SelectSceneItem(viewShape[i].unitIdx);
+	//		for (size_t i = 0; i < viewItem.size(); i++)
+	//		{
+	//			BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(viewItem[i]);
+	//			if (!proxyWidget->isAuxiliary)
+	//			{
+	//				int coordX = viewShape[i].nCen[0];
+	//				int coordY = viewShape[i].nCen[1];
+	//				proxyWidget->setX(coordX);
+	//				proxyWidget->setY(coordY);
+	//			}
+	//			else
+	//			{
+	//				//删除标准线
+	//			}
+	//		}
+	//	}
+	//}
 	return;
 }
 //画布移动元素
 void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 {
-	int a = nUnitType;
-	int v = nUnitIdx;
-	SimpleShape oShape = viewShape[nUnitIdx];
-	int nMoveXY[2];
 	// 发送绝对位置信息时 按 相对左下角计算位移
 // 	nMoveXY[0] = pos.x() - pSceneOffset - (oShape.nCen[0] - oShape.nWH[0] / 2); 
 // 	nMoveXY[1] = pos.y() - pSceneOffset - (oShape.nCen[1] - oShape.nWH[1] / 2); 
 	// 发送位移时 直接赋值
 	//如果构件是水平的修改x
 	//如果构件是垂直的修改y
-	
+	SelectUnitIdx = nUnitIdx;
+	SelectUnitType = nUnitType;
 	nMoveXY[0] = pos.x();
 	nMoveXY[1] = pos.y();
-
-
-
-	int nCen[2];
-	nCen[0] = nMoveXY[0] + vModelTmpl[nUnitIdx].nCenPos[0];
-	nCen[1] = nMoveXY[1] + vModelTmpl[nUnitIdx].nCenPos[2];
-
 	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y());
 	myLogOutLabel->setText(sInfo);
-	// 	QString sInfo1 = QString("%1 %2").arg(nCen[0]).arg(nCen[1]); 
-	// 	myLogOutLabel->setText(sInfo1); 
-	 
 
 	return;
 }
@@ -1624,7 +1622,8 @@ void ParaModel::AddSceneData()
 	//清除画布
 	SceneMainClear();
 
-	DimDataConvert* d = new DimDataConvert(); 
+	DimDataConvert* d = new DimDataConvert();
+
 	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
 	//根据数据绘制图形

@@ -64,6 +64,7 @@ private:
 	SysPath oPath;									//系统路径
 	int pSceneOffset;
 
+	int nMoveXY[2];
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
 	int MainDockState;								// 0是X视图 1是Y视图 2是Z视图 3是三维视图
 
