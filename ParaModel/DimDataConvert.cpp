@@ -378,6 +378,7 @@ int AddWallInCols(BasicUnit oAddUnit, int nAdjCol[2], VTOPOTABLE& vLayerTopo)
 
 	return 0;
 }
+
 // 在当前拓扑图中增加构件
 int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos,VUNITTABLE & vTable, VTOPOTABLE& vLayerTopo,VSHAPE vPlaneDraw)
 {
