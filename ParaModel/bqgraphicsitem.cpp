@@ -83,7 +83,6 @@ void BGraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 }
 
 
-
 BEllipse::BEllipse(qreal x, qreal y, qreal width, qreal height, ItemType type)
 	: BGraphicsItem(QPointF(x, y), QPointF(x + width / 2, y + height / 2), type)
 {

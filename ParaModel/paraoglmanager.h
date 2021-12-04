@@ -15,11 +15,11 @@
 #include "camera.h"
 #include <ShaderProc.h>
 
-struct Point//绘制所需点结构
+struct Point//点结构(二维)
 {
-	float x;
-	float y;
-	float z;
+	int x;
+	int y;
+	int z;
 };
 typedef vector<Point> vPoint;
 
@@ -56,21 +56,26 @@ public:
 	//绘制
 	// 
 	//柱
-	void InitAndDrawColumn(float x, float y, float z, float radius, float height);//参数：底面圆心xz，半径，高度
-
-	//多边形柱(竖着)
-	void InitAndDrawPolygonColumnPortrait(VINT data, float height);
-
-	//多边形柱(横着)
-	void InitAndDrawPolygonColumnHorizontal(VINT data, float length);
+	void InitAndDrawColumn(int x, int y, int z, int radius, int height);//参数：底面圆心xz，半径，高度
+	
+																		
+	//多边形体(竖着),多边形绘制算法有待完善(opengl只能绘制凸多边形)
+	void InitAndDrawPolygonPortrait(VINT data, int begin_y, int height);
+	//多边形体(横着)
+	void InitAndDrawPolygonHorizontal(VINT data, int length);
+	
 	//长方体（墙、板等）x\y\z 为墙体最左下角的点坐标
-	void InitAndDrawCuboid(float x, float y, float z, float length, float thickness, float height, int type);
+	void InitAndDrawCuboid(int x, int y, int z, int length, int thickness, int height, int type);
+	
 
 	//根据中心构件单元Id去构件库里查具体模型参数
 	BasicUnit findUnit(int idx, VUNITTABLE oglUnitTable);
 
-	VTOPOTABLE* oglTopTable;//绘制所需的拓扑结构表
-	VUNITTABLE* oglUnitTable;//绘制所需的结构单元表
+	VTOPOTABLE oglTopTable;	//绘制所需的拓扑结构表
+	VUNITTABLE oglUnitTable;	//绘制所需的结构单元表
+
+		
+
 
 public:
 	//相机、鼠标键入相关参数
