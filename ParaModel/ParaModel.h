@@ -23,6 +23,7 @@
 #include "SARibbonMainWindow.h"
 #include <ParaType.h>
 
+#include "DimDataConvert.h"
 
 class QMenu;
 class QListWidget;
@@ -115,6 +116,7 @@ private:
 	int GetUnitTypeCode(QString unitTypeStr);
 	//根据构建形状的字符描述转换成对应的类别编码
 	int GetShapeTypeCode(QString shapeTypeStr);
+	QList<QGraphicsItem*> SelectSceneItem(int nUnitIdx);
 
 	// 释放各种界面资源
 	void ReleaseUISource();
@@ -128,7 +130,9 @@ private:
 	void SceneZClear();
 	//更新画布元素
 	void UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height);
-
+public:
+	VSHAPE viewShape;
+	DimDataConvert* pCalShapeData;
 public slots:
 	void MyLogOutput(QString myLogout);         //输出日志
 	void ApplyDataAction();		//保存属性输入的数据 

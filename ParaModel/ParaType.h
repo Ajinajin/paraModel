@@ -6,9 +6,8 @@
 using namespace std;
 
 typedef vector<int> VINT;
+typedef vector<VINT> VVINT;
 typedef vector<float> VFLOAT;
-
-
 
 // 整型平面点
 typedef struct PixelPos
@@ -60,7 +59,7 @@ typedef struct MatInfo
 typedef struct BasicUnit
 {
 	int nUnitIdx;				// 基本构件单元Idx
-	int nUnitType;				// 基本单元类型 柱梁板墙门窗
+	int nUnitType;				// 基本单元类型 线柱梁板墙门窗
 	GeoShape oShape;			// 外形轮廓描述
 	MatInfo  oMaterial;			// 组成材质描述
 }BasicUnit;
@@ -70,9 +69,9 @@ typedef vector<BasicUnit> VUNITTABLE;
 typedef struct TopoUnit
 {
 	int nTopoIdx;				// 构件序号
-	int nUnitType;				// 中心构件单元类型 柱梁板墙门窗
+	int nUnitType;				// 中心构件单元类型 线柱梁板墙门窗
 	int nCenUnitIdx;			// 中心构件单元Id
-	int nAdjUnitIdx[10];		// 前后左右方向 按上下表示梁墙 每方向最多两个 邻接单元Id 无邻接-1
+	int nAdjUnitIdx[12];		// 前后左右方向 按上下表示梁墙 每方向最多两个 邻接单元Id 无邻接-1
 	int nEdgeType;				// 边界类型 前后上下左右 按向限角度划分 45度 右上为1 正下为6
 	int nStatusFlag;			// 标志0 1 2 正常 删除 其他
 	int nUnitAngle;				// 0 90度 两种

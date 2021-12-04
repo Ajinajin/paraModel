@@ -41,6 +41,12 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	Q_UNUSED(event)
 		setCursor(QCursor(Qt::ClosedHandCursor));
+	if (event->buttons() == Qt::LeftButton)
+	{
+		nOriPos[0] = event->scenePos().x();
+		nOriPos[1] = event->scenePos().y();
+	}
+
 	this->scene()->clearSelection(); 
 	QList<QGraphicsItem*> itemList=this->scene()->items();
 	for (size_t i = 0; i < itemList.size(); i++)
@@ -59,10 +65,19 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
 void BGraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-	if (event->buttons() == Qt::LeftButton) {
+	if (event->buttons() == Qt::LeftButton) 
+	{
 		if (nUnitType == 1)
 			return;
-		emit SceneItemMove(nUnitType, nUnitIdx, event->scenePos());
+		// 发送相对位移
+		QPointF oMove; 
+		oMove.setX(event->scenePos().x() - nOriPos[0]);
+		oMove.setY(event->scenePos().y() - nOriPos[1]); 
+		emit SceneItemMove(nUnitType, nUnitIdx, oMove);
+		// 发送当前绝对位置
+// 		nMoveXY[0] = event->scenePos().x() - nOriPos[0]; 
+// 		nMoveXY[1] = event->scenePos().y() - nOriPos[1]; 
+// 		emit SceneItemMove(nUnitType, nUnitIdx, event->scenePos());
 		QAbstractGraphicsShapeItem::mouseMoveEvent(event);
 	}
 }

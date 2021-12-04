@@ -688,7 +688,7 @@ void ParaModel::OpenFileAction()
 		TopoUnit Topo;
 		Topo.nUnitType = 0;
 		Topo.nCenUnitIdx = 0;
-		for (size_t i = 0; i < 10; i++)
+		for (size_t i = 0; i < 12; i++)
 		{
 			Topo.nAdjUnitIdx[i] = -1;
 		}
@@ -738,6 +738,10 @@ void ParaModel::OpenFileAction()
 		}
 	}
 	if_data = 1;
+
+	pCalShapeData = new DimDataConvert();
+	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
+
 	ParaModel::updateScene();
 }
 
@@ -952,8 +956,8 @@ void ParaModel::drawWall(const std::vector<float>& points) {
 
 int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 {
-	// 0-5 柱梁板墙门窗
-	QString sType = "柱梁板墙门窗";
+	// 0-6 柱梁板墙门窗
+	QString sType = "线柱梁板墙门窗";
 	oUnit.nUnitIdx = listInfo[0].toInt();
 	int nType = sType.indexOf(listInfo[1]);
 	if (nType < 0)
@@ -1261,6 +1265,24 @@ int ParaModel::GetShapeTypeCode(QString shapeTypeStr)
 	}
 	return 0;
 }
+
+//更新画布中单独的元素
+QList<QGraphicsItem*> ParaModel::SelectSceneItem(int nUnitIdx)
+{
+	bool isWall = false;
+	QList<QGraphicsItem*> itemList = pSceneMain.items();
+	QList<QGraphicsItem*> returnList;
+	for (size_t i = 0; i < itemList.size(); i++)
+	{
+		BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
+		if (proxyWidget->nUnitIdx == nUnitIdx)
+		{
+			returnList.append(proxyWidget);
+		}
+	}
+	return returnList;
+}
+
 #pragma endregion
 
 #pragma region 释放资源
@@ -1302,19 +1324,56 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 {
 	int a = nUnitType;
 	int v = nUnitIdx;
-	QPointF pos1 = pos;
-	int s = a + v;
-	//QList<QGraphicsItem*> itemList = pSceneMain.selectedItems();
-	//for (size_t i = 0; i < itemList.size(); i++)
-	//{
-	//	BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
-	//	if (!proxyWidget->isAuxiliary)
-	//	{
-	//		//获取到当前选中的
-	//		proxyWidget->nUnitIdx;
-	//		proxyWidget->nUnitType;
-	//	}
-	//}
+	SimpleShape oShape = viewShape[nUnitIdx]; 
+	int nMoveXY[2]; 
+	// 发送绝对位置信息时 按 相对左下角计算位移
+// 	nMoveXY[0] = pos.x() - pSceneOffset - (oShape.nCen[0] - oShape.nWH[0] / 2); 
+// 	nMoveXY[1] = pos.y() - pSceneOffset - (oShape.nCen[1] - oShape.nWH[1] / 2); 
+	// 发送位移时 直接赋值
+	nMoveXY[0] = pos.x() ; 
+	nMoveXY[1] = pos.y() ; 
+
+	// 计算移动后的新坐标
+	pCalShapeData->MoveBaseUnit(nUnitIdx, nMoveXY, vModelTmpl, viewShape); 
+	
+	// 转为绘图坐标
+	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
+
+	for (size_t i = 0; i < viewShape.size(); i++)
+	{
+// 		if (viewShape[i].unitIdx != nUnitIdx)
+// 			continue;
+		//绘制柱、墙、门、窗
+		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
+		{
+			//在画布中重新找到该元素
+			QList<QGraphicsItem*> viewItem = SelectSceneItem(viewShape[i].unitIdx);
+			for (size_t i = 0; i < viewItem.size(); i++)
+			{
+				BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(viewItem[i]);
+				if (!proxyWidget->isAuxiliary)
+				{
+					int coordX = viewShape[i].nCen[0] + pSceneOffset;
+					int coordY = viewShape[i].nCen[1] + pSceneOffset;
+
+					proxyWidget->m_leftup =  QPointF(coordX, coordY );
+					proxyWidget->m_edge = QPointF(viewShape[i].nWH[0], viewShape[i].nWH[1]);
+				}
+				else
+				{
+					//删除标准线
+				}
+			}
+		}
+	}
+
+	int nCen[2]; 
+	nCen[0] = nMoveXY[0] + vModelTmpl[nUnitIdx].nCenPos[0];
+	nCen[1] = nMoveXY[1] + vModelTmpl[nUnitIdx].nCenPos[2];
+	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y()); 
+	myLogOutLabel->setText(sInfo); 
+// 	QString sInfo1 = QString("%1 %2").arg(nCen[0]).arg(nCen[1]); 
+// 	myLogOutLabel->setText(sInfo1); 
 	return;
 }
 //画布菜单点击
@@ -1331,30 +1390,6 @@ void ParaModel::updateScene()
 	if (vModelTmpl.size() == 0)
 		return;
 
-
-	DimDataConvert* d = new DimDataConvert();
-	VSHAPE viewShape;
-	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
-	//只绘制柱、墙、梁
-	//for (size_t i = 0; i < vModelTmpl.size(); i++)
-	//{
-	//	//柱梁板墙门窗
-	//	if (vModelTmpl[i].nUnitType == 1)//柱
-	//	{
-	//		BasicUnit unit = GetBaseUnit(vModelTmpl[i].nCenUnitIdx);
-	//		int coordX = vModelTmpl[i].nCenPos[0] + unit.oShape.nShapeRange[0] + pSceneOffset;
-	//		int coordY = vModelTmpl[i].nCenPos[1] + unit.oShape.nShapeRange[1] + pSceneOffset;
-	//		//根据构建id找到对应是构件
-	//		BRectangle* pillar = new BRectangle(
-	//			coordX, coordY,
-	//			unit.oShape.nShapeRange[2], unit.oShape.nShapeRange[3],
-	//			BGraphicsItem::ItemType::Rectangle);
-	//		pillar->nUnitType = vModelTmpl[i].nUnitType;
-	//		pillar->nUnitIdx = vModelTmpl[i].nCenUnitIdx;
-	//		pillar->setBrush(ColorHelper(vModelTmpl[i].nUnitType));
-	//		pSceneMain.addItem(pillar);
-	//	}
-	//}
 	//根据数据绘制图形
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
@@ -1432,8 +1467,8 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 		{
 			if (!proxyWidget->isAuxiliary)
 			{
-				proxyWidget->m_leftup = QPointF(pSceneOffset + x, pSceneOffset + y);
-				proxyWidget->m_edge = QPointF(pSceneOffset + x + width, pSceneOffset + y + height);
+// 				proxyWidget->m_leftup = QPointF(pSceneOffset + x, pSceneOffset + y);
+// 				proxyWidget->m_edge = QPointF(pSceneOffset + x + width, pSceneOffset + y + height);
 			}
 			else
 			{
