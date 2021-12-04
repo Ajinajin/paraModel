@@ -344,6 +344,30 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	//menu->addAction(applyBtn_widgetAction);
 	 
 	QAction* act = new QAction(this);
+
+	act->setObjectName((u8"增加构件"));
+	act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
+	act->setText((u8"增加构件"));
+	act->setCheckable(true);
+	connect(act, &QAction::triggered, this, [=]() {
+		//发送信号 提示点击了更换
+		emit SceneMenuAddClick(nUnitType, nUnitIdx);
+		});
+	menu->addAction(act);
+
+	act = new QAction(this);
+	act->setObjectName((u8"删除构件"));
+	act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
+	act->setText((u8"删除构件"));
+	act->setCheckable(true);
+	connect(act, &QAction::triggered, this, [=]() {
+		//发送信号 提示点击了更换
+		emit SceneMenuDeleteClick(nUnitType, nUnitIdx);
+		});
+	menu->addAction(act);
+
+
+	act = new QAction(this);
 	act->setObjectName((u8"更换构件"));
 	act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
 	act->setText((u8"更换构件"));
@@ -353,6 +377,9 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 		emit SceneMenuClick(nUnitType, nUnitIdx);
 		});
 	menu->addAction(act);
+
+
+
 
 
 	menu->exec(QCursor::pos());
