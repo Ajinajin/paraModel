@@ -140,6 +140,8 @@ private:
 	void SceneXClear();
 	void SceneYClear();
 	void SceneZClear();
+	//刷新画布
+	void RefreshScene();
 	//更新画布元素
 	void UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height);
 public:
