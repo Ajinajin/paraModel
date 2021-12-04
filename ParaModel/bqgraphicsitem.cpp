@@ -41,11 +41,10 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	Q_UNUSED(event)
 		setCursor(QCursor(Qt::ClosedHandCursor));
-	if (event->buttons() == Qt::LeftButton)
-	{
+ 
 		nOriPos[0] = event->scenePos().x();
 		nOriPos[1] = event->scenePos().y();
-	}
+ 
 
 	this->scene()->clearSelection(); 
 	QList<QGraphicsItem*> itemList=this->scene()->items();

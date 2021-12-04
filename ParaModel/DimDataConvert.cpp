@@ -3,6 +3,24 @@
 #include <DimDataConvert.h>
 #include <math.h>
 
+//通过墙的构建序号来得到与其连接的两个柱子索引
+void calColumnsIdxFromWallIdx(int wallIdx, int *columnArrayIdx, VTOPOTABLE oglTopTable)
+{
+	//查找墙连接的两个柱构件序号
+	
+	int index = 0;
+
+	int j = 0;
+	while (oglTopTable.at(wallIdx).nAdjUnitIdx[j] != -1)
+	{
+		if (oglTopTable.at(oglTopTable.at(wallIdx).nAdjUnitIdx[j]).nUnitType == 1)
+		{
+			columnArrayIdx[index++] = oglTopTable.at(wallIdx).nAdjUnitIdx[j];
+		}
+		j++;
+	}
+
+}
 
 // 根据中心点和长宽生成矩形形状信息
 int DimDataConvert::GenRectShape(int nCen[2], int nWH[2], SimpleShape& oRectShape)
@@ -88,7 +106,7 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& 
 	int nWH[2], nCen[2];
 	if (oUnit.nUnitAngle == 0)
 	{
-		nWH[0] = oColShape0.nCen[0] - oColShape1.nCen[0];
+		nWH[0] = abs(oColShape0.nCen[0] - oColShape1.nCen[0]);
 		nWH[1] = table[oUnit.nCenUnitIdx].oShape.nThickNess; // 厚度 查表得到
 
 		if (oColShape0.nCen[0] > oColShape1.nCen[0])
@@ -99,7 +117,7 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE & vLayerTopo, VSHAPE& 
 		}
 		else
 		{
-			nWH[0] += (oColShape0.nWH[0] + oColShape1.nWH[0]) / 4;
+			nWH[0] = nWH[0]- (oColShape0.nWH[0] + oColShape1.nWH[0])/2;
 			nCen[1] = oColShape0.nCen[1];
 			nCen[0] = oColShape1.nCen[0] - oColShape1.nWH[0] / 2 - abs(nWH[0] / 2);
 		}
@@ -239,12 +257,15 @@ int DimDataConvert::CalPlaneData(VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw, VU
 // 在墙上插入门窗
 int AddDoorWndInWall(BasicUnit oDoorWnd, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE& vTable, VTOPOTABLE& vLayerTopo, VSHAPE & vPlaneDraw)
 {
-	vTable.push_back(oDoorWnd);
+	//vTable.push_back(oDoorWnd);
 
 	TopoUnit oInsUnit;
 	oInsUnit.nUnitType = oDoorWnd.nUnitType;
-	oInsUnit.nCenUnitIdx = vTable.size() - 1;
+	oInsUnit.nCenUnitIdx = oDoorWnd.nUnitIdx;
 	oInsUnit.nUnitAngle = vLayerTopo[nInsWallIdx].nUnitAngle;
+	oInsUnit.nTopoIdx = vLayerTopo.size();
+	for (int i = 0; i < 12; i++) { oInsUnit.nAdjUnitIdx[i] = -1; }
+	for (int i = 0; i < 4; i++) { oInsUnit.nCenPos[i] = 0; }
 	// 根据插入信息完成插入
 	if (oInsUnit.nUnitAngle == 0)
 	{
@@ -271,16 +292,20 @@ int UpdateNewAdj(int nNewAdj, int nAllOldAdj[12], int nAllNewAdj[12], VTOPOTABLE
 	bool bfirst = true;
 	for (i = 0; i < 12; i++)
 	{
-		if (bfirst && vLayerTopo[nAllOldAdj[i]].nUnitType == nNewType)
+		if (nAllOldAdj[i] != -1 && nAllNewAdj[i]!=-1)
 		{
-			nAllOldAdj[i] = nNewAdj;
-			bfirst = false;
+			if (bfirst && vLayerTopo[nAllOldAdj[i]].nUnitType == nNewType)
+			{
+				nAllOldAdj[i] = nNewAdj;
+				bfirst = false;
+			}
+			else if (!bfirst && vLayerTopo[nAllNewAdj[i]].nUnitType == nNewType)
+			{
+				nAllNewAdj[i] = nNewAdj;
+				break;
+			}
 		}
-		else if (!bfirst && vLayerTopo[nAllNewAdj[i]].nUnitType == nNewType)
-		{
-			nAllNewAdj[i] = nNewAdj;
-			break;
-		}
+		
 	}
 
 	return 0;
@@ -291,25 +316,32 @@ int UpdateNewAdj(int nNewAdj, int nAllOldAdj[12], VTOPOTABLE const& vLayerTopo, 
 	int i = 0;
 	for (i = 0; i < 12; i++)
 	{
-		if (vLayerTopo[nAllOldAdj[i]].nUnitType == nNewType)
+		if (nAllOldAdj[i] != -1)
 		{
-			nAllOldAdj[i] = nNewAdj;
-			break;
+			if (vLayerTopo[nAllOldAdj[i]].nUnitType == nNewType)
+			{
+				nAllOldAdj[i] = nNewAdj;
+				break;
+			}
 		}
+		
 	}
 
 	return 0;
 }
 // 在墙上插入柱子 待完善
-int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE& vTable, VTOPOTABLE& vLayerTopo, VSHAPE & vPlaneDraw)
+int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE vTable, VTOPOTABLE& vLayerTopo, VSHAPE & vPlaneDraw)
 {
-	vTable.push_back(oCol);
+	//vTable.push_back(oCol);
 
 	// 待增加柱子的拓扑单元
 	TopoUnit oInsUnit;
 	oInsUnit.nUnitType = oCol.nUnitType;
-	oInsUnit.nCenUnitIdx = vTable.size() - 1;
+	//oInsUnit.nCenUnitIdx = vTable.size() - 1;
+	oInsUnit.nCenUnitIdx = oCol.nUnitIdx;
 	oInsUnit.nUnitAngle = vLayerTopo[nInsWallIdx].nUnitAngle;
+	oInsUnit.nTopoIdx = vLayerTopo.size();
+	for (int i = 0; i < 12; i++) { oInsUnit.nAdjUnitIdx[i]=-1; }
 	// 根据插入信息完成插入
 	if (oInsUnit.nUnitAngle == 0)
 	{
@@ -346,6 +378,7 @@ int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE& 
 		}
 	}
 	TopoUnit oBeamUnit;
+	for (int j = 0; j < 12; j++) { oBeamUnit.nAdjUnitIdx[j] = -1; }
 	int nNewBeamIdx = -1;
 	if (nBeamIdx != -1)
 	{
@@ -370,12 +403,29 @@ int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE& 
 }
 
 // 在两个柱子之间插入墙 两个柱子之间必须为空 
-int AddWallInCols(BasicUnit oAddUnit, int nAdjCol[2], VTOPOTABLE& vLayerTopo)
+int AddWallInCols(BasicUnit oAddUnit, int nAdjCol[2], VUNITTABLE vTable,VTOPOTABLE& vLayerTopo)
 {
 	// 根据插入信息完成插入
+	TopoUnit oInsUnit;
+	oInsUnit.nUnitType = oAddUnit.nUnitType;
+	oInsUnit.nCenUnitIdx = vTable.size() - 1;
+
+	if (vLayerTopo[nAdjCol[0]].nCenPos[2] == vLayerTopo[nAdjCol[1]].nCenPos[2])
+	{
+		oInsUnit.nUnitAngle = 0;
+	}
+	else
+	{
+		oInsUnit.nUnitAngle = 90;
+	}
+	oInsUnit.nTopoIdx = vLayerTopo.size();
+	for (int i = 0; i < 12; i++){oInsUnit.nAdjUnitIdx[i] = -1;}
+	oInsUnit.nAdjUnitIdx[0] = nAdjCol[0];
+	oInsUnit.nAdjUnitIdx[1] = nAdjCol[1];
+	
 
 	// 更新拓扑结构
-
+	vLayerTopo.push_back(oInsUnit);
 	return 0;
 }
 
@@ -386,7 +436,13 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos,VUNITTABLE 
 	// 判断插入点是否在墙线范围内 返回墙在拓扑图的Idx 或者 虚墙区域关联的两个柱子
 	int nInsWallIdx = 0;
 	int nAdjCol[2];		// 两个中有一个为空则置 [0]为-1
+	
 	// 计算 待完善
+
+	//计算与墙连接的两个柱ID
+	nInsWallIdx = 9;
+	calColumnsIdxFromWallIdx(nInsWallIdx, nAdjCol, vLayerTopo);
+
 
 	if (nInsWallIdx < 0 && nAdjCol[0] < 0)
 		return 1;
@@ -400,7 +456,7 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos,VUNITTABLE 
 
 	// 插入墙
 	else if (oAddUnit.nUnitType == 4 && nAdjCol[0] >= 0)
-		nRe = AddWallInCols(oAddUnit, nAdjCol, vLayerTopo);
+		nRe = AddWallInCols(oAddUnit, nAdjCol, vTable,vLayerTopo);
 
 	// 基于新拓扑结构重新计算几何数值
 
@@ -419,12 +475,11 @@ int GetSelUnitIdx(PixelPos oInsPos, int& nUnitIdx, VTOPOTABLE& vLayerTopp)
 	return 0;
 }
 // 在当前拓扑图中删除构件
-int DimDataConvert::DelBaseUnit(PixelPos oInsPos, VTOPOTABLE& vLayerTopp, int nRealDel)
+int DimDataConvert::DelBaseUnit(int nSelUnitIdx,VTOPOTABLE& vLayerTopp, int nRealDel)
 {
 	int nRe = 0;
 	// 根据点击位置确定选择的构件
-	int nSelUnitIdx;
-	nRe = GetSelUnitIdx(oInsPos, nSelUnitIdx, vLayerTopp);
+	//nRe = GetSelUnitIdx(oInsPos, nSelUnitIdx, vLayerTopp);
 	if (nRe != 0 || nSelUnitIdx < 0)
 		return nRe;
 	// 从关联的构件中删除关联关系 假删除 数据还在 但不可用
@@ -671,3 +726,5 @@ int DimDataConvert::MoveBaseUnit(int nSelUnitIdx, int nMoveXY[2], VTOPOTABLE& vL
 
 	return 0;
 }
+
+

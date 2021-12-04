@@ -66,7 +66,7 @@ public:
 	//多边形体(横着)
 	void InitAndDrawPolygonHorizontal(VINT data, int length);
 	
-	//长方体（墙、板等）x\y\z 为墙体最左下角的点坐标
+	//长方体（墙、板等）x\y\z 为长方体的中心点
 	void InitAndDrawCuboid(int x, int y, int z, int length, int thickness, int height, int type);
 	
 

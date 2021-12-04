@@ -325,6 +325,7 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 		}
 		msg = item->text(0) + "构件加载完成";
 		MyLogOutput(msg);
+
 		});
 	from->setWidget(pModelTreeWidget);
 	pModelTreeWidget->expandAll();
@@ -447,7 +448,7 @@ void ParaModel::updateOGL()
 	paraOglmanagerMain->oglTopTable = this->vModelTmpl;
 	paraOglmanagerMain->oglUnitTable = this->vBaseUnit;
 
-	ParaModel::RefreshScene();
+	//ParaModel::RefreshScene();
 
 }
 
@@ -685,6 +686,7 @@ void ParaModel::ShowUnitSelectWindow()
 		}
 		msg = item->text(0) + "构件更换成功";
 		MyLogOutput(msg);
+
 		});
 	unitSelectWidget->setWindowModality(Qt::ApplicationModal);
 	unitSelectWidget->setWindowFlags(Qt::WindowCloseButtonHint);
@@ -770,16 +772,16 @@ void ParaModel::ShowAllUnitSelectWindow()
 
 		
 		
-		//TODO:
 		//待添加的构建信息
 		BasicUnit oAddUnit = findUnit(nUnitIdx1, vBaseUnit);
 		//坐标
 		PixelPos pos; 
-		pos.nXY[0] = moveXY[0],pos.nXY[1] = moveXY[1];
+		pos.nXY[0] = moveXY[0]- pSceneOffset,pos.nXY[1] = moveXY[1]- pSceneOffset;
 
 		//添加构建入拓扑图
 		pCalShapeData->AddBaseUnit(oAddUnit, pos, vBaseUnit, vModelTmpl,viewShape);
 
+		unitSelectWidget->hide();
 		});
 
 
@@ -1568,13 +1570,6 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 
 
 
-	// 计算移动后的新坐标
-	pCalShapeData->MoveBaseUnit(nUnitIdx, nMoveXY, vModelTmpl, viewShape);
-
-	// 转为绘图坐标
-	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
-
-
 	int nCen[2];
 	nCen[0] = nMoveXY[0] + vModelTmpl[nUnitIdx].nCenPos[0];
 	nCen[1] = nMoveXY[1] + vModelTmpl[nUnitIdx].nCenPos[2];
@@ -1601,6 +1596,8 @@ void ParaModel::SceneMenuDeleteClickAction(int nUnitType, int nUnitIdx)
 {
 	SelectUnitIdx = nUnitIdx;
 	SelectUnitType = nUnitType;
+
+	pCalShapeData->DelBaseUnit(nUnitIdx, vModelTmpl,0);
 	return;
 }
 //增加
@@ -1608,7 +1605,9 @@ void ParaModel::SceneMenuAddClickAction(int nUnitType, int nUnitIdx)
 {
 	SelectUnitIdx = nUnitIdx;
 	SelectUnitType = nUnitType;
-	BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(SelectSceneItem(nUnitIdx)[0]);
+	
+	QList<QGraphicsItem*> x=SelectSceneItem(nUnitIdx);
+	BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(x[0]);
 	moveXY[0] = proxyWidget->nOriPos[0];
 	moveXY[1] = proxyWidget->nOriPos[1];
 	ShowAllUnitSelectWindow();
