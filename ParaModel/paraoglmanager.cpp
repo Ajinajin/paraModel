@@ -30,19 +30,23 @@ QColor ColorHelper(int nUnitType)
 {
 	if (nUnitType == 1)
 	{
-		return QColor(47, 65, 80);
+		//return QColor(47, 65, 80);
+		return QColor(0, 0, 255);
 	}
 	else if (nUnitType == 2)
 	{
-		return QColor(69, 173, 206);
+		//return QColor(69, 173, 206);
+		return QColor(0, 255, 127);
 	}
 	else if (nUnitType == 3)
 	{
-		return QColor(62, 179, 203);
+		//return QColor(62, 179, 203);
+		return QColor(163, 143, 128);
 	}
 	else if (nUnitType == 4)
 	{
-		return QColor(64, 135, 163);
+		//return QColor(64, 135, 163);
+		return QColor(192, 192, 192);
 	}
 	else if (nUnitType == 5)
 	{
@@ -184,7 +188,7 @@ void ParaOGLManager::initializeGL()
 
 	///************ 背景颜色参数调控 ***********/
 	pCore->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	pCore->glClearColor(1.0f, 0.9725f, 0.8627f, 1.0f);
+	pCore->glClearColor(284.0/255.0, 284.0 / 255.0, 255.0/255.0f, 1.0f);
 	//pCore->glClearColor(1.0f, 1.0f, 1.0, 1.0f);
 }
 
@@ -218,7 +222,7 @@ void ParaOGLManager::paintGL()
 	float transOfBeam = 1.0;
 	float transOfBoard = 0.75;
 	float transOfWall = 0.5;
-	float transOfDoor = 0.25;
+	float transOfDoor = 1.0;
 	float transOfWindow = 0.25;
 
 	//绘制三维模型
@@ -794,7 +798,7 @@ void ParaOGLManager::updateGL()
 	GLfloat b = height();
 	projection.perspective(camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 2000.f);
 	//projection.frustum(-10000, 10000, -10000, 10000, -10000, 10000);
-	//projection.ortho(-1000,1000,-1000,1000,-1000,10000);
+	//projection.ortho(-100,100,-100,100,-1,-1000);
 
 	switch (switchView)
 	{
@@ -1033,15 +1037,20 @@ void ParaOGLManager::InitAndDrawCuboid(int x, int y, int z, int length, int thic
 
 
 	//柱、门窗是不透明的，所以对其类型不加深度缓冲
-	if (type != 1 && type != 2 /*&& type != 3 && type != 5 && type != 6*/) { pCore->glDepthMask(GL_FALSE); }//取消深度缓冲
+	
+	pCore->glEnable(GL_DEPTH_TEST);
+	if (type != 1 && type != 2/* && type != 3*/ && type != 5 /*&& type != 6*/) { pCore->glDepthMask(GL_FALSE); }//取消深度缓冲
+	
+	pCore->glDisable(GL_CULL_FACE);
 	pCore->glEnable(GL_BLEND);//开启颜色混合
 	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 
 	pCore->glDrawArrays(GL_QUADS, 0, 24);
 
 	pCore->glDisable(GL_BLEND);
-	if (type != 1 && type != 2/* && type != 3 && type != 5 && type != 6*/) { pCore->glDepthMask(GL_TRUE); }
 
+	if (type != 1 && type != 2 /*&& type != 3*/  && type != 5 /*&& type != 6*/ ) { pCore->glDepthMask(GL_TRUE); }
+	pCore->glDisable(GL_DEPTH_TEST);
 
 
 	
