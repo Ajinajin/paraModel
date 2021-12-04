@@ -447,7 +447,7 @@ void ParaModel::updateOGL()
 	paraOglmanagerMain->oglTopTable = this->vModelTmpl;
 	paraOglmanagerMain->oglUnitTable = this->vBaseUnit;
 
-
+	ParaModel::RefreshScene();
 
 }
 
@@ -822,6 +822,7 @@ void ParaModel::CloseFileAction()
 
 	MyLogOutput("清除数据成功");
 }
+
 void ParaModel::OpenFileAction()
 {
 	if (if_data == 1)
@@ -1462,7 +1463,10 @@ QList<QGraphicsItem*> ParaModel::SelectSceneItem(int nUnitIdx)
 		BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
 		if (proxyWidget->nUnitIdx == nUnitIdx)
 		{
-			returnList.append(proxyWidget);
+			if (proxyWidget->nOriPos[0] >= 0)
+			{ 
+				returnList.append(proxyWidget);
+			}
 		}
 	}
 	return returnList;
@@ -1504,6 +1508,39 @@ void ParaModel::ReleaseSysModel()
 
 #pragma region 画布操作
 
+// 释放系统模型库
+void ParaModel::RefreshScene()
+{
+	if (if_data == 0)
+		return;
+	if (viewShape.size() == 0)
+		return;
+	for (size_t i = 0; i < viewShape.size(); i++)
+	{ 
+		//绘制柱、墙、门、窗
+		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
+		{
+			//在画布中重新找到该元素
+			QList<QGraphicsItem*> viewItem = SelectSceneItem(viewShape[i].unitIdx);
+			for (size_t i = 0; i < viewItem.size(); i++)
+			{
+				BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(viewItem[i]);
+				if (!proxyWidget->isAuxiliary)
+				{
+					int coordX = viewShape[i].nCen[0];
+					int coordY = viewShape[i].nCen[1];
+					proxyWidget->setX(coordX);
+					proxyWidget->setY(coordY);
+				}
+				else
+				{
+					//删除标准线
+				}
+			}
+		}
+	}
+	return;
+}
 //画布移动元素
 void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 {
@@ -1519,7 +1556,7 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 	//如果构件是垂直的修改y
 	
 	nMoveXY[0] = pos.x();
-	nMoveXY[1] =0;
+	nMoveXY[1] = pos.y();
 
 
 
@@ -1529,40 +1566,6 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 	// 转为绘图坐标
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
-	for (size_t i = 0; i < viewShape.size(); i++)
-	{ 
-		if (i == nUnitIdx)
-			int j = 10;
-		//绘制柱、墙、门、窗
-		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
-		{
-			//在画布中重新找到该元素
-			QList<QGraphicsItem*> viewItem = SelectSceneItem(viewShape[i].unitIdx);
-			for (size_t i = 0; i < viewItem.size(); i++)
-			{
-				BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(viewItem[i]);
-				if (!proxyWidget->isAuxiliary)
-				{
-					int coordX = viewShape[i].nCen[0] + pSceneOffset;
-					int coordY = viewShape[i].nCen[1] + pSceneOffset;
-					proxyWidget = new BRectangle(
-						coordX, coordY,
-						viewShape[i].nWH[0], viewShape[i].nWH[1],
-						BGraphicsItem::ItemType::Rectangle);
-					proxyWidget->isAuxiliary = false;
-					proxyWidget->nUnitType = viewShape[i].unitType;
-					proxyWidget->nUnitIdx = viewShape[i].unitIdx;
-					proxyWidget->setBrush(ColorHelper(viewShape[i].unitType));
-					connect(proxyWidget, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
-					connect(proxyWidget, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
-				}
-				else
-				{
-					//删除标准线
-				}
-			}
-		}
-	}
 
 	int nCen[2];
 	nCen[0] = nMoveXY[0] + vModelTmpl[nUnitIdx].nCenPos[0];
@@ -1572,12 +1575,7 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 	myLogOutLabel->setText(sInfo);
 	// 	QString sInfo1 = QString("%1 %2").arg(nCen[0]).arg(nCen[1]); 
 	// 	myLogOutLabel->setText(sInfo1); 
-
-	if (MainDockState != 3)
-	{
-		graphicsViewMain->hide();
-		graphicsViewMain->show();
-	}
+	 
 
 	return;
 }
@@ -1602,14 +1600,14 @@ void ParaModel::SceneMenuAddClickAction(int nUnitType, int nUnitIdx)
 {
 	SelectUnitIdx = nUnitIdx;
 	SelectUnitType = nUnitType;
-	BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(SelectSceneItem(nUnitIdx)[1]);
+	BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(SelectSceneItem(nUnitIdx)[0]);
 	moveXY[0] = proxyWidget->nOriPos[0];
 	moveXY[1] = proxyWidget->nOriPos[1];
 	ShowAllUnitSelectWindow();
 	return;
 }
 
-//更新画布内容
+//画布增加数据
 void ParaModel::AddSceneData()
 {
 	if (if_data == 0)
