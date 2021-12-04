@@ -20,7 +20,7 @@ public:
 		Square,             // 正方形
 		Polygon,            // 多边形
 	};
-	QPointF m_oldleftup;          //中心点，拖动图形
+	QPointF m_oldleftup;       //中心点，拖动图形
 	QPointF m_center;          //中心点，拖动图形
 	QPointF m_edge;            //右下角点，拉动大小
 	QPointF m_leftup;          //左上角点
@@ -46,7 +46,9 @@ protected:
 	virtual void focusOutEvent(QFocusEvent* event) override;
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
-
+private:
+	int nOriPos[2]; 
+	int nMoveXY[2]; 
 protected:
 	QPen m_pen_isSelected;
 	QPen m_pen_noSelected;

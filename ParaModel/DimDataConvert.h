@@ -19,4 +19,14 @@ public:
 
 	// 拓扑结构数据转为现实数据 只考虑矩形截面
 	int CalPlaneData(VTOPOTABLE & vLayerTopo, VSHAPE& vPlaneDraw,  VUNITTABLE table);
+
+	// 在当前拓扑图中增加构件
+	int AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE & vTable, VTOPOTABLE& vLayerTopo, VSHAPE vPlaneDraw); 
+
+	// 在当前拓扑图中删除构件
+	int DelBaseUnit(PixelPos oInsPos, VTOPOTABLE& vLayerTopp, int nRealDel = 1); 
+
+	// 平面图中移动选中单元构件
+	int MoveBaseUnit(int nSelUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw); 
+
 };
