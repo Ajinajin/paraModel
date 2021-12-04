@@ -30,6 +30,8 @@ public:
 	int nUnitIdx;				//构件id
 	bool isAuxiliary;			//是否辅助线
 
+	int nOriPos[2];				//点击位置坐标
+	int nMoveXY[2];				//移动偏移
 
 	ItemType m_type;
 	QPointF getCenter() { return m_center; }
@@ -47,15 +49,14 @@ protected:
 	virtual void focusOutEvent(QFocusEvent* event) override;
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
-private:
-	int nOriPos[2]; 
-	int nMoveXY[2]; 
 protected:
 	QPen m_pen_isSelected;
 	QPen m_pen_noSelected;
 signals:
 	void SceneItemMove(int nUnitType, int nUnitIdx, QPointF pos);
 	void SceneMenuClick(int nUnitType, int nUnitIdx);
+	void SceneMenuAddClick(int nUnitType, int nUnitIdx);
+	void SceneMenuDeleteClick(int nUnitType, int nUnitIdx);
 };
 
 //------------------------------------------------------------------------------

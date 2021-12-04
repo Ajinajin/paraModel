@@ -483,6 +483,9 @@ void ParaOGLManager::paintGL()
 				//墙的厚度
 				thickness = info.oShape.nThickNess;
 
+				//墙的高度暂时与柱一致
+				height = columnHeight;
+
 				//查找墙连接的两个柱之间的距离
 				vPoint columnPoints;		//记录两个柱的中心点
 				vector<BasicUnit> Columns;	//墙连接的柱子
@@ -506,7 +509,7 @@ void ParaOGLManager::paintGL()
 						BasicUnit tmpinfo = findUnit(oglTopTable.at(oglTopTable.at(i).nAdjUnitIdx[j]).nCenUnitIdx, oglUnitTable);
 						//墙高度
 						//height = columnHeight - (tmpinfo.oShape.nShapeRange[2]- tmpinfo.oShape.nShapeRange[0]);//减去梁的高度
-						height = columnHeight;
+						
 					}
 					j++;
 				}

@@ -40,8 +40,10 @@
 		p = NULL ;\
 	 }\
 
+
 #pragma region 初始化窗口
 //初始化属性窗口
+
 void ParaModel::InitPropertyWidget(QDockWidget* from)
 {
 
@@ -681,9 +683,98 @@ void ParaModel::ShowUnitSelectWindow()
 
 			}
 		}
-		msg = item->text(0) + "构件加载成功";
+		msg = item->text(0) + "构件更换成功";
 		MyLogOutput(msg);
 		});
+	unitSelectWidget->setWindowModality(Qt::ApplicationModal);
+	unitSelectWidget->setWindowFlags(Qt::WindowCloseButtonHint);
+	unitSelectWidget->setWindowTitle("请选择构件");
+	unitSelectWidget->setWindowIcon(QIcon(":/qss/res/qss/White/icon2.png"));
+	unitSelectWidget->show();
+}
+
+//显示选择构件窗口
+void ParaModel::ShowAllUnitSelectWindow()
+{
+	QWidget* unitSelectWidget = new QWidget();
+	unitSelectWidget->setFixedWidth(300);
+	unitSelectWidget->setFixedHeight(700);
+
+	QTreeWidget* punitSelectTreeWidget = new QTreeWidget(unitSelectWidget);
+	punitSelectTreeWidget->setFixedWidth(300);
+	punitSelectTreeWidget->setFixedHeight(700);
+	punitSelectTreeWidget->setHeaderHidden(true);
+	QTreeWidgetItem* rootItemPillar = new QTreeWidgetItem(punitSelectTreeWidget);
+	rootItemPillar->setText(0, "柱");
+	QTreeWidgetItem* rootItemBeam = new QTreeWidgetItem(punitSelectTreeWidget);
+	rootItemBeam->setText(0, "梁");
+	QTreeWidgetItem* rootItemBoard = new QTreeWidgetItem(punitSelectTreeWidget);
+	rootItemBoard->setText(0, "板");
+	QTreeWidgetItem* rootItemWall = new QTreeWidgetItem(punitSelectTreeWidget);
+	rootItemWall->setText(0, "墙");
+	QTreeWidgetItem* rootItemDoor = new QTreeWidgetItem(punitSelectTreeWidget);
+	rootItemDoor->setText(0, "门");
+	QTreeWidgetItem* rootItemWindow = new QTreeWidgetItem(punitSelectTreeWidget);
+	rootItemWindow->setText(0, "窗");
+
+	for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
+	{
+
+		QTreeWidgetItem* childItem;
+#pragma region nUnitType赋值
+		if (iter->nUnitType == 1)
+		{
+			childItem = new QTreeWidgetItem(rootItemPillar);
+		}
+		else if (iter->nUnitType == 2)
+		{
+			childItem = new QTreeWidgetItem(rootItemBeam);
+		}
+		else if (iter->nUnitType == 3)
+		{
+			childItem = new QTreeWidgetItem(rootItemBoard);
+		}
+		else if (iter->nUnitType == 4)
+		{
+			childItem = new QTreeWidgetItem(rootItemWall);
+		}
+		else if (iter->nUnitType == 5)
+		{
+			childItem = new QTreeWidgetItem(rootItemDoor);
+		}
+		else if (iter->nUnitType == 6)
+		{
+			childItem = new QTreeWidgetItem(rootItemWindow);
+		}
+#pragma endregion
+		//矩形 1 圆 2 多边形3
+
+		childItem->setText(0, iter->oShape.nShapeName);
+
+		childItem->setData(0, Qt::UserRole, iter->nUnitIdx);
+	}
+
+	//树按钮响应
+	connect(punitSelectTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column) {
+		if (if_data == 0)
+		{
+			MyLogOutput("当前无画布信息，请新建或者打开后在操作");
+			return;
+		}
+		QTreeWidgetItem* parent = item->parent();
+		if (NULL == parent) //注意：最顶端项是没有父节点的，双击这些项时注意(陷阱)
+			return;
+
+		QVariant variant = item->data(0, Qt::UserRole);
+		int nUnitIdx1 = variant.value<int>();
+
+		int a = moveXY[0] + moveXY[1]+1;
+		//
+
+
+		});
+
+
 	unitSelectWidget->setWindowModality(Qt::ApplicationModal);
 	unitSelectWidget->setWindowFlags(Qt::WindowCloseButtonHint);
 	unitSelectWidget->setWindowTitle("请选择构件");
@@ -1476,10 +1567,12 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 	int nCen[2];
 	nCen[0] = nMoveXY[0] + vModelTmpl[nUnitIdx].nCenPos[0];
 	nCen[1] = nMoveXY[1] + vModelTmpl[nUnitIdx].nCenPos[2];
+
 	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y());
 	myLogOutLabel->setText(sInfo);
 	// 	QString sInfo1 = QString("%1 %2").arg(nCen[0]).arg(nCen[1]); 
 	// 	myLogOutLabel->setText(sInfo1); 
+
 	if (MainDockState != 3)
 	{
 		graphicsViewMain->hide();
@@ -1496,6 +1589,26 @@ void ParaModel::SceneMenuClickAction(int nUnitType, int nUnitIdx)
 	ShowUnitSelectWindow();
 	return;
 }
+
+//删除
+void ParaModel::SceneMenuDeleteClickAction(int nUnitType, int nUnitIdx)
+{
+	SelectUnitIdx = nUnitIdx;
+	SelectUnitType = nUnitType;
+	return;
+}
+//增加
+void ParaModel::SceneMenuAddClickAction(int nUnitType, int nUnitIdx)
+{
+	SelectUnitIdx = nUnitIdx;
+	SelectUnitType = nUnitType;
+	BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(SelectSceneItem(nUnitIdx)[1]);
+	moveXY[0] = proxyWidget->nOriPos[0];
+	moveXY[1] = proxyWidget->nOriPos[1];
+	ShowAllUnitSelectWindow();
+	return;
+}
+
 //更新画布内容
 void ParaModel::AddSceneData()
 {
@@ -1526,6 +1639,8 @@ void ParaModel::AddSceneData()
 			viewItem->nUnitIdx = viewShape[i].unitIdx;
 			viewItem->setBrush(ColorHelper(viewShape[i].unitType));
 			connect(viewItem, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+			connect(viewItem, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+			connect(viewItem, &BRectangle::SceneMenuDeleteClick, this, &ParaModel::SceneMenuDeleteClickAction);
 			connect(viewItem, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
 			pSceneMain.addItem(viewItem);
 		}

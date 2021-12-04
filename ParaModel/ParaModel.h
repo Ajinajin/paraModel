@@ -70,8 +70,9 @@ private:
 	// mainLabel显示的图像
 	QMenu* popMenu_In_ListWidget_;					/*弹出菜单被使用无法删除*/
 
-	int SelectUnitIdx;								//选中的构件id
-	int SelectUnitType;								//选中的构件类型
+	int SelectUnitIdx;
+	int SelectUnitType;
+	int moveXY[2];
 
 
 public:
@@ -112,6 +113,7 @@ private:
 
 	//构件选择窗口
 	void ShowUnitSelectWindow();
+	void ShowAllUnitSelectWindow();
 
 	//获取系统构建库中的构建
 	BasicUnit GetBaseUnit(int idx);
@@ -163,4 +165,6 @@ public slots:
 
 	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//画布移动元素
 	void SceneMenuClickAction(int nUnitType, int nUnitIdx);	//画布菜单点击
+	void SceneMenuDeleteClickAction(int nUnitType, int nUnitIdx);	//画布菜单点击
+	void SceneMenuAddClickAction(int nUnitType, int nUnitIdx);	//画布菜单点击
 };
