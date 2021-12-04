@@ -40,8 +40,10 @@
 		p = NULL ;\
 	 }\
 
-#pragma region 
+
+#pragma region 初始化窗口
 //初始化属性窗口
+
 void ParaModel::InitPropertyWidget(QDockWidget* from)
 {
 
@@ -1471,10 +1473,12 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 	int nCen[2];
 	nCen[0] = nMoveXY[0] + vModelTmpl[nUnitIdx].nCenPos[0];
 	nCen[1] = nMoveXY[1] + vModelTmpl[nUnitIdx].nCenPos[2];
-	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y());
-	myLogOutLabel->setText(sInfo);
-	// 	QString sInfo1 = QString("%1 %2").arg(nCen[0]).arg(nCen[1]); 
-	// 	myLogOutLabel->setText(sInfo1); 
+
+	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y()); 
+	myLogOutLabel->setText(sInfo); 
+// 	QString sInfo1 = QString("%1 %2").arg(nCen[0]).arg(nCen[1]); 
+// 	myLogOutLabel->setText(sInfo1); 
+
 	if (MainDockState != 3)
 	{
 		graphicsViewMain->hide();
