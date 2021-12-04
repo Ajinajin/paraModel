@@ -23,6 +23,8 @@ struct Point//点结构(二维)
 };
 typedef vector<Point> vPoint;
 
+//根据中心构件单元Id去构件库里查具体模型参数
+BasicUnit findUnit(int idx, VUNITTABLE oglUnitTable);
 
 class ParaOGLManager : public QOpenGLWidget
 {
@@ -68,8 +70,7 @@ public:
 	void InitAndDrawCuboid(int x, int y, int z, int length, int thickness, int height, int type);
 	
 
-	//根据中心构件单元Id去构件库里查具体模型参数
-	BasicUnit findUnit(int idx, VUNITTABLE oglUnitTable);
+	
 
 	VTOPOTABLE oglTopTable;	//绘制所需的拓扑结构表
 	VUNITTABLE oglUnitTable;	//绘制所需的结构单元表

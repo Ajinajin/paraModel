@@ -768,9 +768,17 @@ void ParaModel::ShowAllUnitSelectWindow()
 		QVariant variant = item->data(0, Qt::UserRole);
 		int nUnitIdx1 = variant.value<int>();
 
-		int a = moveXY[0] + moveXY[1]+1;
-		//
+		
+		
+		//TODO:
+		//待添加的构建信息
+		BasicUnit oAddUnit = findUnit(nUnitIdx1, vBaseUnit);
+		//坐标
+		PixelPos pos; 
+		pos.nXY[0] = moveXY[0],pos.nXY[1] = moveXY[1];
 
+		//添加构建入拓扑图
+		pCalShapeData->AddBaseUnit(oAddUnit, pos, vBaseUnit, vModelTmpl,viewShape);
 
 		});
 

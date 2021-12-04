@@ -1062,7 +1062,7 @@ void ParaOGLManager::InitAndDrawCuboid(int x, int y, int z, int length, int thic
 	delete[] vertices;
 }
 
-BasicUnit ParaOGLManager::findUnit(int idx, VUNITTABLE oglUnitTable)
+BasicUnit findUnit(int idx, VUNITTABLE oglUnitTable)
 {
 	for (int i = 0; i < oglUnitTable.size(); i++)
 	{
