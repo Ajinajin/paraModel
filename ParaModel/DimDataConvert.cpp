@@ -461,31 +461,31 @@ int ModifyBaseUnitProp(void* pValue, VTOPOTABLE& vLayerTopp)
 }
 
 // 移动门窗
-int MovDoorWndInWall(int nMoveUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
+int MovDoorWndInWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	// 门窗只能在墙范围内沿墙方向移动
 	// 得到包含门窗的墙
 	int nInsWallIdx = vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0];
 
 	// 符合移动条件 移动方向一致且值不为0
-	if (nMoveXY[0] != 0 && vLayerTopo[nInsWallIdx].nUnitAngle == 0)
+	if (nMoveX != 0 && vLayerTopo[nInsWallIdx].nUnitAngle == 0)
 	{
 		// 计算门窗移动的合规范围 nCenPos[0]是相對位置
 		//不能小于0;
-		//不能大于墻的寬度-元素的中心點;
+		//不能大于墻的寬度-元素的中心點宽;
 		//如果超过等于极限值
-		 
-		int nLeft= 0;
-		 
+
+		int nLeft = 0;
+
 
 		int doorW = table[vLayerTopo[nMoveUnitIdx].nCenUnitIdx].oShape.nShapeRange[0] / 2; //元素的中心点
-		int nWallWH = vPlaneDraw[vLayerTopo[nInsWallIdx].nTopoIdx].nWH[0] ;					//墻的寬度
+		int nWallWH = vPlaneDraw[vLayerTopo[nInsWallIdx].nTopoIdx].nWH[0];					//墻的寬度
 		int nRight = vPlaneDraw[vLayerTopo[nInsWallIdx].nTopoIdx].nWH[0] - doorW;
-		
-		
+
+
 		// 按墙方向更改门窗位置
-		int nNewX = vLayerTopo[nMoveUnitIdx].nCenPos[0] + nMoveXY[0];
-		
+		int nNewX = vLayerTopo[nMoveUnitIdx].nCenPos[0] + nMoveX;
+
 		if (nNewX < nLeft)
 			nNewX = nLeft;
 
@@ -493,18 +493,25 @@ int MovDoorWndInWall(int nMoveUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo, V
 			nNewX = nRight;
 		vLayerTopo[nMoveUnitIdx].nCenPos[0] = nNewX;
 	}
-	else if (nMoveXY[1] != 0 && vLayerTopo[nInsWallIdx].nUnitAngle == 90)
+	else if (nMoveY != 0 && vLayerTopo[nInsWallIdx].nUnitAngle == 90)
 	{
-		// 计算门窗移动的合规范围
-		int nBottom;
-		nBottom = vPlaneDraw[nMoveUnitIdx].nWH[1] / 2;
-		int nUp = vPlaneDraw[nInsWallIdx].nWH[1] - nBottom;
+
+		// 计算门窗移动的合规范围 nCenPos[0]是相對位置
+		//不能小于0;
+		//不能大于墻的高度-元素的中心點Y - 柱子的宽度/2;
+		//(vPlaneDraw[(vLayerTopo[(vLayerTopo[24]).nAdjUnitIdx[0]]).nAdjUnitIdx[0]]).nWH/2
+		int nBottom = 0;
+		int doorW = table[vLayerTopo[nMoveUnitIdx].nCenUnitIdx].oShape.nShapeRange[0] / 2; //元素的中心点
+		int PillarH = (vPlaneDraw[(vLayerTopo[(vLayerTopo[24]).nAdjUnitIdx[0]]).nAdjUnitIdx[0]]).nWH[1] / 2; //柱子的高度 / 2;
+		int nUp = vPlaneDraw[nInsWallIdx].nWH[1] - doorW- PillarH;
 		// 按墙方向更改门窗位置
-		int nNewY = vLayerTopo[nMoveUnitIdx].nCenPos[1] + nMoveXY[0];
+		int nNewY = vLayerTopo[nMoveUnitIdx].nCenPos[1] + (nMoveY * -1) ;
 		if (nNewY < nBottom)
 			nNewY = nBottom;
 		else if (nNewY > nUp)
 			nNewY = nUp;
+
+		 
 		vLayerTopo[nMoveUnitIdx].nCenPos[0] = nNewY;
 	}
 
@@ -561,11 +568,11 @@ int GetColAdjWall(int nSelWallIdx, VTOPOTABLE const& vLayerTopo, VVINT& vvAdjWal
 	return 0;
 }
 // 移动柱子 由PreMoveWall带动的移动
-int MovCol(int nMoveUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo)
+int MovCol(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo)
 {
 	// 只移动柱子
-	vLayerTopo[nMoveUnitIdx].nCenPos[0] += nMoveXY[0];
-	vLayerTopo[nMoveUnitIdx].nCenPos[2] += nMoveXY[1];
+	vLayerTopo[nMoveUnitIdx].nCenPos[0] += nMoveX;
+	vLayerTopo[nMoveUnitIdx].nCenPos[2] += nMoveY;
 
 	return 0;
 }
@@ -653,7 +660,7 @@ int CalWallMoveRange(int nWallIdx, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, i
 	return 0;
 }
 // 移动墙
-int MovWall(int nMoveUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw)
+int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw)
 {
 	int nRe = 0;
 	// 墙只能沿垂直墙方向移动
@@ -665,34 +672,34 @@ int MovWall(int nMoveUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo, VSHAPE& vP
 	nRe = CalWallMoveRange(nMoveUnitIdx, vLayerTopo, vPlaneDraw, nAdjCol, nXYMoveRange);
 
 	// 按墙垂直方向计算移动距离
-	if (nMoveXY[0] <= nXYMoveRange[0][0] || nMoveXY[0] >= nXYMoveRange[0][1])
-		nMoveXY[0] = 0;
-	if (nMoveXY[1] <= nXYMoveRange[1][0] || nMoveXY[1] >= nXYMoveRange[1][1])
-		nMoveXY[1] = 0;
+	if (nMoveX <= nXYMoveRange[0][0] || nMoveX >= nXYMoveRange[0][1])
+		nMoveX = 0;
+	if (nMoveY <= nXYMoveRange[1][0] || nMoveY >= nXYMoveRange[1][1])
+		nMoveY = 0;
 	// 移动两端柱子
 	int nColNum = 2;
 	int i = 0;
 	for (i = 0; i < nColNum; i++)
 	{
-		MovCol(nAdjCol[i], nMoveXY, vLayerTopo);
+		MovCol(nAdjCol[i], nMoveX, nMoveY, vLayerTopo);
 	}
 	// 重新计算几何数值
 
 	return 0;
 }
 // 平面图中移动选中单元构件
-int DimDataConvert::MoveBaseUnit(int nSelUnitIdx, int nMoveXY[2], VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
+int DimDataConvert::MoveBaseUnit(int nSelUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	int nRe = 0;
 	// 平面图中 墙门窗可动 判断是否是墙门窗
 	int nUnitType = vLayerTopo[nSelUnitIdx].nUnitType;
 	// 判断待移动构件是否是门窗
 	if (nUnitType > 4)
-		nRe = MovDoorWndInWall(nSelUnitIdx, nMoveXY, vLayerTopo, vPlaneDraw, table);
+		nRe = MovDoorWndInWall(nSelUnitIdx,  nMoveX,  nMoveY, vLayerTopo, vPlaneDraw, table);
 
 	// 移动墙
 	else if (nUnitType == 4)
-		nRe = MovWall(nSelUnitIdx, nMoveXY, vLayerTopo, vPlaneDraw);
+		nRe = MovWall(nSelUnitIdx,  nMoveX,  nMoveY, vLayerTopo, vPlaneDraw);
 
 	return 0;
 }

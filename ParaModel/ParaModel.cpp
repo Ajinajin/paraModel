@@ -1526,7 +1526,7 @@ void ParaModel::RefreshScene()
 		return;
 
 	// 计算移动后的新坐标
-	pCalShapeData->MoveBaseUnit(SelectUnitIdx, nMoveXY, vModelTmpl, viewShape, vBaseUnit);
+	pCalShapeData->MoveBaseUnit(SelectUnitIdx, nMoveXY[0], nMoveXY[1], vModelTmpl, viewShape, vBaseUnit);
 	nMoveXY[0] = 0;
 	nMoveXY[1] = 0;
 	// 转为绘图坐标
