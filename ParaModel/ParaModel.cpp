@@ -681,12 +681,12 @@ void ParaModel::ShowUnitSelectWindow()
 
 			}
 		}
-		msg = item->text(0) + "�����������";
+		msg = item->text(0) + "构件加载成功";
 		MyLogOutput(msg);
 		});
 	unitSelectWidget->setWindowModality(Qt::ApplicationModal);
 	unitSelectWidget->setWindowFlags(Qt::WindowCloseButtonHint);
-	unitSelectWidget->setWindowTitle("��ѡ�񹹼�");
+	unitSelectWidget->setWindowTitle("请选择构件");
 	unitSelectWidget->setWindowIcon(QIcon(":/qss/res/qss/White/icon2.png"));
 	unitSelectWidget->show();
 }
@@ -1415,7 +1415,6 @@ void ParaModel::ReleaseSysModel()
 
 //画布移动元素
 void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
-
 {
 	int a = nUnitType;
 	int v = nUnitIdx;
@@ -1425,8 +1424,13 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 // 	nMoveXY[0] = pos.x() - pSceneOffset - (oShape.nCen[0] - oShape.nWH[0] / 2); 
 // 	nMoveXY[1] = pos.y() - pSceneOffset - (oShape.nCen[1] - oShape.nWH[1] / 2); 
 	// 发送位移时 直接赋值
+	//如果构件是水平的修改x
+	//如果构件是垂直的修改y
+	
 	nMoveXY[0] = pos.x();
-	nMoveXY[1] = pos.y();
+	nMoveXY[1] =0;
+
+
 
 	// 计算移动后的新坐标
 	pCalShapeData->MoveBaseUnit(nUnitIdx, nMoveXY, vModelTmpl, viewShape);
@@ -1435,9 +1439,9 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
 	for (size_t i = 0; i < viewShape.size(); i++)
-	{
-		if (viewShape[i].unitIdx != nUnitIdx)
-			continue;
+	{ 
+		if (i == nUnitIdx)
+			int j = 10;
 		//绘制柱、墙、门、窗
 		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
 		{
@@ -1502,8 +1506,7 @@ void ParaModel::AddSceneData()
 	//清除画布
 	SceneMainClear();
 
-	DimDataConvert* d = new DimDataConvert();
-	VSHAPE viewShape;
+	DimDataConvert* d = new DimDataConvert(); 
 	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
 	//根据数据绘制图形

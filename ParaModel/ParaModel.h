@@ -70,8 +70,8 @@ private:
 	// mainLabel显示的图像
 	QMenu* popMenu_In_ListWidget_;					/*弹出菜单被使用无法删除*/
 
-	int SelectUnitIdx;
-	int SelectUnitType;
+	int SelectUnitIdx;								//选中的构件id
+	int SelectUnitType;								//选中的构件类型
 
 
 public:
