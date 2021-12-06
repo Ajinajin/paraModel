@@ -31,7 +31,16 @@ void BGraphicsItem::focusInEvent(QFocusEvent* event)
 void BGraphicsItem::focusOutEvent(QFocusEvent* event)
 {
 	Q_UNUSED(event);
-	this->setPen(m_pen_noSelected);
+	if (nUnitType == 0)
+	{
+		QPen pen = QPen(Qt::yellow);
+		pen.setStyle(Qt::DashLine);
+		this->setPen(pen);
+	}
+	else
+	{
+		this->setPen(m_pen_noSelected);
+	}
 	setSelected(false);
 }
 
@@ -270,14 +279,18 @@ BRectangle::BRectangle(qreal x, qreal y, qreal width, qreal height, ItemType typ
 	: BGraphicsItem(QPointF(x, y), QPointF(x + width / 2, y + height / 2), type)
 {
 
-	m_leftup.setX(int((m_center.x() * 2 - m_edge.x() + 10) / 20) * 20);
-	m_leftup.setY(int((m_center.y() * 2 - m_edge.y() + 10) / 20) * 20);
+	if (nUnitIdx == 15)
+	{
+		int k = 0;
+	}
+	m_leftup.setX(int(m_center.x() - (m_edge.x()- m_center.x())  ));
+	m_leftup.setY(int(m_center.y() - (m_edge.y() - m_center.y()) ));
 
 }
 
 QRectF BRectangle::boundingRect() const
 {
-	return QRectF(m_leftup.x(), m_leftup.y(), int((m_edge.x() - m_leftup.x() + 10) / 20) * 20, int((m_edge.y() - m_leftup.y() + 10) / 20) * 20);
+	return QRectF(m_leftup.x(), m_leftup.y(), m_edge.x() - m_leftup.x(), m_edge.y() - m_leftup.y());
 }
 
 void BRectangle::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -287,10 +300,11 @@ void BRectangle::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 	painter->setPen(this->pen());
 	painter->setBrush(this->brush());
 
-	m_edge.setX(int(m_edge.x() + 10) / 20 * 20);
-	m_edge.setY(int(m_edge.y() + 10) / 20 * 20);
-
-	QRectF ret(m_leftup.x(), m_leftup.y(), int((m_edge.x() - m_leftup.x() + 10) / 20) * 20, int((m_edge.y() - m_leftup.y() + 10) / 20) * 20);
+	if (nUnitIdx == 15)
+	{
+		int k = 0;
+	}
+	QRectF ret(m_leftup.x(), m_leftup.y(), m_edge.x() - m_leftup.x(), m_edge.y()- m_leftup.y());
 	painter->drawRect(ret);
 }
 

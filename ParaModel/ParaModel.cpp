@@ -1624,11 +1624,7 @@ void ParaModel::AddSceneData()
 	if (vModelTmpl.size() == 0)
 		return;
 	//清除画布
-	SceneMainClear();
-
-	DimDataConvert* d = new DimDataConvert();
-
-	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
+	SceneMainClear(); 
 
 	//加载标准线
 	for (size_t i = 0; i < viewShape.size(); i++)
@@ -1683,6 +1679,10 @@ void ParaModel::AddSceneData()
 	//根据数据绘制图形
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
+		if (viewShape[i].unitIdx == 15)
+		{
+			int k = 0;
+		}
 		//绘制柱、墙、门、窗
 		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
 		{
