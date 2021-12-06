@@ -174,6 +174,7 @@ public slots:
 	void NewFileAction();
 	void OpenFileAction();
 	void CloseFileAction();
+	void ExportFileAction();
 
 	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//画布移动元素
 	void SceneMenuClickAction(int nUnitType, int nUnitIdx);	//画布菜单点击

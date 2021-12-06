@@ -399,6 +399,14 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	//connect(act, &QAction::triggered, this, &ParaModel::SaveasFileAction);
 
 
+
+	act = new QAction(this);
+	act->setObjectName(("导出K文件"));
+	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
+	act->setText(("导出K文件")); 
+	pannel->addLargeAction(act);
+	connect(act, &QAction::triggered, this, &ParaModel::ExportFileAction);
+
 	act = new QAction(this);
 	act->setObjectName(("关闭"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
@@ -730,6 +738,14 @@ void ParaModel::NewFileAction()
 
 
 	MyLogOutput("新建场景文件成功");
+}
+/// <summary>
+/// 导出k文件
+/// </summary>
+void ParaModel::ExportFileAction()
+{
+	//TODO::让用户选择文件夹，在选择的文件夹中导出k文件
+	return;
 }
 
 /// <summary>
