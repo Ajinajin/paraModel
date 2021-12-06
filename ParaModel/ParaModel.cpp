@@ -809,6 +809,9 @@ ParaModel::ParaModel(QWidget* parent)
 }
 
 #pragma region 界面交互
+/// <summary>
+/// 新建场景
+/// </summary>
 void ParaModel::NewFileAction()
 {
 	if (if_data == 1)
@@ -821,6 +824,9 @@ void ParaModel::NewFileAction()
 	MyLogOutput("新建场景文件成功");
 }
 
+/// <summary>
+/// 关闭场景
+/// </summary>
 void ParaModel::CloseFileAction()
 {
 	if_data = 0;
@@ -833,6 +839,9 @@ void ParaModel::CloseFileAction()
 	MyLogOutput("清除数据成功");
 }
 
+/// <summary>
+/// 打开场景
+/// </summary>
 void ParaModel::OpenFileAction()
 {
 	if (if_data == 1)
@@ -1145,8 +1154,6 @@ void ParaModel::drawWall(const std::vector<float>& points) {
 
 #pragma region 初始化数据
 
-
-
 int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 {
 	// 0-6 柱梁板墙门窗
@@ -1346,7 +1353,6 @@ BasicUnit ParaModel::GetBaseUnit(int idx)
 	return b;
 }
 
-
 //获取加载构建集中的构建
 TopoUnit ParaModel::GetTopoUnit(int idx)
 {
@@ -1508,7 +1514,6 @@ void ParaModel::ReleaseUISource()
 	return;
 }
 
-
 // 释放系统模型库
 void ParaModel::ReleaseSysModel()
 {
@@ -1577,7 +1582,7 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 	nMoveXY[1] = pos.y();
 	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y());
 	myLogOutLabel->setText(sInfo);
-
+	ParaModel::RefreshScene();
 	return;
 }
 //画布菜单点击
@@ -1588,7 +1593,6 @@ void ParaModel::SceneMenuClickAction(int nUnitType, int nUnitIdx)
 	ShowUnitSelectWindow();
 	return;
 }
-
 //删除
 void ParaModel::SceneMenuDeleteClickAction(int nUnitType, int nUnitIdx)
 {
@@ -1611,7 +1615,6 @@ void ParaModel::SceneMenuAddClickAction(int nUnitType, int nUnitIdx)
 	ShowAllUnitSelectWindow();
 	return;
 }
-
 //画布增加数据
 void ParaModel::AddSceneData()
 {
@@ -1665,6 +1668,7 @@ void ParaModel::AddSceneData()
 					8000, 2,
 					BGraphicsItem::ItemType::Rectangle);
 				divideLine->isAuxiliary = true;
+				divideLine->nUnitType = 0;
 				divideLine->nUnitIdx = viewShape[i].unitIdx;
 				/*QBrush b = (Qt::DashLine);
 				b.setColor(ColorHelper(viewShape[i].unitType));
@@ -1672,6 +1676,7 @@ void ParaModel::AddSceneData()
 				QPen pen = QPen(Qt::yellow);
 				pen.setStyle(Qt::DashLine);
 				divideLine->setPen(pen);
+				connect(divideLine, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
 				pSceneMain.addItem(divideLine);
 			}
 			else
@@ -1681,6 +1686,7 @@ void ParaModel::AddSceneData()
 					2, 8000,
 					BGraphicsItem::ItemType::Rectangle);
 				divideLine->isAuxiliary = true;
+				divideLine->nUnitType = 0;
 				divideLine->nUnitIdx = viewShape[i].unitIdx;
 				/*QBrush b = (Qt::DashLine);
 				b.setColor(ColorHelper(viewShape[i].unitType));
@@ -1688,6 +1694,7 @@ void ParaModel::AddSceneData()
 				QPen pen = QPen(Qt::yellow);
 				pen.setStyle(Qt::DashLine);
 				divideLine->setPen(pen);
+				connect(divideLine, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
 				pSceneMain.addItem(divideLine);
 			}
 
@@ -1765,9 +1772,9 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 void ParaModel::SceneMainClear()
 {
 	pSceneMain.clear();
-	for (int x = 0; x <= 2000; x += 20)
+	for (int x = 0; x <= 2000; x += 10)
 		pSceneMain.addLine(0, x, 2000, x, QPen(Qt::red));
-	for (int y = 0; y <= 2000; y += 20)
+	for (int y = 0; y <= 2000; y += 10)
 		pSceneMain.addLine(y, 0, y, 2000, QPen(Qt::red));
 }
 void ParaModel::SceneXClear()

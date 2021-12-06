@@ -25,7 +25,7 @@ public:
 	QPointF m_edge;            //右下角点，拉动大小
 	QPointF m_leftup;          //左上角点
 	BPointItemList m_pointList;//绘图形的各个点
-	
+	Qt::MouseButton operMourse;//当前鼠标操作结束后 
 	int nUnitType;				//构件类型
 	int nUnitIdx;				//构件id
 	bool isAuxiliary;			//是否辅助线
@@ -49,6 +49,7 @@ protected:
 	virtual void focusOutEvent(QFocusEvent* event) override;
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 protected:
 	QPen m_pen_isSelected;
 	QPen m_pen_noSelected;
