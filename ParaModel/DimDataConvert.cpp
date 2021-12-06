@@ -284,18 +284,66 @@ int AddDoorWndInWall(BasicUnit oDoorWnd, int nInsWallIdx, PixelPos oInsPos, VUNI
 	// 根据插入信息完成插入
 	if (oInsUnit.nUnitAngle == 0)
 	{
-		oInsUnit.nCenPos[2] = vPlaneDraw[nInsWallIdx].nCen[1];
+		//oInsUnit.nCenPos[2] = vPlaneDraw[nInsWallIdx].nCen[1];
 		int nWallLeft = vPlaneDraw[nInsWallIdx].nCen[0] - vPlaneDraw[nInsWallIdx].nWH[0] / 2;
-		oInsUnit.nCenPos[0] = oInsPos.nXY[0] - nWallLeft;
+		oInsUnit.nCenPos[0] = abs(oInsPos.nXY[0] - nWallLeft);
+
+		//门窗的起始点高度先写死
+		if (oInsUnit.nUnitType == 5){oInsUnit.nCenPos[1] = 0;}
+		if (oInsUnit.nUnitType == 6) { oInsUnit.nCenPos[1] = 80; }
+		
 	}
 	else if (oInsUnit.nUnitAngle == 90)
 	{
-		oInsUnit.nCenPos[0] = vPlaneDraw[nInsWallIdx].nCen[1];
-		int nWallBottom = vPlaneDraw[nInsWallIdx].nCen[1] - vPlaneDraw[nInsWallIdx].nWH[1] / 2;
-		oInsUnit.nCenPos[2] = oInsPos.nXY[0] - nWallBottom;
+		//oInsUnit.nCenPos[0] = vPlaneDraw[nInsWallIdx].nCen[0];
+		int nWallBottom = vPlaneDraw[nInsWallIdx].nCen[1] + vPlaneDraw[nInsWallIdx].nWH[1] / 2;
+		//oInsUnit.nCenPos[2] = oInsPos.nXY[0] - nWallBottom;
+		oInsUnit.nCenPos[0] = abs(oInsPos.nXY[1] - nWallBottom);
+		//门窗的起始点高度先写死
+		if (oInsUnit.nUnitType == 5) { oInsUnit.nCenPos[1] = 0; }
+		if (oInsUnit.nUnitType == 6) { oInsUnit.nCenPos[1] = 80; }
+
 	}
 	// 更新拓扑结构
 	oInsUnit.nAdjUnitIdx[0] = nInsWallIdx;
+	vLayerTopo.push_back(oInsUnit);
+	return 0;
+}
+
+//在墙上添加梁
+int AddBeamOnWall(BasicUnit oBeam, int nInsWallIdx, VUNITTABLE vTable, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw)
+{
+	// 待增加梁的拓扑单元
+	TopoUnit oInsUnit;
+	oInsUnit.nUnitType = oBeam.nUnitType;
+	//oInsUnit.nCenUnitIdx = vTable.size() - 1;
+	oInsUnit.nCenUnitIdx = oBeam.nUnitIdx;
+	oInsUnit.nUnitAngle = vLayerTopo[nInsWallIdx].nUnitAngle;
+	oInsUnit.nTopoIdx = vLayerTopo.size();
+	for (int i= 0; i < 12; i++) { oInsUnit.nAdjUnitIdx[i]=-1; }
+
+	for (int i = 0; i < 4; i++) { oInsUnit.nCenPos[i]=0; }
+	oInsUnit.nCenPos[0] = vLayerTopo[nInsWallIdx].nCenPos[0];
+	oInsUnit.nCenPos[1] = vLayerTopo[nInsWallIdx].nCenPos[1] * 2 + (vTable[oInsUnit.nCenUnitIdx].oShape.nShapeRange[3]- vTable[oInsUnit.nCenUnitIdx].oShape.nShapeRange[1])/2;
+	oInsUnit.nCenPos[2] = vLayerTopo[nInsWallIdx].nCenPos[2];
+
+	//更新新梁的拓扑关系
+	int nColIdx[2];
+	calColumnsIdxFromWallIdx(nInsWallIdx, nColIdx, vLayerTopo);
+	oInsUnit.nAdjUnitIdx[0] = nColIdx[0];
+	oInsUnit.nAdjUnitIdx[1] = nColIdx[1];
+	oInsUnit.nAdjUnitIdx[2] = nInsWallIdx;
+
+	//更新旧墙的拓扑关系
+	for (int i = 0; i < 12; i++)
+	{
+		if (vLayerTopo[nInsWallIdx].nAdjUnitIdx[i] == -1)
+		{
+			vLayerTopo[nInsWallIdx].nAdjUnitIdx[i] = oInsUnit.nTopoIdx;
+			break;
+		}
+	}
+	
 	vLayerTopo.push_back(oInsUnit);
 	return 0;
 }
@@ -432,6 +480,7 @@ int AddWallInCols(BasicUnit oAddUnit, int nAdjCol[2], VUNITTABLE vTable,VTOPOTAB
 	TopoUnit oInsUnit;
 	oInsUnit.nUnitType = oAddUnit.nUnitType;
 	oInsUnit.nCenUnitIdx = vTable.size() - 1;
+	oInsUnit.nCenUnitIdx = oAddUnit.nUnitIdx;
 
 	if (vLayerTopo[nAdjCol[0]].nCenPos[2] == vLayerTopo[nAdjCol[1]].nCenPos[2])
 	{
@@ -474,15 +523,67 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE
 		return 1;
 	// 判断待插入构件是否是门窗
 	if (oAddUnit.nUnitType > 4)
+	{
 		nRe = AddDoorWndInWall(oAddUnit, nInsWallIdx, oInsPos, vTable, vLayerTopo, vPlaneDraw);
+	}
+		
 
 	// 插入柱子
 	else if (oAddUnit.nUnitType == 1)
+	{
 		nRe = AddColInWall(oAddUnit, nInsWallIdx, oInsPos, vTable, vLayerTopo, vPlaneDraw);
+	}
+	// 插入梁
+	else if (oAddUnit.nUnitType == 2)
+	{
+		nRe = AddBeamOnWall(oAddUnit, nInsWallIdx, vTable,vLayerTopo, vPlaneDraw);
+	}
+	// 插入板
+	else if (oAddUnit.nUnitType == 2)
+	{
+		//nRe = AddBoard(oAddUnit, nInsWallIdx, vTable, vLayerTopo, vPlaneDraw);;
+	}
 
 	// 插入墙
 	else if (oAddUnit.nUnitType == 4 && nAdjCol[0] >= 0)
-		nRe = AddWallInCols(oAddUnit, nAdjCol, vTable,vLayerTopo);
+	{
+		//获取两柱子ID
+		for (int i = 0; i < vLayerTopo.size(); i++)
+		{
+			for (int j = 0; j < vLayerTopo.size(); j++)
+			{
+				//两个为柱子，则判断插入点是否在两个柱子之间
+				if (j != i && vLayerTopo[i].nUnitType == 1 && vLayerTopo[j].nUnitType == 1)
+				{
+					//0度
+					if (vLayerTopo[i].nCenPos[2] == vLayerTopo[j].nCenPos[2])
+					{
+						if ((oInsPos.nXY[0]< vLayerTopo[i].nCenPos[0] && oInsPos.nXY[0] > vLayerTopo[j].nCenPos[0])
+							|| (oInsPos.nXY[0]< vLayerTopo[j].nCenPos[0] && oInsPos.nXY[0] > vLayerTopo[i].nCenPos[0]))
+						{
+							nAdjCol[0] = vLayerTopo[i].nTopoIdx, nAdjCol[1] = vLayerTopo[j].nTopoIdx;
+							break;
+						}
+						
+					}
+					//90度
+					if (vLayerTopo[i].nCenPos[0] == vLayerTopo[j].nCenPos[0])
+					{
+						if ((oInsPos.nXY[1]< vLayerTopo[i].nCenPos[2] && oInsPos.nXY[1] > vLayerTopo[j].nCenPos[2])
+							|| (oInsPos.nXY[1]< vLayerTopo[j].nCenPos[2] && oInsPos.nXY[1] > vLayerTopo[i].nCenPos[2]))
+						{
+							nAdjCol[0] = vLayerTopo[i].nTopoIdx, nAdjCol[1] = vLayerTopo[j].nTopoIdx;
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		nRe = AddWallInCols(oAddUnit, nAdjCol, vTable, vLayerTopo);
+	}
+		
+
 
 	// 基于新拓扑结构重新计算几何数值
 

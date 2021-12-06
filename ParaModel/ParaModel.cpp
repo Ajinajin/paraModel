@@ -1630,6 +1630,52 @@ void ParaModel::AddSceneData()
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
 		//如果当前要渲染的是强
+		if (viewShape[i].unitType == 1)
+		{
+			int coordX = viewShape[i].nCen[0] + pSceneOffset;
+			int coordY = viewShape[i].nCen[1] + pSceneOffset;
+			//判断墙的角度加标准线
+			if (vModelTmpl[viewShape[i].unitIdx].nUnitAngle == 0)
+			{
+				BRectangle* divideLine = new BRectangle(
+					1, coordY,
+					8000, 2,
+					BGraphicsItem::ItemType::Rectangle);
+				divideLine->isAuxiliary = true;
+				divideLine->nUnitType = 0;
+				divideLine->nUnitIdx = viewShape[i].unitIdx;
+				/*QBrush b = (Qt::DashLine);
+				b.setColor(ColorHelper(viewShape[i].unitType));
+				divideLine->setBrush(b);*/
+				QPen pen = QPen(Qt::blue);
+				pen.setStyle(Qt::DashLine);
+				divideLine->setPen(pen);
+				connect(divideLine, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+				connect(divideLine, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+				pSceneMain.addItem(divideLine);
+			}
+			else
+			{
+				BRectangle* divideLine = new BRectangle(
+					coordX, 1,
+					2, 8000,
+					BGraphicsItem::ItemType::Rectangle);
+				divideLine->isAuxiliary = true;
+				divideLine->nUnitType = 0;
+				divideLine->nUnitIdx = viewShape[i].unitIdx;
+				/*QBrush b = (Qt::DashLine);
+				b.setColor(ColorHelper(viewShape[i].unitType));
+				divideLine->setBrush(b);*/
+				QPen pen = QPen(Qt::blue);
+				pen.setStyle(Qt::DashLine);
+				divideLine->setPen(pen);
+				connect(divideLine, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+				connect(divideLine, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+				pSceneMain.addItem(divideLine);
+			}
+
+		}
+		//如果当前要渲染的是强
 		if (viewShape[i].unitType == 4)
 		{
 			int coordX = viewShape[i].nCen[0] + pSceneOffset;
