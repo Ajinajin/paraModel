@@ -58,7 +58,7 @@ int DimDataConvert::CalPlaneColShape(TopoUnit oUnit, SimpleShape& oShape, VUNITT
 	nWH[1] = table[oUnit.nCenUnitIdx].oShape.nShapeRange[3];
 	int nCen[2];
 	nCen[0] = oUnit.nCenPos[0];
-	nCen[1] = oUnit.nCenPos[1];
+	nCen[1] = oUnit.nCenPos[2];
 	GenRectShape(nCen, nWH, oShape);
 
 	return 0;
