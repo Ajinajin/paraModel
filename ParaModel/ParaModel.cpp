@@ -1629,29 +1629,6 @@ void ParaModel::AddSceneData()
 
 	d->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
-	//根据数据绘制图形
-	for (size_t i = 0; i < viewShape.size(); i++)
-	{
-		//绘制柱、墙、门、窗
-		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
-		{
-			int coordX = viewShape[i].nCen[0] + pSceneOffset;
-			int coordY = viewShape[i].nCen[1] + pSceneOffset;
-			BRectangle* viewItem = new BRectangle(
-				coordX, coordY,
-				viewShape[i].nWH[0], viewShape[i].nWH[1],
-				BGraphicsItem::ItemType::Rectangle);
-			viewItem->isAuxiliary = false;
-			viewItem->nUnitType = viewShape[i].unitType;
-			viewItem->nUnitIdx = viewShape[i].unitIdx;
-			viewItem->setBrush(ColorHelper(viewShape[i].unitType));
-			connect(viewItem, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
-			connect(viewItem, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
-			connect(viewItem, &BRectangle::SceneMenuDeleteClick, this, &ParaModel::SceneMenuDeleteClickAction);
-			connect(viewItem, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
-			pSceneMain.addItem(viewItem);
-		}
-	}
 	//加载标准线
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
@@ -1677,6 +1654,7 @@ void ParaModel::AddSceneData()
 				pen.setStyle(Qt::DashLine);
 				divideLine->setPen(pen);
 				connect(divideLine, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+				connect(divideLine, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
 				pSceneMain.addItem(divideLine);
 			}
 			else
@@ -1695,9 +1673,33 @@ void ParaModel::AddSceneData()
 				pen.setStyle(Qt::DashLine);
 				divideLine->setPen(pen);
 				connect(divideLine, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+				connect(divideLine, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
 				pSceneMain.addItem(divideLine);
 			}
 
+		}
+	}
+	//根据数据绘制图形
+	for (size_t i = 0; i < viewShape.size(); i++)
+	{
+		//绘制柱、墙、门、窗
+		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
+		{
+			int coordX = viewShape[i].nCen[0] + pSceneOffset;
+			int coordY = viewShape[i].nCen[1] + pSceneOffset;
+			BRectangle* viewItem = new BRectangle(
+				coordX, coordY,
+				viewShape[i].nWH[0], viewShape[i].nWH[1],
+				BGraphicsItem::ItemType::Rectangle);
+			viewItem->isAuxiliary = false;
+			viewItem->nUnitType = viewShape[i].unitType;
+			viewItem->nUnitIdx = viewShape[i].unitIdx;
+			viewItem->setBrush(ColorHelper(viewShape[i].unitType));
+			connect(viewItem, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+			connect(viewItem, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+			connect(viewItem, &BRectangle::SceneMenuDeleteClick, this, &ParaModel::SceneMenuDeleteClickAction);
+			connect(viewItem, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
+			pSceneMain.addItem(viewItem);
 		}
 	}
 
