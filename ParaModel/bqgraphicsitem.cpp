@@ -41,16 +41,13 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	Q_UNUSED(event)
 		setCursor(QCursor(Qt::ClosedHandCursor));
- 
-		nOriPos[0] = event->scenePos().x();
-		nOriPos[1] = event->scenePos().y();
- 
-
-	this->scene()->clearSelection(); 
-	QList<QGraphicsItem*> itemList=this->scene()->items();
+	nOriPos[0] = event->scenePos().x();
+	nOriPos[1] = event->scenePos().y();
+	this->scene()->clearSelection();
+	QList<QGraphicsItem*> itemList = this->scene()->items();
 	for (size_t i = 0; i < itemList.size(); i++)
 	{
-		if (itemList[i]->type() == BGraphicsItem::type()) 
+		if (itemList[i]->type() == BGraphicsItem::type())
 		{
 			BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
 			if (proxyWidget->nUnitIdx == this->nUnitIdx)
@@ -61,18 +58,31 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	}
 	setSelected(true);
 }
-
-void BGraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+void BGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
-	if (event->buttons() == Qt::LeftButton) 
+	if (operMourse == Qt::LeftButton)
 	{
 		if (nUnitType == 1)
 			return;
-		// 发送相对位移
-		QPointF oMove; 
+		QPointF oMove;
 		oMove.setX(event->scenePos().x() - nOriPos[0]);
-		oMove.setY(event->scenePos().y() - nOriPos[1]); 
+		oMove.setY(event->scenePos().y() - nOriPos[1]);
 		emit SceneItemMove(nUnitType, nUnitIdx, oMove);
+	}
+}
+
+void BGraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+{
+	if (event->buttons() == Qt::LeftButton)
+	{
+		operMourse = Qt::LeftButton;
+		if (nUnitType == 1)
+			return;
+		// 发送相对位移
+		QPointF oMove;
+		oMove.setX(event->scenePos().x() - nOriPos[0]);
+		oMove.setY(event->scenePos().y() - nOriPos[1]);
+		//emit SceneItemMove(nUnitType, nUnitIdx, oMove);
 		// 发送当前绝对位置
 // 		nMoveXY[0] = event->scenePos().x() - nOriPos[0]; 
 // 		nMoveXY[1] = event->scenePos().y() - nOriPos[1]; 
@@ -288,8 +298,6 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 {
 	if (!this->isSelected())
 		return;
-	if (nUnitType == 1)
-		return;
 	QMenu* menu = new QMenu();
 	menu->setStyleSheet("QMenu { background-color:rgb(89,87,87); border: 5px solid rgb(235,110,36); }");
 
@@ -318,7 +326,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 		});
 
 
-	
+
 
 	QWidgetAction* width_widgetAction = new QWidgetAction(menu);
 	width_widgetAction->setDefaultWidget(width_spinBox);
@@ -341,46 +349,68 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	//QWidgetAction* applyBtn_widgetAction = new QWidgetAction(menu);
 	//applyBtn_widgetAction->setDefaultWidget(pApplyBtn);
 	//menu->addAction(applyBtn_widgetAction);
-	 
+
 	QAction* act = new QAction(this);
 
-	act->setObjectName((u8"增加构件"));
-	act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
-	act->setText((u8"增加构件"));
-	act->setCheckable(true);
-	connect(act, &QAction::triggered, this, [=]() {
-		//发送信号 提示点击了更换
-		emit SceneMenuAddClick(nUnitType, nUnitIdx);
-		});
-	menu->addAction(act);
+	if (nUnitType >= 4)
+	{ 
+		act->setObjectName((u8"增加构件"));
+		act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
+		act->setText((u8"增加构件"));
+		act->setCheckable(true);
+		connect(act, &QAction::triggered, this, [=]() {
+			//发送信号 提示点击了更换
+			emit SceneMenuAddClick(nUnitType, nUnitIdx);
+			});
+		menu->addAction(act);
 
-	act = new QAction(this);
-	act->setObjectName((u8"删除构件"));
-	act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
-	act->setText((u8"删除构件"));
-	act->setCheckable(true);
-	connect(act, &QAction::triggered, this, [=]() {
-		//发送信号 提示点击了更换
-		emit SceneMenuDeleteClick(nUnitType, nUnitIdx);
-		});
-	menu->addAction(act);
+		act = new QAction(this);
+		act->setObjectName((u8"删除构件"));
+		act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
+		act->setText((u8"删除构件"));
+		act->setCheckable(true);
+		connect(act, &QAction::triggered, this, [=]() {
+			//发送信号 提示点击了更换
+			emit SceneMenuDeleteClick(nUnitType, nUnitIdx);
+			});
+		menu->addAction(act);
 
+		act = new QAction(this);
+		act->setObjectName((u8"更换构件"));
+		act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
+		act->setText((u8"更换构件"));
+		act->setCheckable(true);
+		connect(act, &QAction::triggered, this, [=]() {
+			//发送信号 提示点击了更换
+			emit SceneMenuClick(nUnitType, nUnitIdx);
+			});
+		menu->addAction(act);
+	}
+	else if (nUnitType == 0)
+	{
+		act->setObjectName((u8"增加构件"));
+		act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
+		act->setText((u8"增加构件"));
+		act->setCheckable(true);
+		connect(act, &QAction::triggered, this, [=]() {
+			//发送信号 提示点击了更换
+			emit SceneMenuAddClick(nUnitType, nUnitIdx);
+			});
+		menu->addAction(act);
+	}
+	else if (nUnitType == 1)
+	{
 
-	act = new QAction(this);
-	act->setObjectName((u8"更换构件"));
-	act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
-	act->setText((u8"更换构件"));
-	act->setCheckable(true); 
-	connect(act, &QAction::triggered, this, [=]() {
-		//发送信号 提示点击了更换
-		emit SceneMenuClick(nUnitType, nUnitIdx);
-		});
-	menu->addAction(act);
-
-
-
-
-
+		act->setObjectName((u8"更换构件"));
+		act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
+		act->setText((u8"更换构件"));
+		act->setCheckable(true);
+		connect(act, &QAction::triggered, this, [=]() {
+			//发送信号 提示点击了更换
+			emit SceneMenuClick(nUnitType, nUnitIdx);
+			});
+		menu->addAction(act);
+	} 
 	menu->exec(QCursor::pos());
 	delete menu;
 
@@ -446,7 +476,7 @@ void BPolygon::pushPoint(QPointF p, QList<QPointF> list, bool isCenter)
 		else {
 			BPointItem* point = new BPointItem(this, p, BPointItem::Edge);
 			point->setParentItem(this);
-			m_pointList.append(point); 
+			m_pointList.append(point);
 		}
 		this->hide();
 		this->update();
