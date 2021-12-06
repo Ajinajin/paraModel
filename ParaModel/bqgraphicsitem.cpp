@@ -278,11 +278,6 @@ void BCircle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 BRectangle::BRectangle(qreal x, qreal y, qreal width, qreal height, ItemType type)
 	: BGraphicsItem(QPointF(x, y), QPointF(x + width / 2, y + height / 2), type)
 {
-
-	if (nUnitIdx == 15)
-	{
-		int k = 0;
-	}
 	m_leftup.setX(int(m_center.x() - (m_edge.x()- m_center.x())  ));
 	m_leftup.setY(int(m_center.y() - (m_edge.y() - m_center.y()) ));
 
@@ -299,11 +294,7 @@ void BRectangle::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 	Q_UNUSED(widget);
 	painter->setPen(this->pen());
 	painter->setBrush(this->brush());
-
-	if (nUnitIdx == 15)
-	{
-		int k = 0;
-	}
+	 
 	QRectF ret(m_leftup.x(), m_leftup.y(), m_edge.x() - m_leftup.x(), m_edge.y()- m_leftup.y());
 	painter->drawRect(ret);
 }

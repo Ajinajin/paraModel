@@ -3,11 +3,11 @@
 BQGraphicsScene::BQGraphicsScene(QObject *parent) : QGraphicsScene(parent)
 {
     is_creating_BPolygon = false;
-	for (int x = 0; x <= 2000; x += 20)
+	for (int x = 0; x <= 2000; x += 10)
 		//水平网格线 起点（x，y），终点（x，y），颜色  size是终点x坐标在这里也是网格线长度
 		this->addLine(0, x, 2000, x, QPen(Qt::red));
 	// Now add the horizontal lines,paint them green
-	for (int y = 0; y <= 2000; y += 20)
+	for (int y = 0; y <= 2000; y += 10)
 		//垂直网格线
 		this->addLine(y, 0, y, 2000, QPen(Qt::red));
 }
