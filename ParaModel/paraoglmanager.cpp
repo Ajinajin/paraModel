@@ -275,7 +275,7 @@ void ParaOGLManager::paintGL()
 
 					x = oglTopTable.at(i).nCenPos[0];
 					y = columnHeight / 2;
-					z = oglTopTable.at(i).nCenPos[1];
+					z = oglTopTable.at(i).nCenPos[2];
 
 					InitAndDrawCuboid(x, y, z, length, thickness, height,1);
 
@@ -287,11 +287,11 @@ void ParaOGLManager::paintGL()
 				{
 					float x, y, z, radius, height;
 					x = oglTopTable.at(i).nCenPos[0];
-					y = oglTopTable.at(i).nCenPos[1];
-					//y = 0.5;
-					z = oglTopTable.at(i).nCenPos[1];
+					y = columnHeight / 2;
+					
+					z = oglTopTable.at(i).nCenPos[2];
 					height = oglTopTable.at(i).nCenPos[3];
-					//height = 2;
+					
 					radius = info.oShape.nNumOrRadius;
 					//radius = 1;
 					InitAndDrawColumn(x, y, z, radius, height);
@@ -346,7 +346,7 @@ void ParaOGLManager::paintGL()
 							Point info;
 							info.x = oglTopTable.at(oglTopTable.at(i).nAdjUnitIdx[j]).nCenPos[0];
 							info.y = 0;
-							info.z = oglTopTable.at(oglTopTable.at(i).nAdjUnitIdx[j]).nCenPos[1];
+							info.z = oglTopTable.at(oglTopTable.at(i).nAdjUnitIdx[j]).nCenPos[2];
 							columnPoints.push_back(info);
 						}
 						
@@ -444,7 +444,7 @@ void ParaOGLManager::paintGL()
 						Point info;
 						info.x = oglTopTable.at(oglTopTable.at(i).nAdjUnitIdx[j]).nCenPos[0];
 						info.y = 0;
-						info.z = oglTopTable.at(oglTopTable.at(i).nAdjUnitIdx[j]).nCenPos[1];
+						info.z = oglTopTable.at(oglTopTable.at(i).nAdjUnitIdx[j]).nCenPos[2];
 						columnPoints.push_back(info);
 					}
 					j++;
@@ -519,7 +519,7 @@ void ParaOGLManager::paintGL()
 						Point info;
 						info.x = oglTopTable.at(oglTopTable.at(i).nAdjUnitIdx[j]).nCenPos[0];
 						info.y = 0;
-						info.z = oglTopTable.at(oglTopTable.at(i).nAdjUnitIdx[j]).nCenPos[1];
+						info.z = oglTopTable.at(oglTopTable.at(i).nAdjUnitIdx[j]).nCenPos[2];
 						columnPoints.push_back(info);
 					}
 					//if (oglTopTable.at(oglTopTable.at(i).nAdjUnitIdx[j]).nUnitType == 2)//Áº
@@ -615,7 +615,7 @@ void ParaOGLManager::paintGL()
 							Point info;
 							info.x = oglTopTable.at(oglTopTable.at(wallId).nAdjUnitIdx[j]).nCenPos[0];
 							info.y = 0;
-							info.z = oglTopTable.at(oglTopTable.at(wallId).nAdjUnitIdx[j]).nCenPos[1];
+							info.z = oglTopTable.at(oglTopTable.at(wallId).nAdjUnitIdx[j]).nCenPos[2];
 							columnPoints.push_back(info);
 						}
 

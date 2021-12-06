@@ -2,7 +2,6 @@
 
 #include <ParaType.h>
 
-
 class DimDataConvert
 {
 public:
@@ -30,4 +29,8 @@ public:
 	// 平面图中移动选中单元构件
 	int MoveBaseUnit(int nSelUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw,VUNITTABLE table);
 
+
+
+public:
+	int selectUnitIdx;
 };

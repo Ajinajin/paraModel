@@ -778,6 +778,7 @@ void ParaModel::ShowAllUnitSelectWindow()
 		PixelPos pos; 
 		pos.nXY[0] = moveXY[0]- pSceneOffset,pos.nXY[1] = moveXY[1]- pSceneOffset;
 
+		pCalShapeData->selectUnitIdx = SelectUnitIdx;
 		//添加构建入拓扑图
 		pCalShapeData->AddBaseUnit(oAddUnit, pos, vBaseUnit, vModelTmpl,viewShape);
 
