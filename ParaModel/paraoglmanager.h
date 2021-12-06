@@ -15,13 +15,19 @@
 #include "camera.h"
 #include <ShaderProc.h>
 
-struct Point//点结构(二维)
+struct Point		//点结构(二维)
 {
 	int x;
 	int y;
 	int z;
 };
 typedef vector<Point> vPoint;
+
+struct Solid
+{
+	int idx[2][4];
+};
+typedef vector<Solid> vSolid;
 
 //根据中心构件单元Id去构件库里查具体模型参数
 BasicUnit findUnit(int idx, VUNITTABLE oglUnitTable);
@@ -69,13 +75,15 @@ public:
 	//长方体（墙、板等）x\y\z 为长方体的中心点
 	void InitAndDrawCuboid(int x, int y, int z, int length, int thickness, int height, int type);
 	
-
+	void outputKFile();
 	
-
-	VTOPOTABLE oglTopTable;	//绘制所需的拓扑结构表
+	
+	VTOPOTABLE oglTopTable;		//绘制所需的拓扑结构表
 	VUNITTABLE oglUnitTable;	//绘制所需的结构单元表
-
-		
+	
+	vPoint allNodes;			//存储三维模型的所有节点信息
+	vSolid allSolids;			//存储三维模型内的所有solid信息
+	int outFlag = 0;			//暂时变量，用于只输出一次K文件
 
 
 public:
