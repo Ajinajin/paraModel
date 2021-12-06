@@ -24,6 +24,7 @@
 #include <ParaType.h>
 
 #include "DimDataConvert.h"
+#include <QFormLayout>
 
 class QMenu;
 class QListWidget;
@@ -59,6 +60,7 @@ private:
 
 	ParaOGLManager* paraOglmanager;					// 三维显示窗口类
 	ParaOGLManager* paraOglmanagerMain;				// 三维显示窗口大屏幕主类
+	QDockWidget* layerWidget;
 
 	int if_data;									//0是未加载数据。1是有数据
 	SysPath oPath;									//系统路径
@@ -71,15 +73,19 @@ private:
 	// mainLabel显示的图像
 	QMenu* popMenu_In_ListWidget_;					/*弹出菜单被使用无法删除*/
 
-	int SelectUnitIdx;
-	int SelectUnitType;
+	int SelectUnitIdx;								//当前选中的楼层
+	int SelectUnitType;								//当前选中的楼层
 	int moveXY[2];
+	int SelectLayer;								//当前选中的楼层
+
+
 
 
 public:
 	VUNITTABLE vBaseUnit;					// 系统基本构件库
 	VTOPOTABLE vModelTmpl;					// 当前绘制计算用的平面图
 	VBUILDTOPO vBuildTopo;					// 系统平面图库
+	VBUILDTOPO vLoadModelData;				// 当前绘制计算的模型数据 多层级
 	int InitPath();							// 初始化路径
 	int InitUnitLib();						// 初始化基本构件库 
 	int InitPlaneDrawLib();					// 初始化平面图库
@@ -98,8 +104,9 @@ private:
 	void InitLoadModelWidget(QDockWidget* from);
 	//初始化系统模型窗口
 	void InitSysWidget(QDockWidget* from);
-	//初始化属性窗口
-	void InitPropertyWidget(QDockWidget* from);
+
+	//初始化楼层选择
+	void InitLayerWidget(QDockWidget* from);
 
 	//初始化状态栏文字提示
 	void InitStatusWidget();
@@ -143,6 +150,8 @@ private:
 	void SceneZClear();
 	//刷新画布
 	void RefreshSceneData();
+	//刷新楼层数据
+	void RefreshLayerWidget();
 	//更新画布元素
 	void UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height);
 public:
@@ -150,7 +159,6 @@ public:
 	DimDataConvert* pCalShapeData;
 public slots:
 	void MyLogOutput(QString myLogout);         //输出日志
-	void ApplyDataAction();		//保存属性输入的数据 
 	void drawWall(const std::vector<float>& points);
 
 
@@ -171,4 +179,10 @@ public slots:
 	void SceneMenuClickAction(int nUnitType, int nUnitIdx);	//画布菜单点击
 	void SceneMenuDeleteClickAction(int nUnitType, int nUnitIdx);	//画布菜单点击
 	void SceneMenuAddClickAction(int nUnitType, int nUnitIdx);	//画布菜单点击
+
+
+
+	void CopyLayerAction();					//复制当前层数据
+	void DeleteLayerAction(int layer);		//删除当前层数据
+	void ChangeLayerAction(int layer);		//修改画布显示层数据
 };

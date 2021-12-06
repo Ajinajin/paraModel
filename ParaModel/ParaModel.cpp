@@ -12,7 +12,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QTextStream>
-
+#include <QFormLayout>
 
 #include "bqgraphicsitem.h"
 #include "bqgraphicsscene.h"
@@ -42,157 +42,11 @@
 
 
 #pragma region 初始化窗口
-//初始化属性窗口
-
-void ParaModel::InitPropertyWidget(QDockWidget* from)
+//初始化建筑楼层窗口
+void ParaModel::InitLayerWidget(QDockWidget* from)
 {
-
 	from->setMaximumWidth(300);
-	from->setMaximumHeight(390);
-	from->setWindowTitle("属性窗口");
-	// 当前选择弹的属性
-	QLabel* lbl1 = new QLabel("属性");
-	QLabel* lblvalue = new QLabel("值");
-	QLabel* lbl2 = new QLabel("位置XYZ");
-	pModelEdit[0] = new QLineEdit;
-	pModelEdit[1] = new QLineEdit;
-	pModelEdit[2] = new QLineEdit;
-	pModelEdit[0]->setText("0");
-	pModelEdit[1]->setText("0");
-	pModelEdit[2]->setText("0");
-	QLabel* lbl3 = new QLabel("速度");
-	pModelEdit[3] = new QLineEdit;
-	pModelEdit[3]->setText("1000");
-	QLabel* lbl4 = new QLabel("方向XYZ");
-	pModelEdit[4] = new QLineEdit;
-	pModelEdit[5] = new QLineEdit;
-	pModelEdit[6] = new QLineEdit;
-	pModelEdit[4]->setText("0");
-	pModelEdit[5]->setText("-1");
-	pModelEdit[6]->setText("0");
-
-	// 当前选择弹的战斗部
-	QLabel* lbl5 = new QLabel("当量Kg");
-	pArmHeadEdit[0] = new QLineEdit;
-	pArmHeadEdit[0]->setText("100");
-	QLabel* lbl6 = new QLabel("弹片数量");
-	pArmHeadEdit[1] = new QLineEdit;
-	pArmHeadEdit[1]->setText("1000");
-	QLabel* lbl7 = new QLabel(QWidget::tr("弹片质量g"));
-	pArmHeadEdit[2] = new QLineEdit;
-	pArmHeadEdit[2]->setText("20");
-	QLabel* lbl8 = new QLabel(QWidget::tr("分布角"));
-	pArmHeadEdit[3] = new QLineEdit;
-	pArmHeadEdit[4] = new QLineEdit;
-	pArmHeadEdit[3]->setText("60");
-	pArmHeadEdit[4]->setText("20");
-	QWidget* mywidget = new QWidget;
-	QVBoxLayout* myVBoxLayout = new QVBoxLayout();
-	QHBoxLayout* myHBoxLayout = new QHBoxLayout();
-
-	QVBoxLayout* myLayout = new QVBoxLayout();
-
-
-	QWidget* temp = new QWidget();
-	lbl5->setFixedWidth(56);
-	lbl6->setFixedWidth(56);
-	lbl7->setFixedWidth(56);
-	lbl8->setFixedWidth(56);
-	lbl1->setFixedWidth(56);
-	lbl2->setFixedWidth(56);
-	lbl3->setFixedWidth(56);
-	lbl4->setFixedWidth(56);
-	//通过这个把其他挤在一起
-	//QLabel* lbl9 = new QLabel(QWidget::tr(""));
-	//lbl9->hide();
-	//myVBoxLayout->setAlignment(Qt::AlignTop);
-	// 	mygridLayout->setRowStretch(1, 1);
-	// 	mygridLayout->setRowStretch(5, 10);
-	//myVBoxLayout->setMargin(15);
-	//最小宽度
-	// 	mygridLayout->setColumnMinimumWidth(4, 10); 
-	//myVBoxLayout->addWidget(temp);
-	//myHBoxLayout->addWidget(lbl1);
-	//myHBoxLayout->addWidget(lblvalue);
-	//temp->setLayout(myHBoxLayout);
-	//myLayout->addWidget(temp);
-
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myHBoxLayout->addWidget(lbl2);
-	myHBoxLayout->addWidget(pModelEdit[0]);
-	myHBoxLayout->addWidget(pModelEdit[1]);
-	myHBoxLayout->addWidget(pModelEdit[2]);
-	temp->setLayout(myHBoxLayout);
-	myVBoxLayout->addWidget(temp);
-	myLayout->addWidget(temp);
-
-
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myVBoxLayout->addWidget(temp);
-	myHBoxLayout->addWidget(lbl3);
-	myHBoxLayout->addWidget(pModelEdit[3]);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myVBoxLayout->addWidget(temp);
-	myHBoxLayout->addWidget(lbl4);
-	myHBoxLayout->addWidget(pModelEdit[4]);
-	myHBoxLayout->addWidget(pModelEdit[5]);
-	myHBoxLayout->addWidget(pModelEdit[6]);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myVBoxLayout->addWidget(temp);
-	myHBoxLayout->addWidget(lbl5);
-	myHBoxLayout->addWidget(pArmHeadEdit[0]);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-
-
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myVBoxLayout->addWidget(temp);
-	myHBoxLayout->addWidget(lbl6);
-	myHBoxLayout->addWidget(pArmHeadEdit[1]);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-
-
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myVBoxLayout->addWidget(temp);
-	myHBoxLayout->addWidget(lbl7);
-	myHBoxLayout->addWidget(pArmHeadEdit[2]);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myVBoxLayout->addWidget(temp);
-	myHBoxLayout->addWidget(lbl8);
-	myHBoxLayout->addWidget(pArmHeadEdit[3]);
-	myHBoxLayout->addWidget(pArmHeadEdit[4]);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-
-
-	QPushButton* pApplyBtn = new QPushButton("应用", this);
-	pApplyBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-	pApplyBtn->setFixedWidth(100);
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myHBoxLayout->addWidget(pApplyBtn);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-	mywidget->setLayout(myLayout);
-	from->setWidget(mywidget);
-	connect(pApplyBtn, &QPushButton::clicked, this, &ParaModel::ApplyDataAction);
+	from->setWindowTitle("建筑楼层");
 }
 
 //初始化系统模型窗口
@@ -256,74 +110,75 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 	}
 
 	//树按钮响应
-	connect(pModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column) {
-		if (if_data == 0)
+	connect(pModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column)
 		{
-			MyLogOutput("当前无画布信息，请新建或者打开后在操作");
-			return;
-		}
-
-		QTreeWidgetItem* parent = item->parent();
-		if (NULL == parent) //注意：最顶端项是没有父节点的，双击这些项时注意(陷阱)
-			return;
-
-		QVariant variant = item->data(0, Qt::UserRole);
-		int nUnitIdx = variant.value<int>();
-		QString msg;
-		for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
-		{
-			if (iter->nUnitIdx != nUnitIdx)
-				continue;
-
-			if (iter->oShape.nShapeType == 1)
+			if (if_data == 0)
 			{
+				MyLogOutput("当前无画布信息，请新建或者打开后在操作");
+				return;
+			}
 
-				//板墙门窗 宽度为1
-				int wThickNess = 0;
-				int hThickNess = 0;
-				if (iter->nUnitType > 2)
+			QTreeWidgetItem* parent = item->parent();
+			if (NULL == parent) //注意：最顶端项是没有父节点的，双击这些项时注意(陷阱)
+				return;
+
+			QVariant variant = item->data(0, Qt::UserRole);
+			int nUnitIdx = variant.value<int>();
+			QString msg;
+			for (vector<BasicUnit>::const_iterator iter = vBaseUnit.begin(); iter != vBaseUnit.end(); iter++)
+			{
+				if (iter->nUnitIdx != nUnitIdx)
+					continue;
+
+				if (iter->oShape.nShapeType == 1)
 				{
-					wThickNess = 1;
-					hThickNess = 20;
-				}
-				BRectangle* m_rectangle = new BRectangle(
-					pSceneOffset + iter->oShape.nShapeRange[0], pSceneOffset + iter->oShape.nShapeRange[1],
-					wThickNess + iter->oShape.nShapeRange[2], hThickNess + iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
-				m_rectangle->wallwidth = iter->oShape.nThickNess;
-				m_rectangle->nUnitType = iter->nUnitType;
-				m_rectangle->nUnitIdx = iter->nUnitIdx;
-				m_rectangle->setBrush(ColorHelper(iter->nUnitType));
-				pSceneMain.addItem(m_rectangle);
-			}
-			else if (iter->oShape.nShapeType == 2)
-			{
 
-				BCircle* m_ellipse = new BCircle(pSceneOffset + iter->oShape.nCen[0], pSceneOffset + iter->oShape.nCen[1],
-					iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
-				m_ellipse->setBrush(ColorHelper(iter->nUnitType));
-				m_ellipse->nUnitType = iter->nUnitType;
-				m_ellipse->nUnitIdx = iter->nUnitIdx;
-				pSceneMain.addItem(m_ellipse);
-			}
-			else if (iter->oShape.nShapeType == 3)
-			{
-				vector<float> point;
-				for (size_t i = 0; i < iter->oShape.vPolyPt.size(); i++)
+					//板墙门窗 宽度为1
+					int wThickNess = 0;
+					int hThickNess = 0;
+					if (iter->nUnitType > 2)
+					{
+						wThickNess = 1;
+						hThickNess = 20;
+					}
+					BRectangle* m_rectangle = new BRectangle(
+						pSceneOffset + iter->oShape.nShapeRange[0], pSceneOffset + iter->oShape.nShapeRange[1],
+						wThickNess + iter->oShape.nShapeRange[2], hThickNess + iter->oShape.nShapeRange[3], BGraphicsItem::ItemType::Rectangle);
+					m_rectangle->wallwidth = iter->oShape.nThickNess;
+					m_rectangle->nUnitType = iter->nUnitType;
+					m_rectangle->nUnitIdx = iter->nUnitIdx;
+					m_rectangle->setBrush(ColorHelper(iter->nUnitType));
+					pSceneMain.addItem(m_rectangle);
+				}
+				else if (iter->oShape.nShapeType == 2)
 				{
-					point.push_back(iter->oShape.vPolyPt[i] + 100);
+
+					BCircle* m_ellipse = new BCircle(pSceneOffset + iter->oShape.nCen[0], pSceneOffset + iter->oShape.nCen[1],
+						iter->oShape.nNumOrRadius, BGraphicsItem::ItemType::Circle);
+					m_ellipse->setBrush(ColorHelper(iter->nUnitType));
+					m_ellipse->nUnitType = iter->nUnitType;
+					m_ellipse->nUnitIdx = iter->nUnitIdx;
+					pSceneMain.addItem(m_ellipse);
 				}
-				drawWall(point);
+				else if (iter->oShape.nShapeType == 3)
+				{
+					vector<float> point;
+					for (size_t i = 0; i < iter->oShape.vPolyPt.size(); i++)
+					{
+						point.push_back(iter->oShape.vPolyPt[i] + 100);
+					}
+					drawWall(point);
 
-				//setBtnEnabled(false);
-				/*BPolygon* m_polygon = new BPolygon(BGraphicsItem::ItemType::Polygon);
-				m_polygon->is_create_finished = true;*/
-				//m_polygon->paint();
-				//pSceneMain.addItem(m_polygon);
+					//setBtnEnabled(false);
+					/*BPolygon* m_polygon = new BPolygon(BGraphicsItem::ItemType::Polygon);
+					m_polygon->is_create_finished = true;*/
+					//m_polygon->paint();
+					//pSceneMain.addItem(m_polygon);
 
+				}
 			}
-		}
-		msg = item->text(0) + "构件加载完成";
-		MyLogOutput(msg);
+			msg = item->text(0) + "构件加载完成";
+			MyLogOutput(msg);
 
 		});
 	from->setWidget(pModelTreeWidget);
@@ -462,7 +317,6 @@ void ParaModel::InitCentralWidget()
 	setDockNestingEnabled(true);
 
 	QDockWidget* sysWidget = new QDockWidget(this);
-
 	InitSysWidget(sysWidget);
 
 	QDockWidget* oglWidget = new QDockWidget(this);
@@ -471,8 +325,8 @@ void ParaModel::InitCentralWidget()
 	QDockWidget* loadModelWidget = new QDockWidget(this);
 	InitLoadModelWidget(loadModelWidget);
 
-	QDockWidget* propertyWidget = new QDockWidget(this);
-	InitPropertyWidget(propertyWidget);
+	layerWidget = new QDockWidget(this);
+	InitLayerWidget(layerWidget);
 
 	QDockWidget* logWidget = new QDockWidget(this);
 	InitLogWidget(logWidget);
@@ -484,10 +338,13 @@ void ParaModel::InitCentralWidget()
 	splitDockWidget(sysWidget, oglWidget, Qt::Horizontal);
 	splitDockWidget(oglWidget, logWidget, Qt::Vertical);
 	addDockWidget(Qt::RightDockWidgetArea, loadModelWidget);
-	splitDockWidget(loadModelWidget, propertyWidget, Qt::Vertical);
+	splitDockWidget(loadModelWidget, layerWidget, Qt::Vertical);
 	//tabifyDockWidget(loadModelWidget, propertyWidget);
 	loadModelWidget->raise();
 
+
+	SelectLayer = 0;
+	RefreshLayerWidget();
 }
 
 //初始化状态栏文字提示
@@ -687,6 +544,7 @@ void ParaModel::ShowUnitSelectWindow()
 		msg = item->text(0) + "构件更换成功";
 		MyLogOutput(msg);
 
+		unitSelectWidget->hide();
 		});
 	unitSelectWidget->setWindowModality(Qt::ApplicationModal);
 	unitSelectWidget->setWindowFlags(Qt::WindowCloseButtonHint);
@@ -770,17 +628,17 @@ void ParaModel::ShowAllUnitSelectWindow()
 		QVariant variant = item->data(0, Qt::UserRole);
 		int nUnitIdx1 = variant.value<int>();
 
-		
-		
+
+
 		//待添加的构建信息
 		BasicUnit oAddUnit = findUnit(nUnitIdx1, vBaseUnit);
 		//坐标
-		PixelPos pos; 
-		pos.nXY[0] = moveXY[0]- pSceneOffset,pos.nXY[1] = moveXY[1]- pSceneOffset;
+		PixelPos pos;
+		pos.nXY[0] = moveXY[0] - pSceneOffset, pos.nXY[1] = moveXY[1] - pSceneOffset;
 
 		pCalShapeData->selectUnitIdx = SelectUnitIdx;
 		//添加构建入拓扑图
-		pCalShapeData->AddBaseUnit(oAddUnit, pos, vBaseUnit, vModelTmpl,viewShape);
+		pCalShapeData->AddBaseUnit(oAddUnit, pos, vBaseUnit, vModelTmpl, viewShape);
 
 		unitSelectWidget->hide();
 		});
@@ -837,12 +695,12 @@ void ParaModel::NewFileAction()
 		divideLineH->nUnitType = 0;
 		divideLineH->nUnitIdx = 0;
 		divideLineH->setPen(pen);
-		connect(divideLineH, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction); 
+		connect(divideLineH, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
 		if (i == 0)
 		{
 			pSceneMain.addItem(divideLineH);
 		}
-		if (i ==1)
+		if (i == 1)
 		{
 			pSceneX.addItem(divideLineH);
 		}
@@ -859,7 +717,7 @@ void ParaModel::NewFileAction()
 		divideLineV->nUnitType = 0;
 		divideLineV->nUnitIdx = 0;
 		divideLineV->setPen(pen);
-		connect(divideLineV, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction); 
+		connect(divideLineV, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
 		if (i == 0)
 		{
 			pSceneMain.addItem(divideLineV);
@@ -992,14 +850,25 @@ void ParaModel::OpenFileAction()
 
 	pCalShapeData = new DimDataConvert();
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
-
+	vLoadModelData.push_back(vModelTmpl);
+	SelectLayer = 1;
 	ParaModel::AddSceneData();
 	ParaModel::AddSceneXData();
+	ParaModel::RefreshLayerWidget();
 }
 
 void ParaModel::GraphicsViewXFocus(bool b)
 {
-	MainDockWidget->setWindowTitle("当前编辑视图 （二维X）");
+	QString titleStr;
+	if (SelectLayer == 0)
+	{
+		titleStr = QString("当前编辑视图 （二维X）楼层");
+	}
+	else
+	{
+		titleStr = QString("当前编辑视图 （二维X）楼层：%1").arg(SelectLayer);
+	}
+	MainDockWidget->setWindowTitle(titleStr);
 	if (MainDockState == 3)
 	{
 		MainDockWidget->setWidget(graphicsViewMain);
@@ -1011,7 +880,17 @@ void ParaModel::GraphicsViewXFocus(bool b)
 
 void ParaModel::GraphicsViewYFocus(bool b)
 {
-	MainDockWidget->setWindowTitle("当前编辑视图 （二维Y）");
+
+	QString titleStr;
+	if (SelectLayer == 0)
+	{
+		titleStr = QString("当前编辑视图 （二维Y）楼层");
+	}
+	else
+	{
+		titleStr = QString("当前编辑视图 （二维Y）楼层：%1").arg(SelectLayer);
+	}
+	MainDockWidget->setWindowTitle(titleStr);
 	if (MainDockState == 3)
 	{
 		MainDockWidget->setWidget(graphicsViewMain);
@@ -1024,7 +903,16 @@ void ParaModel::GraphicsViewYFocus(bool b)
 
 void ParaModel::GraphicsViewZFocus(bool b)
 {
-	MainDockWidget->setWindowTitle("当前编辑视图 （二维Z）");
+	QString titleStr;
+	if (SelectLayer == 0)
+	{
+		titleStr = QString("当前编辑视图 （二维Z）楼层");
+	}
+	else
+	{
+		titleStr = QString("当前编辑视图 （二维Z）楼层：%1").arg(SelectLayer);
+	}
+	MainDockWidget->setWindowTitle(titleStr);
 	if (MainDockState == 3)
 	{
 		MainDockWidget->setWidget(graphicsViewMain);
@@ -1038,7 +926,16 @@ void ParaModel::GraphicsViewZFocus(bool b)
 
 void ParaModel::GraphicsViewOgl(bool b)
 {
-	MainDockWidget->setWindowTitle("当前编辑视图 （三维模型）");
+	QString titleStr;
+	if (SelectLayer == 0)
+	{
+		titleStr = QString("当前编辑视图 （三维模型）楼层");
+	}
+	else
+	{
+		titleStr = QString("当前编辑视图 （三维模型）楼层：%1").arg(SelectLayer);
+	}
+	MainDockWidget->setWindowTitle(titleStr);
 	if (MainDockState != 3)
 	{
 		MainDockState = 3;
@@ -1058,139 +955,92 @@ void ParaModel::MyLogOutput(QString myLogout)
 		myLogOutLabel->setText(myLogOutLabel->toPlainText() + "\r\n" + myLogout);
 	}
 }
+//刷新楼层窗口
+void ParaModel::RefreshLayerWidget()
+{
+	QWidget* temp = new QWidget();
+	QPushButton* pCopyLayerBtn = new QPushButton("复制当前楼层", this);
+	pCopyLayerBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
+	pCopyLayerBtn->setFixedWidth(200);
+	connect(pCopyLayerBtn, &QPushButton::clicked, this, &ParaModel::CopyLayerAction);
 
-// 数据修改后更新
-void ParaModel::ApplyDataAction()
-{ 
-	// 场景未 没有数据
-	// if (pEnvir2 == NULL)
-	// {
-	// 	QMessageBox::information(NULL, "信息提示", "还未加载场景数据，无法保存！");
-	// 	return;
-	// }
+	QString layerDetail;
+	if (SelectLayer == 0)
+	{
+		layerDetail = QString("已有楼层：%1").arg(vLoadModelData.size());
+	}
+	else
+	{
+		layerDetail = QString("已有楼层：%1  当前编辑楼层：%2").arg(vLoadModelData.size()).arg(SelectLayer);
+	}
+	QLabel* layerlbl = new QLabel(layerDetail);
+	layerlbl->setFixedWidth(300);
 
+	QFormLayout* pLayout = new QFormLayout();
+	pLayout->addRow(pCopyLayerBtn);
+	pLayout->addRow(layerlbl);
+	for (size_t i = 0; i < vLoadModelData.size(); i++)
+	{
 
-	//组织界面上输入的数据
-	//位置
-	bool verify;
-	QString str = pModelEdit[0]->text();
-	float  locationX = str.toFloat(&verify);
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "位置X必须是数值，请重新输入");
-	}
-	if (locationX > 180 || locationX < -180)
-	{
-		QMessageBox::information(NULL, "信息提示", "位置X范围必须是正负180");
-	}
-	str = pModelEdit[1]->text();
-	float locationY = str.toFloat(&verify);
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "位置Y必须是数值，请重新输入");
-	}
-	if (locationY > 180 || locationY < -180)
-	{
-		QMessageBox::information(NULL, "信息提示", "位置Y范围必须是正负180");
-	}
-	str = pModelEdit[2]->text();
-	float locationZ = str.toFloat(&verify);
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "位置Z必须是数值，请重新输入");
-	}
-	if (locationZ > 180 || locationZ < -180)
-	{
-		QMessageBox::information(NULL, "信息提示", "位置Z范围必须是正负180");
-	}
-	//速度 
-	str = pModelEdit[3]->text();
-	float speed = str.toFloat(&verify);
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "速度必须是数值，请重新输入");
-	}
-	//方向XYZ
-	str = pModelEdit[4]->text();
-	float angleToX = str.toFloat(&verify);
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "方向X必须是数值，请重新输入");
-	}
-	if (angleToX > 180 || angleToX < -180)
-	{
-		QMessageBox::information(NULL, "信息提示", "方向X范围必须是正负180");
-	}
-	str = pModelEdit[5]->text();
-	float angleToY = str.toFloat(&verify);
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "方向Y必须是数值，请重新输入");
-	}
-	if (angleToY > 180 || angleToY < -180)
-	{
-		QMessageBox::information(NULL, "信息提示", "方向Y范围必须是正负180");
-	}
-	str = pModelEdit[6]->text();
-	float angleToZ = str.toFloat(&verify);
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "方向Z必须是数值，请重新输入");
-	}
-	if (angleToZ > 180 || angleToZ < -180)
-	{
-		QMessageBox::information(NULL, "信息提示", "方向Z范围必须是正负180");
-	}
-	//当量Kg	  
-	str = pArmHeadEdit[0]->text();
-	float tnt = str.toFloat(&verify);
+		QString layerStr = QString("%1楼").arg(i + 1);
+		QPushButton* pLayerBtn = new QPushButton(layerStr, this);
+		pLayerBtn->setToolTip(QString("%1").arg(i));
+		pLayerBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
+		pLayerBtn->setFixedWidth(100);
+		connect(pLayerBtn, &QPushButton::clicked, this, [=]()
+			{
+				ParaModel::ChangeLayerAction(i);
+			});
 
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "TNT当量输入必须是数值，请重新输入");
+		QPushButton* pDelLayerBtn = new QPushButton("删除", this);
+		pDelLayerBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
+		pDelLayerBtn->setFixedWidth(100);
+		connect(pDelLayerBtn, &QPushButton::clicked, this, [=]()
+			{
+				ParaModel::DeleteLayerAction(i);
+			});
+		pLayout->addRow(pLayerBtn, pDelLayerBtn);
 	}
-	//弹片数量	  
-	str = pArmHeadEdit[1]->text();
-	int fragNum = str.toInt(&verify);
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "位置X输入必须是数值，请重新输入");
-	}
-	//弹片质量g 
-	str = pArmHeadEdit[2]->text();
-	float fragQuality = str.toFloat(&verify);
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "弹片质量必须是数值，请重新输入");
-	}
-	// 分布角 主飞散角  
 
-	str = pArmHeadEdit[3]->text();
-	float majorScatteringAngle = str.toFloat(&verify);
-
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "主飞散角必须是数值，请重新输入");
+	temp->setLayout(pLayout);
+	layerWidget->setWidget(temp);
+}
+// 复制楼层数据
+void ParaModel::CopyLayerAction()
+{
+	if (SelectLayer == 0)
+	{ 
+		MyLogOutput("当前没有选中的楼层请加载数据后在选择");
+		return;
 	}
-	if (majorScatteringAngle > 90 || majorScatteringAngle < -90)
-	{
-		QMessageBox::information(NULL, "信息提示", "主飞散角范围必须是正负90");
-	}
-	// 分布角 副飞散角  
-	str = pArmHeadEdit[4]->text();
-	float secondScatteringAngle = str.toFloat(&verify);
-
-	if (!verify)
-	{
-		QMessageBox::information(NULL, "信息提示", "副飞散角必须是数值，请重新输入");
-	}
-	if (secondScatteringAngle > 90 || secondScatteringAngle < -90)
-	{
-		QMessageBox::information(NULL, "信息提示", "副飞散角范围必须是正负90");
-	}
+	SelectLayer = SelectLayer + 1;
+	VTOPOTABLE x = vModelTmpl;
+	vLoadModelData.push_back(x);
+	ParaModel::RefreshLayerWidget();
 	return;
 }
-
+// 将界面上的所有数据切换到其他选中楼层
+void ParaModel::ChangeLayerAction(int layer)
+{
+	SelectLayer = layer;
+	vModelTmpl = vLoadModelData[layer];
+	RefreshSceneData();
+	ParaModel::RefreshLayerWidget();
+	return;
+}
+// 删除当前层数据
+void ParaModel::DeleteLayerAction(int layer)
+{
+	vLoadModelData.erase(vLoadModelData.begin() + layer);
+	if (vLoadModelData.size() == 0)
+	{
+		SelectLayer = 0;
+		if_data == 0;
+		vModelTmpl.clear();
+	}
+	ParaModel::RefreshLayerWidget();
+	return;
+}
 
 void ParaModel::drawWall(const std::vector<float>& points) {
 	MyItem* item = new MyItem;
@@ -1574,14 +1424,11 @@ void ParaModel::ReleaseSysModel()
 
 #pragma region 画布操作
 
-// 释放系统模型库
+// 刷新画布数据
 void ParaModel::RefreshSceneData()
 {
 	if (if_data == 0)
 		return;
-	if (viewShape.size() == 0)
-		return;
-
 	// 计算移动后的新坐标
 	pCalShapeData->MoveBaseUnit(SelectUnitIdx, nMoveXY[0], nMoveXY[1], vModelTmpl, viewShape, vBaseUnit);
 	nMoveXY[0] = 0;
@@ -1590,32 +1437,6 @@ void ParaModel::RefreshSceneData()
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 	AddSceneData();
 	AddSceneXData();
-
-
-	//for (size_t i = 0; i < viewShape.size(); i++)
-	//{
-	//	//绘制柱、墙、门、窗
-	//	if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
-	//	{
-	//		//在画布中重新找到该元素
-	//		QList<QGraphicsItem*> viewItem = SelectSceneItem(viewShape[i].unitIdx);
-	//		for (size_t i = 0; i < viewItem.size(); i++)
-	//		{
-	//			BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(viewItem[i]);
-	//			if (!proxyWidget->isAuxiliary)
-	//			{
-	//				int coordX = viewShape[i].nCen[0];
-	//				int coordY = viewShape[i].nCen[1];
-	//				proxyWidget->setX(coordX);
-	//				proxyWidget->setY(coordY);
-	//			}
-	//			else
-	//			{
-	//				//删除标准线
-	//			}
-	//		}
-	//	}
-	//}
 	return;
 }
 //画布移动元素
@@ -1650,7 +1471,7 @@ void ParaModel::SceneMenuDeleteClickAction(int nUnitType, int nUnitIdx)
 	SelectUnitIdx = nUnitIdx;
 	SelectUnitType = nUnitType;
 
-	pCalShapeData->DelBaseUnit(nUnitIdx, vModelTmpl,0);
+	pCalShapeData->DelBaseUnit(nUnitIdx, vModelTmpl, 0);
 	return;
 }
 //增加
@@ -1658,8 +1479,8 @@ void ParaModel::SceneMenuAddClickAction(int nUnitType, int nUnitIdx)
 {
 	SelectUnitIdx = nUnitIdx;
 	SelectUnitType = nUnitType;
-	
-	QList<QGraphicsItem*> x=SelectSceneItem(nUnitIdx);
+
+	QList<QGraphicsItem*> x = SelectSceneItem(nUnitIdx);
 	BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(x[0]);
 	moveXY[0] = proxyWidget->nOriPos[0];
 	moveXY[1] = proxyWidget->nOriPos[1];
@@ -1674,7 +1495,7 @@ void ParaModel::AddSceneData()
 	if (vModelTmpl.size() == 0)
 		return;
 	//清除画布
-	SceneMainClear(); 
+	SceneMainClear();
 
 	//加载标准线
 	for (size_t i = 0; i < viewShape.size(); i++)
@@ -1684,46 +1505,32 @@ void ParaModel::AddSceneData()
 		{
 			int coordX = viewShape[i].nCen[0] + pSceneOffset;
 			int coordY = viewShape[i].nCen[1] + pSceneOffset;
-			//判断墙的角度加标准线
-			if (vModelTmpl[viewShape[i].unitIdx].nUnitAngle == 0)
-			{
-				BRectangle* divideLine = new BRectangle(
-					1, coordY,
-					8000, 2,
-					BGraphicsItem::ItemType::Rectangle);
-				divideLine->isAuxiliary = true;
-				divideLine->nUnitType = 0;
-				divideLine->nUnitIdx = viewShape[i].unitIdx;
-				/*QBrush b = (Qt::DashLine);
-				b.setColor(ColorHelper(viewShape[i].unitType));
-				divideLine->setBrush(b);*/
-				QPen pen = QPen(Qt::blue);
-				pen.setStyle(Qt::DashLine);
-				divideLine->setPen(pen);
-				connect(divideLine, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
-				connect(divideLine, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
-				pSceneMain.addItem(divideLine);
-			}
-			else
-			{
-				BRectangle* divideLine = new BRectangle(
-					coordX, 1,
-					2, 8000,
-					BGraphicsItem::ItemType::Rectangle);
-				divideLine->isAuxiliary = true;
-				divideLine->nUnitType = 0;
-				divideLine->nUnitIdx = viewShape[i].unitIdx;
-				/*QBrush b = (Qt::DashLine);
-				b.setColor(ColorHelper(viewShape[i].unitType));
-				divideLine->setBrush(b);*/
-				QPen pen = QPen(Qt::blue);
-				pen.setStyle(Qt::DashLine);
-				divideLine->setPen(pen);
-				connect(divideLine, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
-				connect(divideLine, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
-				pSceneMain.addItem(divideLine);
-			}
 
+			QPen pen = QPen(Qt::blue);
+			pen.setStyle(Qt::DashLine);
+			BRectangle* divideLineH = new BRectangle(
+				1, coordY,
+				8000, 2,
+				BGraphicsItem::ItemType::Rectangle);
+			divideLineH->isAuxiliary = true;
+			divideLineH->nUnitType = 0;
+			divideLineH->nUnitIdx = viewShape[i].unitIdx;
+			divideLineH->setPen(pen);
+			connect(divideLineH, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+			connect(divideLineH, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+			pSceneMain.addItem(divideLineH);
+
+			BRectangle* divideLineV = new BRectangle(
+				coordX, 1,
+				2, 8000,
+				BGraphicsItem::ItemType::Rectangle);
+			divideLineV->isAuxiliary = true;
+			divideLineV->nUnitType = 0;
+			divideLineV->nUnitIdx = viewShape[i].unitIdx;
+			divideLineV->setPen(pen);
+			connect(divideLineV, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+			connect(divideLineV, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+			pSceneMain.addItem(divideLineV);
 		}
 		//如果当前要渲染的是强
 		if (viewShape[i].unitType == 4)
