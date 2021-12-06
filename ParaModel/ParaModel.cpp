@@ -205,7 +205,6 @@ void ParaModel::InitSysWidget(QDockWidget* from)
 	from->setFixedWidth(300);
 	from->setWindowTitle("模型组件/属性列表");
 
-
 	QTreeWidgetItem* rootItemPillar = new QTreeWidgetItem(pModelTreeWidget);
 	rootItemPillar->setText(0, "柱");
 	QTreeWidgetItem* rootItemBeam = new QTreeWidgetItem(pModelTreeWidget);
@@ -463,6 +462,7 @@ void ParaModel::InitCentralWidget()
 	setDockNestingEnabled(true);
 
 	QDockWidget* sysWidget = new QDockWidget(this);
+
 	InitSysWidget(sysWidget);
 
 	QDockWidget* oglWidget = new QDockWidget(this);
@@ -822,6 +822,55 @@ void ParaModel::NewFileAction()
 		return;
 	}
 	if_data = 1;
+	//给画布中心绘制十字线， 点击后可以添加
+	QPen pen = QPen(Qt::yellow);
+	pen.setStyle(Qt::DashLine);
+
+	//初始化水平线
+	for (size_t i = 0; i < 2; i++)
+	{
+		BRectangle* divideLineH = new BRectangle(
+			1, 1000,
+			8000, 2,
+			BGraphicsItem::ItemType::Rectangle);
+		divideLineH->isAuxiliary = true;
+		divideLineH->nUnitType = 0;
+		divideLineH->nUnitIdx = 0;
+		divideLineH->setPen(pen);
+		connect(divideLineH, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction); 
+		if (i == 0)
+		{
+			pSceneMain.addItem(divideLineH);
+		}
+		if (i ==1)
+		{
+			pSceneX.addItem(divideLineH);
+		}
+	}
+	//初始化垂直线
+	for (size_t i = 0; i < 2; i++)
+	{
+
+		BRectangle* divideLineV = new BRectangle(
+			1000, 1,
+			2, 8000,
+			BGraphicsItem::ItemType::Rectangle);
+		divideLineV->isAuxiliary = true;
+		divideLineV->nUnitType = 0;
+		divideLineV->nUnitIdx = 0;
+		divideLineV->setPen(pen);
+		connect(divideLineV, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction); 
+		if (i == 0)
+		{
+			pSceneMain.addItem(divideLineV);
+		}
+		if (i == 1)
+		{
+			pSceneX.addItem(divideLineV);
+		}
+	}
+
+
 	MyLogOutput("新建场景文件成功");
 }
 
@@ -945,6 +994,7 @@ void ParaModel::OpenFileAction()
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 
 	ParaModel::AddSceneData();
+	ParaModel::AddSceneXData();
 }
 
 void ParaModel::GraphicsViewXFocus(bool b)
@@ -1011,8 +1061,7 @@ void ParaModel::MyLogOutput(QString myLogout)
 
 // 数据修改后更新
 void ParaModel::ApplyDataAction()
-{
-	RefreshScene();
+{ 
 	// 场景未 没有数据
 	// if (pEnvir2 == NULL)
 	// {
@@ -1526,7 +1575,7 @@ void ParaModel::ReleaseSysModel()
 #pragma region 画布操作
 
 // 释放系统模型库
-void ParaModel::RefreshScene()
+void ParaModel::RefreshSceneData()
 {
 	if (if_data == 0)
 		return;
@@ -1540,6 +1589,7 @@ void ParaModel::RefreshScene()
 	// 转为绘图坐标
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 	AddSceneData();
+	AddSceneXData();
 
 
 	//for (size_t i = 0; i < viewShape.size(); i++)
@@ -1581,9 +1631,9 @@ void ParaModel::SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos)
 	SelectUnitType = nUnitType;
 	nMoveXY[0] = pos.x();
 	nMoveXY[1] = pos.y();
-	QString sInfo = QString("%1 %2").arg(pos.x()).arg(pos.y());
-	myLogOutLabel->setText(sInfo);
-	ParaModel::RefreshScene();
+	QString sInfo = QString("移动%1构建 %2 %3").arg(nUnitIdx).arg(pos.x()).arg(pos.y());
+	MyLogOutput(sInfo);
+	ParaModel::RefreshSceneData();
 	return;
 }
 //画布菜单点击
@@ -1756,6 +1806,102 @@ void ParaModel::AddSceneData()
 		graphicsViewMain->show();
 	}
 }
+
+//画布X增加数据
+void ParaModel::AddSceneXData()
+{
+	if (if_data == 0)
+		return;
+	if (vModelTmpl.size() == 0)
+		return;
+	//清除画布
+	SceneXClear();
+
+	//加载标准线
+	for (size_t i = 0; i < viewShape.size(); i++)
+	{
+		//如果当前要渲染的是强
+		if (viewShape[i].unitType == 4)
+		{
+			int coordX = viewShape[i].nCen[0] + pSceneOffset;
+			int coordY = viewShape[i].nCen[1] + pSceneOffset;
+			//判断墙的角度加标准线
+			if (vModelTmpl[viewShape[i].unitIdx].nUnitAngle == 0)
+			{
+				BRectangle* divideLine = new BRectangle(
+					1, coordY,
+					8000, 2,
+					BGraphicsItem::ItemType::Rectangle);
+				divideLine->isAuxiliary = true;
+				divideLine->nUnitType = 0;
+				divideLine->nUnitIdx = viewShape[i].unitIdx;
+				/*QBrush b = (Qt::DashLine);
+				b.setColor(ColorHelper(viewShape[i].unitType));
+				divideLine->setBrush(b);*/
+				QPen pen = QPen(Qt::yellow);
+				pen.setStyle(Qt::DashLine);
+				divideLine->setPen(pen);
+				connect(divideLine, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+				connect(divideLine, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+				pSceneX.addItem(divideLine);
+			}
+			else
+			{
+				BRectangle* divideLine = new BRectangle(
+					coordX, 1,
+					2, 8000,
+					BGraphicsItem::ItemType::Rectangle);
+				divideLine->isAuxiliary = true;
+				divideLine->nUnitType = 0;
+				divideLine->nUnitIdx = viewShape[i].unitIdx;
+				/*QBrush b = (Qt::DashLine);
+				b.setColor(ColorHelper(viewShape[i].unitType));
+				divideLine->setBrush(b);*/
+				QPen pen = QPen(Qt::yellow);
+				pen.setStyle(Qt::DashLine);
+				divideLine->setPen(pen);
+				connect(divideLine, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+				connect(divideLine, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+				pSceneX.addItem(divideLine);
+			}
+
+		}
+	}
+	//根据数据绘制图形
+	for (size_t i = 0; i < viewShape.size(); i++)
+	{
+		if (viewShape[i].unitIdx == 15)
+		{
+			int k = 0;
+		}
+		//绘制柱、墙、门、窗
+		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
+		{
+			int coordX = viewShape[i].nCen[0] + pSceneOffset;
+			int coordY = viewShape[i].nCen[1] + pSceneOffset;
+			BRectangle* viewItem = new BRectangle(
+				coordX, coordY,
+				viewShape[i].nWH[0], viewShape[i].nWH[1],
+				BGraphicsItem::ItemType::Rectangle);
+			viewItem->isAuxiliary = false;
+			viewItem->nUnitType = viewShape[i].unitType;
+			viewItem->nUnitIdx = viewShape[i].unitIdx;
+			viewItem->setBrush(ColorHelper(viewShape[i].unitType));
+			connect(viewItem, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+			connect(viewItem, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+			connect(viewItem, &BRectangle::SceneMenuDeleteClick, this, &ParaModel::SceneMenuDeleteClickAction);
+			connect(viewItem, &BRectangle::SceneMenuClick, this, &ParaModel::SceneMenuClickAction);
+			pSceneX.addItem(viewItem);
+		}
+	}
+
+	if (MainDockState != 3)
+	{
+		graphicsViewX->hide();
+		graphicsViewX->show();
+	}
+}
+
 //更新画布中单独的元素
 void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height)
 {
@@ -1829,25 +1975,25 @@ void ParaModel::SceneMainClear()
 void ParaModel::SceneXClear()
 {
 	pSceneX.clear();
-	for (int x = 0; x <= 2000; x += 20)
+	for (int x = 0; x <= 2000; x += 10)
 		pSceneX.addLine(0, x, 2000, x, QPen(Qt::red));
-	for (int y = 0; y <= 2000; y += 20)
+	for (int y = 0; y <= 2000; y += 10)
 		pSceneX.addLine(y, 0, y, 2000, QPen(Qt::red));
 }
 void ParaModel::SceneYClear()
 {
 	pSceneY.clear();
-	for (int x = 0; x <= 2000; x += 20)
+	for (int x = 0; x <= 2000; x += 10)
 		pSceneY.addLine(0, x, 2000, x, QPen(Qt::red));
-	for (int y = 0; y <= 2000; y += 20)
+	for (int y = 0; y <= 2000; y += 10)
 		pSceneY.addLine(y, 0, y, 2000, QPen(Qt::red));
 }
 void ParaModel::SceneZClear()
 {
 	pSceneZ.clear();
-	for (int x = 0; x <= 2000; x += 20)
+	for (int x = 0; x <= 2000; x += 10)
 		pSceneZ.addLine(0, x, 2000, x, QPen(Qt::red));
-	for (int y = 0; y <= 2000; y += 20)
+	for (int y = 0; y <= 2000; y += 10)
 		pSceneZ.addLine(y, 0, y, 2000, QPen(Qt::red));
 }
 #pragma endregion

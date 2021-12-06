@@ -142,7 +142,7 @@ private:
 	void SceneYClear();
 	void SceneZClear();
 	//刷新画布
-	void RefreshScene();
+	void RefreshSceneData();
 	//更新画布元素
 	void UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height);
 public:
@@ -161,6 +161,7 @@ public slots:
 	void GraphicsViewOgl(bool b);	//opengl旁侧图
 	void updateOGL();				//更新三维窗口内容
 	void AddSceneData();				//更新画布内容
+	void AddSceneXData();				//更新画布X内容
 
 	void NewFileAction();
 	void OpenFileAction();
