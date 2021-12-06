@@ -3,9 +3,10 @@
 
 #include <QDebug>
 
+#include <fstream>
 #include <set>
 #include <malloc.h>
-
+#include <iomanip>
 
 
 
@@ -16,6 +17,7 @@ const QVector3D LIGHT_POSITION(0.0f, 1.0f, 0.0f);
 const int OGLMANAGER_WIDTH = 1200;
 const int OGLMANAGER_HEIGHT = 800;
 
+//空间两个三维点的距离
 float Distance(float x1, float y1, float z1, float x2, float y2, float z2)
 {
 	float dis = 0;
@@ -26,6 +28,25 @@ float Distance(float x1, float y1, float z1, float x2, float y2, float z2)
 	return sqrt(dis);
 }
 
+//找solid中8个点的索引
+int findIndex(vPoint points, vPoint allNodes, int idx[2][4])
+{
+	//遍历所有节点来寻找此solid的8个点 索引
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < allNodes.size(); j++)
+		{
+			if ((points[i].x == allNodes[j].x) && (points[i].y == allNodes[j].y) && (points[i].z == allNodes[j].z))
+			{
+				idx[i / 4][i % 4] = j + 1;
+				break;
+			}
+		}
+	}
+	return 0;
+}
+
+//不同类型查找不同颜色
 QColor ColorHelper(int nUnitType)
 {
 	if (nUnitType == 1)
@@ -154,6 +175,11 @@ void ParaOGLManager::initializeGL()
 	targetModel.setToIdentity();
 	targetModelsave.setToIdentity();
 	targetModeluse.setToIdentity();
+
+
+	//
+	allNodes.resize(0);
+	allSolids.resize(0);
 
 	/************ 载入shader ***********/
 
@@ -686,9 +712,43 @@ void ParaOGLManager::paintGL()
 		
 		}
 
+
+		if (outFlag != -1) { outFlag++; }
 	}
 
 
+	//此时0 1 2是暂时的，1说明所有的点信息已存储，等于2说明所有的solid信息已存储(此时可输出到K文件了)
+
+	//将此三维模型的数据输出到K文件里
+	if (outFlag == 2)
+	{
+
+		fstream outfile("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/test.k");
+		outfile << "*KEYWORD" << "\n";
+		outfile << "*NODE" << "\n";
+
+		for (int index = 0; index < allNodes.size(); index++)
+		{
+			outfile << std::setw(8) << (index+1) << std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(allNodes[index].x / 100.0)
+				<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(allNodes[index].y / 100.0)
+				<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(allNodes[index].z / 100.0) << std::setw(8) << "0" << std::setw(8) << "0" << std::endl;
+		}
+		
+		outfile << "*ELEMENT_SOLID" << "\n";
+
+		for (int i = 0; i < allSolids.size(); i++)
+		{
+			outfile << std::setw(8) << i + 1 << std::setw(8) << "1";
+			for (int j = 0; j < 8; j++)
+			{
+				outfile << std::setw(8) << allSolids[i].idx[j / 4][j % 4];
+			}
+			outfile << "\n";
+		}
+		
+
+		outFlag = -1;
+	}
 }
 
 void ParaOGLManager::processInput(GLfloat dt)
@@ -922,19 +982,39 @@ void ParaOGLManager::InitAndDrawCuboid(int x, int y, int z, int length, int thic
 
 	vPoint points;
 	Point tmp;
-	tmp.x = x - length / 2, tmp.y = y - height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
-	tmp.x = x + length / 2, tmp.y = y - height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
-	tmp.x = x + length / 2, tmp.y = y - height / 2, tmp.z = z - thickness / 2; points.push_back(tmp);
 	tmp.x = x - length / 2, tmp.y = y - height / 2, tmp.z = z - thickness / 2; points.push_back(tmp);
-	tmp.x = x - length / 2, tmp.y = y + height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
-	tmp.x = x + length / 2, tmp.y = y + height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
-	tmp.x = x + length / 2, tmp.y = y + height / 2, tmp.z = z - thickness / 2; points.push_back(tmp);
+	tmp.x = x + length / 2, tmp.y = y - height / 2, tmp.z = z - thickness / 2; points.push_back(tmp);
+	tmp.x = x + length / 2, tmp.y = y - height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
+	tmp.x = x - length / 2, tmp.y = y - height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
 	tmp.x = x - length / 2, tmp.y = y + height / 2, tmp.z = z - thickness / 2; points.push_back(tmp);
+	tmp.x = x + length / 2, tmp.y = y + height / 2, tmp.z = z - thickness / 2; points.push_back(tmp);
+	tmp.x = x + length / 2, tmp.y = y + height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
+	tmp.x = x - length / 2, tmp.y = y + height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
+
 
 	int solidToFaceOrder[] = { 0,1,2,3,0,1,5,4,1,2,6,5,3,2,6,7,0,3,7,4,4,5,6,7 };
 
-	//6个矩形面片 24个点索引
 
+
+	//存入到点集合中
+	if (outFlag == 0)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			allNodes.push_back(points[i]);
+		}
+	}
+	//点已存入完毕，此时开始对每个solid里面的点索引 赋值
+	if (outFlag == 1)
+	{
+		Solid tmp;
+		findIndex(points,allNodes,tmp.idx);
+
+		allSolids.push_back(tmp);
+	}
+
+
+	//6个矩形面片 24个点索引
 	for (int k = 0; k < 24; k++)
 	{
 		vertices[k * 3] = points[solidToFaceOrder[k]].x;
