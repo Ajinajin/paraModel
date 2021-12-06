@@ -356,19 +356,24 @@ int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE v
 	oInsUnit.nCenUnitIdx = oCol.nUnitIdx;
 	oInsUnit.nUnitAngle = vLayerTopo[nInsWallIdx].nUnitAngle;
 	oInsUnit.nTopoIdx = vLayerTopo.size();
+	//柱子的中心点下点信息 待完善，一层的y值为0
+	oInsUnit.nCenPos[0] = 0, oInsUnit.nCenPos[1] = 0, oInsUnit.nCenPos[2] = 0, oInsUnit.nCenPos[3] = 0;
+
 	for (int i = 0; i < 12; i++) { oInsUnit.nAdjUnitIdx[i]=-1; }
 	// 根据插入信息完成插入
 	if (oInsUnit.nUnitAngle == 0)
 	{
 		oInsUnit.nCenPos[2] = vPlaneDraw[nInsWallIdx].nCen[1];
-		int nWallLeft = vPlaneDraw[nInsWallIdx].nCen[0] - vPlaneDraw[nInsWallIdx].nWH[0] / 2;
-		oInsUnit.nCenPos[0] = oInsPos.nXY[0] - nWallLeft;
+		//int nWallLeft = vPlaneDraw[nInsWallIdx].nCen[0] - vPlaneDraw[nInsWallIdx].nWH[0] / 2;
+		//oInsUnit.nCenPos[0] = oInsPos.nXY[0] - nWallLeft;
+		oInsUnit.nCenPos[0] = oInsPos.nXY[0];
 	}
 	else if (oInsUnit.nUnitAngle == 90)
 	{
-		oInsUnit.nCenPos[0] = vPlaneDraw[nInsWallIdx].nCen[1];
-		int nWallBottom = vPlaneDraw[nInsWallIdx].nCen[1] - vPlaneDraw[nInsWallIdx].nWH[1] / 2;
-		oInsUnit.nCenPos[2] = oInsPos.nXY[0] - nWallBottom;
+		oInsUnit.nCenPos[0] = vPlaneDraw[nInsWallIdx].nCen[0];
+		//int nWallBottom = vPlaneDraw[nInsWallIdx].nCen[1] - vPlaneDraw[nInsWallIdx].nWH[1] / 2;
+		//oInsUnit.nCenPos[2] = oInsPos.nXY[1] - nWallBottom;
+		oInsUnit.nCenPos[2] = oInsPos.nXY[1];
 	}
 	// 添加柱 更新拓扑结构
 	oInsUnit.nAdjUnitIdx[0] = nInsWallIdx;
@@ -386,11 +391,14 @@ int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE v
 	for (i = 0; i < 12; i++)
 	{
 		nAdjIdx = vLayerTopo[nInsWallIdx].nAdjUnitIdx[i];
-		if (vLayerTopo[nAdjIdx].nUnitType == 1)
+
+		if (vLayerTopo[nAdjIdx].nUnitType == 2)
 		{
 			nBeamIdx = nAdjIdx;
 			break;
 		}
+
+		
 	}
 	TopoUnit oBeamUnit;
 	for (int j = 0; j < 12; j++) { oBeamUnit.nAdjUnitIdx[j] = -1; }
@@ -407,12 +415,12 @@ int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE v
 	vLayerTopo[nNewColIdx].nAdjUnitIdx[2] = nBeamIdx;
 	vLayerTopo[nNewColIdx].nAdjUnitIdx[3] = nNewBeamIdx;
 	// 更新墙拓扑结构
-	UpdateNewAdj(nNewColIdx, vLayerTopo[nInsWallIdx].nAdjUnitIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx, vLayerTopo, 0);
-	UpdateNewAdj(nNewBeamIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx, vLayerTopo, 1);
+	UpdateNewAdj(nNewColIdx, vLayerTopo[nInsWallIdx].nAdjUnitIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx, vLayerTopo, 1);
+	UpdateNewAdj(nNewBeamIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx, vLayerTopo, 2);
 
 	// 更新梁拓扑结构
-	UpdateNewAdj(nNewColIdx, vLayerTopo[nBeamIdx].nAdjUnitIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx, vLayerTopo, 0);
-	UpdateNewAdj(nNewWallIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx, vLayerTopo, 1);
+	UpdateNewAdj(nNewColIdx, vLayerTopo[nBeamIdx].nAdjUnitIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx, vLayerTopo, 1);
+	UpdateNewAdj(nNewWallIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx, vLayerTopo, 4);
 
 	return 0;
 }
@@ -448,15 +456,18 @@ int AddWallInCols(BasicUnit oAddUnit, int nAdjCol[2], VUNITTABLE vTable,VTOPOTAB
 int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE& vTable, VTOPOTABLE& vLayerTopo, VSHAPE vPlaneDraw)
 {
 	int nRe = 0;
-	// 判断插入点是否在墙线范围内 返回墙在拓扑图的Idx 或者 虚墙区域关联的两个柱子
-	int nInsWallIdx = 0;
+	int nInsWallIdx=-1;//选择到的墙的ID
 	int nAdjCol[2];		// 两个中有一个为空则置 [0]为-1
 	
 	// 计算 待完善
 
-	//计算与墙连接的两个柱ID
-	nInsWallIdx = 9;
-	calColumnsIdxFromWallIdx(nInsWallIdx, nAdjCol, vLayerTopo);
+	//计算与墙连接的两个柱ID,如果此时选择的不是墙，则nInsWallIdx为-1
+	if (vLayerTopo[selectUnitIdx].nUnitType == 4)
+	{
+		nInsWallIdx = selectUnitIdx;
+		calColumnsIdxFromWallIdx(nInsWallIdx, nAdjCol, vLayerTopo);
+	}
+	
 
 
 	if (nInsWallIdx < 0 && nAdjCol[0] < 0)
