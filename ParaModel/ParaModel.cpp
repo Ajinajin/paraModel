@@ -388,7 +388,7 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setText(("保存"));
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
 	pannel->addLargeAction(act);
-	//connect(act, &QAction::triggered, this, &ParaModel::SaveFileAction);
+	connect(act, &QAction::triggered, this, &ParaModel::SaveFileAction);
 
 
 	act = new QAction(this);
@@ -740,6 +740,14 @@ void ParaModel::NewFileAction()
 	MyLogOutput("新建场景文件成功");
 }
 /// <summary>
+/// 保存原来txt文件
+/// </summary>
+void ParaModel::SaveFileAction()
+{
+	//TODO::如果没有打开文件的路径，就让用户选择文件路径，如果有保存成对应的txt格式
+	return;
+}
+/// <summary>
 /// 导出k文件
 /// </summary>
 void ParaModel::ExportFileAction()
@@ -1038,6 +1046,8 @@ void ParaModel::CopyLayerAction()
 // 将界面上的所有数据切换到其他选中楼层
 void ParaModel::ChangeLayerAction(int layer)
 {
+	//TODO::将数据保存到操作的层中
+    vLoadModelData[SelectLayer]= vModelTmpl;
 	SelectLayer = layer;
 	vModelTmpl = vLoadModelData[layer];
 	RefreshSceneData();
