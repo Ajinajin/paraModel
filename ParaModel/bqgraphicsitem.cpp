@@ -602,7 +602,7 @@ BLine::BLine(ItemType type)
    
 QRectF BLine::boundingRect() const
 {
-	return QRectF(m_center.x() - m_radius, m_center.y() - m_radius, m_radius * 2, m_radius * 2);
+	return QRectF(m_center.x() , m_center.y() , 1,  1);
 }
 
 void BLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -612,13 +612,13 @@ void BLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWi
 	painter->setPen(this->pen());
 	painter->setBrush(this->brush());
 	//给出的关键点绘制线
-	static QList<QPointF> points = QList<QPointF>() << QPointF(10, 40) << QPointF(100, 100) << QPointF(200, 100)
-		<< QPointF(300, 100) << QPointF(330, 80) << QPointF(350, 70);
+	/*static QList<QPointF> points = QList<QPointF>() << QPointF(10, 40) << QPointF(100, 100) << QPointF(200, 100)
+		<< QPointF(300, 100) << QPointF(330, 80) << QPointF(350, 70);*/
 
-	QPainterPath path(points[0]);
-	for (int i = 1; i < points.size(); ++i)
+	QPainterPath path(this->point[0]);
+	for (int i = 1; i < point.size(); ++i)
 	{
-		path.lineTo(points[i]);
+		path.lineTo(point[i]);
 	}
 	painter->drawPath(path);
 }
@@ -634,7 +634,7 @@ BPoint::BPoint(ItemType type)
 
 QRectF BPoint::boundingRect() const
 {
-	return QRectF(m_center.x() - m_radius, m_center.y() - m_radius, m_radius * 2, m_radius * 2);
+	return QRectF(m_center.x() , m_center.y() ,1, 1);
 }
 
 void BPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -643,19 +643,17 @@ void BPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QW
 	Q_UNUSED(widget);
 	painter->setPen(this->pen());
 	painter->setBrush(this->brush());
-	//给出的关键点绘制线
-	static QList<QPointF> points = QList<QPointF>() << QPointF(10, 40) << QPointF(100, 100) << QPointF(200, 100)
-		<< QPointF(300, 100) << QPointF(330, 80) << QPointF(350, 70);
+	//给出的关键点绘制线 
 
 	int ellipse_size = 4;
-	for (int i = 0; i < points.size(); ++i) {
-		painter->drawEllipse(points[i], ellipse_size, ellipse_size);
-		QString text = QString::number(points[i].y());
+	for (int i = 0; i < this->point.size(); ++i) {
+		painter->drawEllipse(this->point[i], ellipse_size, ellipse_size);
+		/*QString text = QString::number(points[i].y());
 		QFontMetrics fm = painter->fontMetrics();
 		int height_font = fm.height();
 		int width_text = fm.width(text);
 		QPointF textPos(points[i].x() - (width_text / 2), points[i].y() - (ellipse_size / 2) - (height_font / 2));
-		painter->drawText(textPos, text);
+		painter->drawText(textPos, text);*/
 	}
 }
 

@@ -47,30 +47,25 @@
 #pragma region 初始化窗口
 //初始化建筑楼层窗口
 void WarheadParaModel::InitWarheadWidget(QDockWidget* from)
-{ 
+{
 	from->setWindowTitle("战斗部属性");
 	from->setFixedWidth(300);
 }
 
 //初始化系统模型窗口
 void WarheadParaModel::InitSysUnitWidget(QDockWidget* from)
-{  
+{
 	from->setFixedWidth(300);
 	from->setWindowTitle("系统战斗部模型");
 }
 
 //初始化已加载的模型窗口
 void WarheadParaModel::InitLoadModelWidget(QDockWidget* from)
-{   
-	 
+{
+
 	from->setWindowTitle("模型结构树");
 	from->setFixedWidth(300);
-	//layout布局
-
-	QWidget* visutal = new QWidget();
-
-
-	from->setWidget(visutal);
+	//layout布局 
 
 }
 
@@ -93,7 +88,7 @@ void WarheadParaModel::InitEditManagerWidget(QDockWidget* from)
 	graphicsViewMain = new BQGraphicsView();
 	graphicsViewMain->setScene(&pSceneMain);
 	pSceneMain.setBackgroundBrush(Qt::darkGray);
-
+	MainDockWidget->setMinimumWidth(1310);
 	MainDockWidget->setWindowTitle("编辑视图 （二维X）");
 	MainDockWidget->setWidget(graphicsViewMain);
 	//中间大屏三位窗口
@@ -134,7 +129,7 @@ void WarheadParaModel::InitCentralWidget()
 
 	QDockWidget* sysWidget = new QDockWidget(this);
 	InitSysUnitWidget(sysWidget);
-	 
+
 
 	QDockWidget* editManagerWidget = new QDockWidget(this);
 	InitEditManagerWidget(editManagerWidget);
@@ -187,14 +182,14 @@ void WarheadParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+N")));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &WarheadParaModel::NewFileAction);
-	 
+
 	act = new QAction(this);
 	act->setObjectName(("打开"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("打开")); 
+	act->setText(("打开"));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &WarheadParaModel::OpenFileAction);
-	 
+
 
 	act = new QAction(this);
 	act->setObjectName(("保存"));
@@ -228,6 +223,14 @@ void WarheadParaModel::InitCategoryMain(SARibbonCategory* page)
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &WarheadParaModel::CloseFileAction);
 
+
+	act = new QAction(this);
+	act->setObjectName(("刷新"));
+	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
+	act->setText(("刷新"));
+	pannel->addLargeAction(act);
+	connect(act, &QAction::triggered, this, &WarheadParaModel::RefreshAction);
+
 }
 //初始化Ribbon
 void WarheadParaModel::InitSARibbon()
@@ -244,7 +247,7 @@ void WarheadParaModel::InitSARibbon()
 	categoryMain->setObjectName(("categoryMain"));
 	ribbon->addCategoryPage(categoryMain);
 	InitCategoryMain(categoryMain);
-	 
+
 	//初始化顶部快捷菜单
 	//InitQuickAccess(ribbon);
 }
@@ -274,6 +277,20 @@ void WarheadParaModel::InitWindow()
 	//QElapsedTimer cost;
 	//int lastTimes = 0;
 	//cost.start();
+
+
+
+
+	BLine* m_rectangle = new BLine(BGraphicsItem::ItemType::Line);
+	m_rectangle->point = QList<QPointF>() << QPointF(10, 40) << QPointF(100, 100) << QPointF(200, 100)
+		<< QPointF(300, 100) << QPointF(330, 80) << QPointF(350, 70);
+	pSceneMain.addItem(m_rectangle);
+
+	BPoint* m_point = new BPoint(BGraphicsItem::ItemType::Point);
+	m_point->point = QList<QPointF>() << QPointF(10, 40) << QPointF(100, 100) << QPointF(200, 100)
+		<< QPointF(300, 100) << QPointF(330, 80) << QPointF(350, 70);
+	pSceneMain.addItem(m_point);
+
 
 }
 //初始化弹出窗口
@@ -310,21 +327,21 @@ void WarheadParaModel::NewFileAction()
 		return;
 	}
 	if_data = 1;
-	
+
 	MyLogOutput("新建场景文件成功");
 }
 /// <summary>
 /// 保存原来txt文件
 /// </summary>
 void WarheadParaModel::SaveFileAction()
-{	
+{
 	if (if_data == 0)
 	{
 		QMessageBox::information(NULL, "信息提示", "当前并无数据可保存");
 	}
 	else
 	{
-		
+
 		MyLogOutput("当前文件保存成功");
 	}
 	return;
@@ -341,7 +358,7 @@ void WarheadParaModel::SaveasFileAction()
 	}
 	else
 	{
-		
+
 		MyLogOutput("文件另存成功");
 	}
 	return;
@@ -364,13 +381,22 @@ void WarheadParaModel::ExportFileAction()
 }
 
 /// <summary>
+/// 刷新画布
+/// </summary>
+void WarheadParaModel::RefreshAction()
+{
+	graphicsViewMain->hide();
+	graphicsViewMain->show();
+}
+
+/// <summary>
 /// 关闭场景
 /// </summary>
 void WarheadParaModel::CloseFileAction()
 {
 	if_data = 0;
-	
-	SceneMainClear(); 
+
+	SceneMainClear();
 	MyLogOutput("清除数据成功");
 }
 
@@ -408,10 +434,10 @@ void WarheadParaModel::OpenFileAction()
 	while (!readStream.atEnd()) {
 		QString content = readStream.readLine();
 		QStringList list = content.split(' ');
-	
+
 	}
 	if_data = 1;
-	 
+
 }
 
 
@@ -440,7 +466,7 @@ int WarheadParaModel::InitSysData()
 	pAuxiliaryLine = 20000;
 	if_data = 0;
 	return 1;
-} 
+}
 // 初始化路径 
 int WarheadParaModel::InitPath()
 {
@@ -480,7 +506,7 @@ int WarheadParaModel::InitUnitLib()
 	while (!readStream.atEnd()) {
 		QString content = readStream.readLine();
 		QStringList list = content.split(' ');
-	 
+
 	}
 	return 1;
 }
@@ -505,7 +531,7 @@ void WarheadParaModel::ReleaseUISource()
 	// 释放各种资源
 	FREEPTR(pTipBar);
 	FREEPTR(myLogOutLabel);
-	FREEPTR(graphicsViewMain); 
+	FREEPTR(graphicsViewMain);
 	return;
 }
 
@@ -523,7 +549,7 @@ void WarheadParaModel::ReleaseSysModel()
 void WarheadParaModel::AddSceneData()
 {
 	if (if_data == 0)
-		return; 
+		return;
 	//清除画布
 	SceneMainClear();
 

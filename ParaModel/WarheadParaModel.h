@@ -118,11 +118,12 @@ public slots:
 	void MyLogOutput(QString myLogout);         //输出日志
 	
 	void updateOGL();				//更新三维窗口内容
-	void AddSceneData();				//更新画布内容 
+	void AddSceneData();			//更新画布内容 
 
 	void NewFileAction();			//新建楼层户型数据
 	void OpenFileAction();			//外部打开楼层户型数据
 	void CloseFileAction();			//清空所有数据
+	void RefreshAction();			//刷新画布
 	void SaveFileAction();			//保存当前数据
 	void SaveasFileAction();		//另存当前数据
 	void ExportFileAction();		//导出成k文件
