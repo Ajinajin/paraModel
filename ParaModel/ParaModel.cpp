@@ -252,7 +252,7 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 	MainDockWidget = from;
 
 	graphicsViewMain = new BQGraphicsView();
-	graphicsViewMain->setScene(&pSceneMain); 
+	graphicsViewMain->setScene(&pSceneMain);
 	pSceneMain.setBackgroundBrush(Qt::darkGray);
 
 	MainDockWidget->setWindowTitle("当前编辑视图 （三维）");
@@ -357,7 +357,123 @@ void ParaModel::InitStatusWidget()
 	winStatus->addWidget(pTipBar);
 	setStatusBar(winStatus);
 }
+//初始化Ribbon中的画布大小
+void ParaModel::InitCategoryScene(SARibbonCategory* page)
+{
 
+	SARibbonPannel* pannel = page->addPannel(("画布大小"));
+	pSceneBtn10 = new QAction(this);
+	pSceneBtn10->setObjectName(("10米"));
+	pSceneBtn10->setIcon(QIcon(":/qss/res/qss/White/save.png"));
+	pSceneBtn10->setText(("10米"));
+	pSceneBtn10->setCheckable(true);
+	pannel->addLargeAction(pSceneBtn10);
+	connect(pSceneBtn10, &QAction::triggered, this, [=]() {
+		pSceneOffset = 350;
+		pAuxiliaryLine = 2000;
+		pSceneBtn10->setChecked(true);
+		pSceneBtn20->setChecked(false);
+		pSceneBtn50->setChecked(false);
+		pSceneBtn100->setChecked(false);
+		pSceneBtn200->setChecked(false);
+		SceneMainClear();
+		SceneXClear();
+		SceneYClear();
+		SceneZClear();
+		AddSceneData();
+		AddSceneXData();
+		});
+	pSceneBtn20 = new QAction(this);
+	pSceneBtn20->setObjectName(("20米"));
+	pSceneBtn20->setIcon(QIcon(":/qss/res/qss/White/save.png"));
+	pSceneBtn20->setText(("20米"));
+	pSceneBtn20->setCheckable(true);
+	pannel->addLargeAction(pSceneBtn20);
+	connect(pSceneBtn20, &QAction::triggered, this, [=]() {
+		pSceneOffset = 700;
+		pAuxiliaryLine = 4000;
+		pSceneBtn10->setChecked(false);
+		pSceneBtn20->setChecked(true);
+		pSceneBtn50->setChecked(false);
+		pSceneBtn100->setChecked(false);
+		pSceneBtn200->setChecked(false);
+		SceneMainClear();
+		SceneXClear();
+		SceneYClear();
+		SceneZClear();
+		AddSceneData();
+		AddSceneXData();
+		});
+
+	pSceneBtn50 = new QAction(this);
+	pSceneBtn50->setObjectName(("50米"));
+	pSceneBtn50->setIcon(QIcon(":/qss/res/qss/White/save.png"));
+	pSceneBtn50->setText(("50米"));
+	pSceneBtn50->setCheckable(true);
+	pannel->addLargeAction(pSceneBtn50);
+	connect(pSceneBtn50, &QAction::triggered, this, [=]() {
+		pSceneOffset = 2350;
+		pAuxiliaryLine = 10000;
+		pSceneBtn10->setChecked(false);
+		pSceneBtn20->setChecked(false);
+		pSceneBtn50->setChecked(true);
+		pSceneBtn100->setChecked(false);
+		pSceneBtn200->setChecked(false);
+		SceneMainClear();
+		SceneXClear();
+		SceneYClear();
+		SceneZClear();
+		AddSceneData();
+		AddSceneXData();
+		});
+
+
+	pSceneBtn100 = new QAction(this);
+	pSceneBtn100->setObjectName(("100米"));
+	pSceneBtn100->setIcon(QIcon(":/qss/res/qss/White/save.png"));
+	pSceneBtn100->setText(("100米"));
+	pSceneBtn100->setCheckable(true);
+	pSceneBtn100->setChecked(true);
+	pannel->addLargeAction(pSceneBtn100);
+	connect(pSceneBtn100, &QAction::triggered, this, [=]() {
+		pSceneOffset = 4700;
+		pAuxiliaryLine = 20000;
+		pSceneBtn10->setChecked(false);
+		pSceneBtn20->setChecked(false);
+		pSceneBtn50->setChecked(false);
+		pSceneBtn100->setChecked(true);
+		pSceneBtn200->setChecked(false);
+		SceneMainClear();
+		SceneXClear();
+		SceneYClear();
+		SceneZClear();
+		AddSceneData();
+		AddSceneXData();
+		});
+
+
+	pSceneBtn200 = new QAction(this);
+	pSceneBtn200->setObjectName(("200米"));
+	pSceneBtn200->setIcon(QIcon(":/qss/res/qss/White/save.png"));
+	pSceneBtn200->setText(("200米"));
+	pSceneBtn200->setCheckable(true);
+	pannel->addLargeAction(pSceneBtn200);
+	connect(pSceneBtn200, &QAction::triggered, this, [=]() {
+		pSceneOffset = 9400;
+		pAuxiliaryLine = 40000;
+		pSceneBtn10->setChecked(false);
+		pSceneBtn20->setChecked(false);
+		pSceneBtn50->setChecked(false);
+		pSceneBtn100->setChecked(false);
+		pSceneBtn200->setChecked(true);
+		SceneMainClear();
+		SceneXClear();
+		SceneYClear();
+		SceneZClear();
+		AddSceneData();
+		AddSceneXData();
+		});
+}
 
 //初始化Ribbon中的文件菜单
 void ParaModel::InitCategoryMain(SARibbonCategory* page)
@@ -368,8 +484,7 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setObjectName(("新建"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
 	act->setText(("新建"));
-	act->setShortcut(QKeySequence(QLatin1String("Ctrl+N")));
-	act->setCheckable(true);
+	act->setShortcut(QKeySequence(QLatin1String("Ctrl+N"))); 
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::NewFileAction);
 
@@ -412,6 +527,7 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setText(("关闭"));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::CloseFileAction);
+
 }
 //初始化Ribbon
 void ParaModel::InitSARibbon()
@@ -428,6 +544,14 @@ void ParaModel::InitSARibbon()
 	categoryMain->setObjectName(("categoryMain"));
 	ribbon->addCategoryPage(categoryMain);
 	InitCategoryMain(categoryMain);
+
+
+	//初始化画布大小ribbon
+	SARibbonCategory* categoryScene = new SARibbonCategory();
+	categoryScene->setCategoryName(("画布大小"));
+	categoryScene->setObjectName(("categoryScene"));
+	ribbon->addCategoryPage(categoryScene);
+	InitCategoryScene(categoryScene);
 
 	//初始化顶部快捷菜单
 	//InitQuickAccess(ribbon);
@@ -790,7 +914,7 @@ void ParaModel::CloseFileAction()
 /// 打开场景
 /// </summary>
 void ParaModel::OpenFileAction()
-{ 
+{
 	QFileDialog* f = new QFileDialog(this);
 	f->setWindowTitle("选择数据文件*.txt");
 	f->setNameFilter("*.txt");
@@ -1188,6 +1312,10 @@ int ParaModel::InitPath()
 	// Exe文件所在目录
 	oPath.sExeDir = qApp->applicationDirPath().toLocal8Bit().data();
 
+	oPath.sTopoUnitDir = oPath.sExeDir + "/TopoUnit";
+	oPath.sTopoLayerDir = oPath.sExeDir + "/TopoLayer";
+
+
 	oPath.sBoomLibDir = oPath.sExeDir + "/BoomLib";
 	oPath.sModelLibDir = oPath.sExeDir + "/ModelLib";
 	oPath.sProcLibDir = oPath.sExeDir + "/ProcLib";
@@ -1199,10 +1327,19 @@ int ParaModel::InitPath()
 
 	return 1;
 }
+
+// 初始化系统平面图库 
+int ParaModel::InitLayerUnitLib()
+{
+	QString Path = QString::fromStdString(oPath.sTopoLayerDir);
+	QFile file(Path);
+	//遍历该路径下的所有文件夹
+
+}
 // 初始化基本构件库 
 int ParaModel::InitUnitLib()
 {
-	QString Path = QString::fromStdString(oPath.sExeDir + "/buildinglib.txt");
+	QString Path = QString::fromStdString(oPath.sTopoUnitDir + u8"/buildinglib.txt");
 	QFile file(Path);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
@@ -1727,7 +1864,7 @@ void ParaModel::AddSceneXData()
 			divideLineV->isAuxiliary = true;
 			divideLineV->nUnitType = 0;
 			divideLineV->graphAngle = vModelTmpl[viewShape[i].unitIdx].nUnitAngle;
-			divideLineV->nUnitIdx = viewShape[i].unitIdx; 
+			divideLineV->nUnitIdx = viewShape[i].unitIdx;
 			divideLineV->setPen(pen);
 			connect(divideLineV, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
 			connect(divideLineV, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
@@ -1784,7 +1921,7 @@ void ParaModel::AddSceneXData()
 	}
 	//根据数据绘制图形
 	for (size_t i = 0; i < viewShape.size(); i++)
-	{ 
+	{
 		//绘制柱、墙、门、窗
 		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
 		{
@@ -1797,7 +1934,7 @@ void ParaModel::AddSceneXData()
 			viewItem->isAuxiliary = false;
 			viewItem->nUnitType = viewShape[i].unitType;
 			viewItem->nUnitIdx = viewShape[i].unitIdx;
-			viewItem->graphAngle= vModelTmpl[viewShape[i].unitIdx].nUnitAngle;
+			viewItem->graphAngle = vModelTmpl[viewShape[i].unitIdx].nUnitAngle;
 			viewItem->setBrush(ColorHelper(viewShape[i].unitType));
 			connect(viewItem, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
 			connect(viewItem, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
@@ -1878,34 +2015,38 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 //清除画布数据
 void ParaModel::SceneMainClear()
 {
-	pSceneMain.clear(); 
-	for (int x = 0; x <= 10000; x += 10)
-		pSceneMain.addLine(0, x, 10000, x, QPen(Qt::red));
-	for (int y = 0; y <= 10000; y += 10)
-		pSceneMain.addLine(y, 0, y, 10000, QPen(Qt::red));
+	pSceneMain.clear();
+	graphicsViewMain->setSceneRect(0, 0, pAuxiliaryLine / 2, pAuxiliaryLine / 2);
+	for (int x = 0; x <= pAuxiliaryLine / 2; x += 10)
+		pSceneMain.addLine(0, x, pAuxiliaryLine / 2, x, QPen(Qt::red));
+	for (int y = 0; y <= pAuxiliaryLine / 2; y += 10)
+		pSceneMain.addLine(y, 0, y, pAuxiliaryLine / 2, QPen(Qt::red));
 }
 void ParaModel::SceneXClear()
 {
 	pSceneX.clear();
-	for (int x = 0; x <= 10000; x += 10)
-		pSceneX.addLine(0, x, 10000, x, QPen(Qt::red));
-	for (int y = 0; y <= 10000; y += 10)
-		pSceneX.addLine(y, 0, y, 10000, QPen(Qt::red));
+	graphicsViewX->setSceneRect(0, 0, pAuxiliaryLine / 2, pAuxiliaryLine / 2);
+	for (int x = 0; x <= pAuxiliaryLine / 2; x += 10)
+		pSceneX.addLine(0, x, pAuxiliaryLine / 2, x, QPen(Qt::red));
+	for (int y = 0; y <= pAuxiliaryLine / 2; y += 10)
+		pSceneX.addLine(y, 0, y, pAuxiliaryLine / 2, QPen(Qt::red));
 }
 void ParaModel::SceneYClear()
 {
 	pSceneY.clear();
-	for (int x = 0; x <= 10000; x += 10)
-		pSceneY.addLine(0, x, 10000, x, QPen(Qt::red));
-	for (int y = 0; y <= 10000; y += 10)
-		pSceneY.addLine(y, 0, y, 10000, QPen(Qt::red));
+	graphicsViewY->setSceneRect(0, 0, pAuxiliaryLine / 2, pAuxiliaryLine / 2);
+	for (int x = 0; x <= pAuxiliaryLine / 2; x += 10)
+		pSceneY.addLine(0, x, pAuxiliaryLine / 2, x, QPen(Qt::red));
+	for (int y = 0; y <= pAuxiliaryLine / 2; y += 10)
+		pSceneY.addLine(y, 0, y, pAuxiliaryLine / 2, QPen(Qt::red));
 }
 void ParaModel::SceneZClear()
 {
 	pSceneZ.clear();
-	for (int x = 0; x <= 10000; x += 10)
-		pSceneZ.addLine(0, x, 10000, x, QPen(Qt::red));
-	for (int y = 0; y <= 10000; y += 10)
-		pSceneZ.addLine(y, 0, y, 10000, QPen(Qt::red));
+	graphicsViewZ->setSceneRect(0,0, pAuxiliaryLine / 2, pAuxiliaryLine / 2);
+	for (int x = 0; x <= pAuxiliaryLine / 2; x += 10)
+		pSceneZ.addLine(0, x, pAuxiliaryLine / 2, x, QPen(Qt::red));
+	for (int y = 0; y <= pAuxiliaryLine / 2; y += 10)
+		pSceneZ.addLine(y, 0, y, pAuxiliaryLine / 2, QPen(Qt::red));
 }
 #pragma endregion
