@@ -16,6 +16,7 @@ typedef struct PixelPos
 }PixelPos;
 typedef vector<PixelPos> VPIXELPOS;
 
+// 平面图具体几何数据 绝对数据
 typedef struct SimpleShape
 {
 	int nCen[2];			// 中心点
@@ -25,6 +26,7 @@ typedef struct SimpleShape
 	VPIXELPOS vCorner;
 }SimpleShape;
 typedef vector<SimpleShape> VSHAPE	;
+
 
 
 
@@ -74,12 +76,28 @@ typedef struct TopoUnit
 	int nAdjUnitIdx[12];		// 前后左右方向 按上下表示梁墙 每方向最多两个 邻接单元Id 无邻接-1
 	int nEdgeType;				// 边界类型 前后上下左右 按向限角度划分 45度 右上为1 正下为6
 	int nStatusFlag;			// 标志0 1 2 正常 删除 其他
-	int nUnitAngle;				// 0 90度 两种
+	int nUnitAngle;				// 0 90度 两种 后续可能扩展为 45度 任意角度
 	int nCenPos[4];				// 基本构件单元的中心线下点 和上点高度  Y值表示高度
 }TopoUnit;
 typedef vector<TopoUnit> VTOPOTABLE;
 typedef vector<TopoUnit> VLAYERTOPO;
 typedef vector<VLAYERTOPO> VBUILDTOPO;
+
+// 整体建筑信息描述结构
+typedef struct BuildProj
+{
+	float fVersion;					// 结构版本 暂定1.0
+	int nBuildIdx;					// 建筑Idx
+	int nTypeIdx;					// 建筑类型Idx 备用
+	int nCalDrawData;				// 几何数据计算标志 0 未计算 vPlaneDraw无数据
+	VINT vPlaneTopoIdx;				// 拓扑图应用楼层ID
+	VINT vLayerHigh;				// 楼层顶板高度 从第一层地面起算 总数=楼层+1
+	VLAYERTOPO vPlaneTopo;			// 楼层拓扑图 可能有多种拓扑
+	VSHAPE     vPlaneDraw;			// 楼层具体几何数据 对应拓扑图 待议
+	QString sBuildName;				// 建筑名称
+	QString sProjFileName;			// 工程文件名称
+	QString sModel3DFileName;		// 对应的三维模型名称 目前暂定K文件格式
+}BuildProj;
 
 // 拓扑单元对应的实际空间数据
 typedef struct UnitData
@@ -103,6 +121,10 @@ typedef struct SysPath
 {
 	string sExePath;			// 可执行文件完整路径 含.exe
 	string sExeDir;				// 可执行文件所在目录完整路径
+	string sTopoUnitDir;		// 系统拓扑构建库路径
+	string sTopoLayerDir;		// 系统平面图库路径
+
+
 	string sProcLibDir;			// 算法库路径
 	string sTmpDir;				// 临时数据路径
 	string sModelLibDir;		// 模型路径

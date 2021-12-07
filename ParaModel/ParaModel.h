@@ -58,13 +58,20 @@ private:
 	BQGraphicsScene pSceneZ;						// 二维模型Z视图画布
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布
 
+	QAction* pSceneBtn10;									//10米画布按钮
+	QAction* pSceneBtn20;									//20米画布按钮
+	QAction* pSceneBtn50;									//50米画布按钮
+	QAction* pSceneBtn100;									//100米画布按钮
+	QAction* pSceneBtn200;									//200米画布按钮
+
 	ParaOGLManager* paraOglmanager;					// 三维显示窗口类
 	ParaOGLManager* paraOglmanagerMain;				// 三维显示窗口大屏幕主类
 	QDockWidget* layerWidget;
 
 	int if_data;									//0是未加载数据。1是有数据
 	SysPath oPath;									//系统路径
-	int pSceneOffset;
+	int pSceneOffset;								//绘制图像偏移
+	int pAuxiliaryLine;								//辅助线长度
 
 	int nMoveXY[2];
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
@@ -88,6 +95,7 @@ public:
 	VBUILDTOPO vLoadModelData;				// 当前绘制计算的模型数据 多层级
 	int InitPath();							// 初始化路径
 	int InitUnitLib();						// 初始化基本构件库 
+	int InitLayerUnitLib();					// 初始化系统平面图库 
 	int InitPlaneDrawLib();					// 初始化平面图库
 	int InitParaTmpl();						// 初始化参数化生成模板
 
@@ -115,6 +123,8 @@ private:
 	void InitSARibbon();
 	//初始化Ribbon中的文件菜单
 	void InitCategoryMain(SARibbonCategory* page);
+	//初始化Ribbon中的画布大小
+	void InitCategoryScene(SARibbonCategory* page);
 
 	//初始化弹出窗口
 	void InitTipWindow();
@@ -171,11 +181,12 @@ public slots:
 	void AddSceneData();				//更新画布内容
 	void AddSceneXData();				//更新画布X内容
 
-	void NewFileAction();
-	void OpenFileAction();
-	void CloseFileAction();
-	void SaveFileAction();
-	void ExportFileAction();
+	void NewFileAction();			//新建楼层户型数据
+	void OpenFileAction();			//外部打开楼层户型数据
+	void CloseFileAction();			//清空所有数据
+	void SaveFileAction();			//保存当前数据
+	void SaveasFileAction();		//另存当前数据
+	void ExportFileAction();		//导出成k文件
 
 	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//画布移动元素
 	void SceneMenuClickAction(int nUnitType, int nUnitIdx);	//画布菜单点击

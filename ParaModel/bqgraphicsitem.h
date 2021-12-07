@@ -32,6 +32,7 @@ public:
 
 	int nOriPos[2];				//点击位置坐标
 	int nMoveXY[2];				//移动偏移
+	int graphAngle;				//外部使用记录的图形方向
 
 	ItemType m_type;
 	QPointF getCenter() { return m_center; }
