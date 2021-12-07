@@ -722,31 +722,6 @@ void ParaOGLManager::paintGL()
 	//将此三维模型的数据输出到K文件里
 	if (outFlag == 2)
 	{
-
-		fstream outfile("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/test.k");
-		outfile << "*KEYWORD" << "\n";
-		outfile << "*NODE" << "\n";
-
-		for (int index = 0; index < allNodes.size(); index++)
-		{
-			outfile << std::setw(8) << (index+1) << std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(allNodes[index].x / 100.0)
-				<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(allNodes[index].y / 100.0)
-				<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(allNodes[index].z / 100.0) << std::setw(8) << "0" << std::setw(8) << "0" << std::endl;
-		}
-		
-		outfile << "*ELEMENT_SOLID" << "\n";
-
-		for (int i = 0; i < allSolids.size(); i++)
-		{
-			outfile << std::setw(8) << i + 1 << std::setw(8) << "1";
-			for (int j = 0; j < 8; j++)
-			{
-				outfile << std::setw(8) << allSolids[i].idx[j / 4][j % 4];
-			}
-			outfile << "\n";
-		}
-		
-
 		outFlag = -1;
 	}
 }

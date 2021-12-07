@@ -24,7 +24,7 @@ typedef struct SimpleShape
 	int unitIdx;
 	VPIXELPOS vCorner;
 }SimpleShape;
-typedef vector<SimpleShape> VSHAPE;
+typedef vector<SimpleShape> VSHAPE	;
 
 
 

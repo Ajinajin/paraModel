@@ -1,5 +1,8 @@
 ﻿#include <QTextCodec>
 
+#include <fstream>
+#include <iomanip>
+
 #include "ParaModel.h"
 #include <qtreeview.h>
 #include <qtreewidget.h>
@@ -743,8 +746,73 @@ void ParaModel::NewFileAction()
 /// 保存原来txt文件
 /// </summary>
 void ParaModel::SaveFileAction()
-{
-	//TODO::如果没有打开文件的路径，就让用户选择文件路径，如果有保存成对应的txt格式
+{	
+	//让用户选择文件夹，在选择的文件夹中保存文件,可以指定名字
+	if (if_data == 0)
+	{
+		QMessageBox::information(NULL, "信息提示", "当前并无数据可保存");
+	}
+	else
+	{
+		QString curPath = QCoreApplication::applicationDirPath();
+		QString dlgTitle = "保存文件";
+		QString filter = "TXT文件(*.txt);;K文件(*.k);;所有文件(*.*)";
+
+		QString dirpath = QFileDialog::getSaveFileName(this, dlgTitle, curPath, filter);
+
+
+		fstream outfile;
+		outfile.open(dirpath.toStdString(), fstream::out);
+
+		QString tmp = "*Unit Sets 构件集";
+		outfile << tmp.toLocal8Bit().data()<< endl;
+		tmp = "* 构件序号 构件类型名称 构件在系统构件库中的Idx 构件中心点/基准点的放置位置 门和窗为 距离墙起始点左下数值 及高度";
+		outfile << tmp.toLocal8Bit().data() << endl;
+		
+		for (int i = 0; i < vModelTmpl.size(); i++)
+		{
+			QString typeName;
+			if (vModelTmpl[i].nUnitType == 1) { typeName = "柱"; }
+			if (vModelTmpl[i].nUnitType == 2) { typeName = "梁"; }
+			if (vModelTmpl[i].nUnitType == 3) { typeName = "板"; }
+			if (vModelTmpl[i].nUnitType == 4) { typeName = "墙"; }
+			if (vModelTmpl[i].nUnitType == 5) { typeName = "门"; }
+			if (vModelTmpl[i].nUnitType == 6) { typeName = "窗"; }
+
+			
+			outfile << vModelTmpl[i].nTopoIdx << " " << typeName.toLocal8Bit().data() << " " << vModelTmpl[i].nCenUnitIdx;
+			if (vModelTmpl[i].nUnitType == 1)
+			{
+				outfile <<" "<< vModelTmpl[i].nCenPos[0] << " " << vModelTmpl[i].nCenPos[1] << " " << vModelTmpl[i].nCenPos[2];
+			}
+			if (vModelTmpl[i].nUnitType == 5 || vModelTmpl[i].nUnitType == 6)
+			{
+				outfile << " " << vModelTmpl[i].nCenPos[0] << " " << vModelTmpl[i].nCenPos[1];
+			}
+			outfile << endl;
+		}
+
+		tmp = "*Topo Sets 拓扑关系集";
+		outfile <<  tmp.toLocal8Bit().data()<< endl;
+		tmp = "* 拓扑序号 当前构件序号 关联构件序号";
+		outfile <<tmp.toLocal8Bit().data()<< endl;
+
+		for (int i = 0; i < vModelTmpl.size(); i++)
+		{
+			outfile << i << " " << vModelTmpl[i].nTopoIdx;
+			for (int j = 0; j < 12; j++)
+			{
+				if(vModelTmpl[i].nAdjUnitIdx[j] != -1)
+				{
+					outfile << " " << vModelTmpl[i].nAdjUnitIdx[j];
+				}
+			}
+			outfile << endl;
+		}
+
+		MyLogOutput("当前文件保存成功");
+	}
+
 	return;
 }
 /// <summary>
@@ -752,7 +820,49 @@ void ParaModel::SaveFileAction()
 /// </summary>
 void ParaModel::ExportFileAction()
 {
-	//TODO::让用户选择文件夹，在选择的文件夹中导出k文件
+	if (if_data == 0)
+	{
+		QMessageBox::information(NULL, "信息提示", "当前并无K文件数据可导出");
+	}
+	else
+	{
+		//让用户选择文件夹，在选择的文件夹中导出k文件,可以指定名字
+
+		QString curPath = QCoreApplication::applicationDirPath();
+		QString dlgTitle = "保存文件";
+		QString filter = "h文件(*.h);;c++文件(*.cpp);;k文件(*.k);;所有文件(*.*)";
+
+		QString dirpath = QFileDialog::getSaveFileName(this, dlgTitle, curPath, filter);
+
+
+		fstream outfile;
+		outfile.open(dirpath.toStdString(), fstream::out);
+		
+		outfile << "*KEYWORD" << "\n";
+		outfile << "*NODE" << "\n";
+
+		for (int index = 0; index < paraOglmanagerMain->allNodes.size(); index++)
+		{
+			outfile << std::setw(8) << (index + 1) << std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(paraOglmanagerMain->allNodes[index].x / 100.0)
+				<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(paraOglmanagerMain->allNodes[index].y / 100.0)
+				<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(paraOglmanagerMain->allNodes[index].z / 100.0) << std::setw(8) << "0" << std::setw(8) << "0" << std::endl;
+		}
+
+		outfile << "*ELEMENT_SOLID" << "\n";
+
+		for (int i = 0; i < paraOglmanagerMain->allSolids.size(); i++)
+		{
+			outfile << std::setw(8) << i + 1 << std::setw(8) << "1";
+			for (int j = 0; j < 8; j++)
+			{
+				outfile << std::setw(8) << paraOglmanagerMain->allSolids[i].idx[j / 4][j % 4];
+			}
+			outfile << "\n";
+		}
+
+		MyLogOutput("K文件导出成功");
+	}
+
 	return;
 }
 
