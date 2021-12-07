@@ -375,9 +375,9 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	connect(act, &QAction::triggered, this, &ParaModel::NewFileAction);
 
 	act = new QAction(this);
-	act->setObjectName(("打开"));
+	act->setObjectName(("加载户型"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("打开"));
+	act->setText(("加载户型"));
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+O")));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::OpenFileAction);
@@ -396,14 +396,14 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
 	act->setText(("另存为"));
 	pannel->addLargeAction(act);
-	//connect(act, &QAction::triggered, this, &ParaModel::SaveasFileAction);
+	connect(act, &QAction::triggered, this, &ParaModel::SaveasFileAction);
 
 
 
 	act = new QAction(this);
 	act->setObjectName(("导出K文件"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("导出K文件")); 
+	act->setText(("导出K文件"));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::ExportFileAction);
 
@@ -688,6 +688,10 @@ void ParaModel::NewFileAction()
 		return;
 	}
 	if_data = 1;
+	SelectLayer = 1;
+	vModelTmpl.clear();
+	vLoadModelData.push_back(vModelTmpl);
+
 	//给画布中心绘制十字线， 点击后可以添加
 	QPen pen = QPen(Qt::yellow);
 	pen.setStyle(Qt::DashLine);
@@ -737,12 +741,21 @@ void ParaModel::NewFileAction()
 	}
 
 
+	ParaModel::RefreshLayerWidget();
 	MyLogOutput("新建场景文件成功");
 }
 /// <summary>
 /// 保存原来txt文件
 /// </summary>
 void ParaModel::SaveFileAction()
+{
+	//TODO::如果没有打开文件的路径，就让用户选择文件路径，如果有保存成对应的txt格式
+	return;
+}
+/// <summary>
+/// 保存原来txt文件
+/// </summary>
+void ParaModel::SaveasFileAction()
 {
 	//TODO::如果没有打开文件的路径，就让用户选择文件路径，如果有保存成对应的txt格式
 	return;
@@ -762,27 +775,22 @@ void ParaModel::ExportFileAction()
 void ParaModel::CloseFileAction()
 {
 	if_data = 0;
+	SelectLayer = 0;
 	vModelTmpl.clear();
+	vLoadModelData.clear();
 	SceneMainClear();
 	SceneXClear();
 	SceneYClear();
 	SceneZClear();
-
 	MyLogOutput("清除数据成功");
+	ParaModel::RefreshLayerWidget();
 }
 
 /// <summary>
 /// 打开场景
 /// </summary>
 void ParaModel::OpenFileAction()
-{
-	if (if_data == 1)
-	{
-		QMessageBox::information(NULL, "信息提示", "当前已有加载数据，请关闭后在打开");
-		MyLogOutput("当前已有加载数据，请关闭后在打开");
-		return;
-	}
-
+{ 
 	QFileDialog* f = new QFileDialog(this);
 	f->setWindowTitle("选择数据文件*.txt");
 	f->setNameFilter("*.txt");
@@ -875,7 +883,7 @@ void ParaModel::OpenFileAction()
 	pCalShapeData = new DimDataConvert();
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 	vLoadModelData.push_back(vModelTmpl);
-	SelectLayer = 1;
+	SelectLayer = SelectLayer + 1;
 	ParaModel::AddSceneData();
 	ParaModel::AddSceneXData();
 	ParaModel::RefreshLayerWidget();
@@ -985,45 +993,73 @@ void ParaModel::RefreshLayerWidget()
 	QWidget* temp = new QWidget();
 	QPushButton* pCopyLayerBtn = new QPushButton("复制当前楼层", this);
 	pCopyLayerBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-	pCopyLayerBtn->setFixedWidth(200);
+	pCopyLayerBtn->setFixedWidth(150);
 	connect(pCopyLayerBtn, &QPushButton::clicked, this, &ParaModel::CopyLayerAction);
 
 	QString layerDetail;
 	if (SelectLayer == 0)
 	{
-		layerDetail = QString("已有楼层：%1").arg(vLoadModelData.size());
+		layerDetail = QString("已有楼层：%1").arg(0);
 	}
 	else
 	{
 		layerDetail = QString("已有楼层：%1  当前编辑楼层：%2").arg(vLoadModelData.size()).arg(SelectLayer);
 	}
 	QLabel* layerlbl = new QLabel(layerDetail);
-	layerlbl->setFixedWidth(300);
+	layerlbl->setFixedWidth(500);
 
 	QFormLayout* pLayout = new QFormLayout();
 	pLayout->addRow(pCopyLayerBtn);
 	pLayout->addRow(layerlbl);
-	for (size_t i = 0; i < vLoadModelData.size(); i++)
+	if (SelectLayer == 1)
 	{
+		for (size_t i = 0; i < 1; i++)
+		{
 
-		QString layerStr = QString("%1楼").arg(i + 1);
-		QPushButton* pLayerBtn = new QPushButton(layerStr, this);
-		pLayerBtn->setToolTip(QString("%1").arg(i));
-		pLayerBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-		pLayerBtn->setFixedWidth(100);
-		connect(pLayerBtn, &QPushButton::clicked, this, [=]()
-			{
-				ParaModel::ChangeLayerAction(i);
-			});
+			QString layerStr = QString("%1楼").arg(i + 1);
+			QPushButton* pLayerBtn = new QPushButton(layerStr, this);
+			pLayerBtn->setToolTip(QString("%1").arg(i));
+			pLayerBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
+			pLayerBtn->setFixedWidth(100);
+			connect(pLayerBtn, &QPushButton::clicked, this, [=]()
+				{
+					ParaModel::ChangeLayerAction(i);
+				});
 
-		QPushButton* pDelLayerBtn = new QPushButton("删除", this);
-		pDelLayerBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-		pDelLayerBtn->setFixedWidth(100);
-		connect(pDelLayerBtn, &QPushButton::clicked, this, [=]()
-			{
-				ParaModel::DeleteLayerAction(i);
-			});
-		pLayout->addRow(pLayerBtn, pDelLayerBtn);
+			QPushButton* pDelLayerBtn = new QPushButton("删除", this);
+			pDelLayerBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
+			pDelLayerBtn->setFixedWidth(100);
+			connect(pDelLayerBtn, &QPushButton::clicked, this, [=]()
+				{
+					ParaModel::DeleteLayerAction(i);
+				});
+			pLayout->addRow(pLayerBtn, pDelLayerBtn);
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < vLoadModelData.size(); i++)
+		{
+
+			QString layerStr = QString("%1楼").arg(i + 1);
+			QPushButton* pLayerBtn = new QPushButton(layerStr, this);
+			pLayerBtn->setToolTip(QString("%1").arg(i));
+			pLayerBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
+			pLayerBtn->setFixedWidth(100);
+			connect(pLayerBtn, &QPushButton::clicked, this, [=]()
+				{
+					ParaModel::ChangeLayerAction(i);
+				});
+
+			QPushButton* pDelLayerBtn = new QPushButton("删除", this);
+			pDelLayerBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
+			pDelLayerBtn->setFixedWidth(100);
+			connect(pDelLayerBtn, &QPushButton::clicked, this, [=]()
+				{
+					ParaModel::DeleteLayerAction(i);
+				});
+			pLayout->addRow(pLayerBtn, pDelLayerBtn);
+		}
 	}
 
 	temp->setLayout(pLayout);
@@ -1033,12 +1069,13 @@ void ParaModel::RefreshLayerWidget()
 void ParaModel::CopyLayerAction()
 {
 	if (SelectLayer == 0)
-	{ 
+	{
 		MyLogOutput("当前没有选中的楼层请加载数据后在选择");
 		return;
 	}
 	SelectLayer = SelectLayer + 1;
-	VTOPOTABLE x = vModelTmpl;
+	VTOPOTABLE x;
+	x.assign(vModelTmpl.begin(), vModelTmpl.end());
 	vLoadModelData.push_back(x);
 	ParaModel::RefreshLayerWidget();
 	return;
@@ -1047,9 +1084,9 @@ void ParaModel::CopyLayerAction()
 void ParaModel::ChangeLayerAction(int layer)
 {
 	//TODO::将数据保存到操作的层中
-    vLoadModelData[SelectLayer]= vModelTmpl;
-	SelectLayer = layer;
-	vModelTmpl = vLoadModelData[layer];
+	vLoadModelData[SelectLayer - 1].assign(vModelTmpl.begin(), vModelTmpl.end());
+	SelectLayer = layer + 1;
+	vModelTmpl.assign(vLoadModelData[layer].begin(), vLoadModelData[layer].end());
 	RefreshSceneData();
 	ParaModel::RefreshLayerWidget();
 	return;
@@ -1058,11 +1095,20 @@ void ParaModel::ChangeLayerAction(int layer)
 void ParaModel::DeleteLayerAction(int layer)
 {
 	vLoadModelData.erase(vLoadModelData.begin() + layer);
+	//如果没有楼层了就把数据都清空 并把选中变成第一层，
 	if (vLoadModelData.size() == 0)
 	{
-		SelectLayer = 0;
-		if_data == 0;
 		vModelTmpl.clear();
+		vLoadModelData.push_back(vModelTmpl);
+		SelectLayer = 1;
+		return;
+	}
+	//如果删除的是当前楼层
+	if (SelectLayer == layer + 1)
+	{
+		//将数据变成第一层
+		vModelTmpl.assign(vLoadModelData[0].begin(), vLoadModelData[0].end());
+		SelectLayer = 1;
 	}
 	ParaModel::RefreshLayerWidget();
 	return;

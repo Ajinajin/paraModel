@@ -171,11 +171,12 @@ public slots:
 	void AddSceneData();				//更新画布内容
 	void AddSceneXData();				//更新画布X内容
 
-	void NewFileAction();
-	void OpenFileAction();
-	void CloseFileAction();
-	void SaveFileAction();
-	void ExportFileAction();
+	void NewFileAction();			//新建楼层户型数据
+	void OpenFileAction();			//外部打开楼层户型数据
+	void CloseFileAction();			//清空所有数据
+	void SaveFileAction();			//保存当前数据
+	void SaveasFileAction();		//另存当前数据
+	void ExportFileAction();		//导出成k文件
 
 	void SceneItemMoveAction(int nUnitType, int nUnitIdx, QPointF pos);		//画布移动元素
 	void SceneMenuClickAction(int nUnitType, int nUnitIdx);	//画布菜单点击
