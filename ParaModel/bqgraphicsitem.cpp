@@ -53,15 +53,38 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	nOriPos[0] = event->scenePos().x();
 	nOriPos[1] = event->scenePos().y();
 	this->scene()->clearSelection();
+	//选中跟随的元素 柱子、门、窗只能选中自己
+	if (this->nUnitType == 1 || this->nUnitType > 4)
+	{
+		setSelected(true);
+		return;
+	} 
 	QList<QGraphicsItem*> itemList = this->scene()->items();
 	for (size_t i = 0; i < itemList.size(); i++)
-	{
+	{ 
 		if (itemList[i]->type() == BGraphicsItem::type())
 		{
 			BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
+			if (proxyWidget->graphAngle == 0 || proxyWidget->graphAngle == 90)
+			{
+				int x1 = proxyWidget->getCenter().x();
+				int x2 = this->getCenter().x();
+
+			}
 			if (proxyWidget->nUnitIdx == this->nUnitIdx)
 			{
 				itemList[i]->setSelected(true);
+				continue;
+			}
+			if (this->graphAngle ==0 && proxyWidget->getCenter().y()==this->getCenter().y())
+			{
+				itemList[i]->setSelected(true);
+				continue;
+			}
+			if (this->graphAngle == 90 && proxyWidget->getCenter().x() == this->getCenter().x())
+			{
+				itemList[i]->setSelected(true);
+				continue;
 			}
 		}
 	}
@@ -91,6 +114,8 @@ void BGraphicsItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 		QPointF oMove;
 		oMove.setX(event->scenePos().x() - nOriPos[0]);
 		oMove.setY(event->scenePos().y() - nOriPos[1]);
+		/*nOriPos[0] = event->scenePos().x();
+		nOriPos[1] = event->scenePos().y();*/
 		//emit SceneItemMove(nUnitType, nUnitIdx, oMove);
 		// 发送当前绝对位置
 // 		nMoveXY[0] = event->scenePos().x() - nOriPos[0]; 
