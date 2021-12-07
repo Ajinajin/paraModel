@@ -361,6 +361,8 @@ void ParaModel::updateOGL()
 	paraOglmanagerMain->oglTopTable = this->vModelTmpl;
 	paraOglmanagerMain->oglUnitTable = this->vBaseUnit;
 
+	
+	
 	//ParaModel::RefreshScene();
 
 }
@@ -1124,6 +1126,9 @@ void ParaModel::ExportFileAction()
 		}
 
 		MyLogOutput("K文件导出成功");
+
+		QImage image = paraOglmanagerMain->grabFramebuffer();
+		image.save("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/1.jpg");
 	}
 
 	return;

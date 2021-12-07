@@ -268,6 +268,7 @@ void ParaOGLManager::paintGL()
 	float transOfDoor = 1.0;
 	float transOfWindow = 0.25;
 
+	
 	//绘制三维模型
 	if (!oglUnitTable.empty() && !oglTopTable.empty())
 	{
