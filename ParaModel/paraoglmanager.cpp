@@ -11,7 +11,7 @@
 
 
 // 定义全局变量 后期修改
-const QVector3D CAMERA_POSITION(300, 130, 1000.0f);
+const QVector3D CAMERA_POSITION(200, 130, 700.0f);
 const QVector3D LIGHT_POSITION(0.0f, 1.0f, 0.0f);
 
 const int OGLMANAGER_WIDTH = 1200;
