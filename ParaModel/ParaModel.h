@@ -45,6 +45,7 @@ private:
 	QLineEdit* pModelEdit[7];						// 战斗部属性编辑框 当量 弹片数量 弹片质量 分布角度1 分布角度2
 	QLineEdit* pArmHeadEdit[5];						// 算法信息
 	QTreeWidget* pModelTreeWidget;					// 系统模型树
+	QTreeWidget* pLayerModelTreeWidget;				// 系统模型树
 	QTreeWidget* pModelUnitTreeWidget;				// 可替换的模型树
 	QDockWidget* MainDockWidget;					// 界面显示窗口
 	BQGraphicsView* graphicsViewX;					// 二维模型X视图
@@ -66,7 +67,7 @@ private:
 
 	ParaOGLManager* paraOglmanager;					// 三维显示窗口类
 	ParaOGLManager* paraOglmanagerMain;				// 三维显示窗口大屏幕主类
-	QDockWidget* layerWidget;
+	QDockWidget* layerWidget;						// 层
 
 	int if_data;									//0是未加载数据。1是有数据
 	SysPath oPath;									//系统路径
@@ -93,10 +94,10 @@ public:
 	VTOPOTABLE vModelTmpl;					// 当前绘制计算用的平面图
 	VBUILDTOPO vBuildTopo;					// 系统平面图库
 	VBUILDTOPO vLoadModelData;				// 当前绘制计算的模型数据 多层级
+	int InitSysData();						// 初始化系统变量
 	int InitPath();							// 初始化路径
 	int InitUnitLib();						// 初始化基本构件库 
-	int InitLayerUnitLib();					// 初始化系统平面图库 
-	int InitPlaneDrawLib();					// 初始化平面图库
+	int InitLayerUnitLib();					// 初始化系统平面图库  
 	int InitParaTmpl();						// 初始化参数化生成模板
 
 private:
@@ -110,8 +111,10 @@ private:
 	void InitLogWidget(QDockWidget* from);
 	//初始化已加载的模型窗口
 	void InitLoadModelWidget(QDockWidget* from);
-	//初始化系统模型窗口
-	void InitSysWidget(QDockWidget* from);
+	//初始化系统构件模型窗口
+	void InitSysUnitWidget(QDockWidget* from);
+	//初始化系统平面模型窗口
+	void InitSysLayerWidget(QDockWidget* from);
 
 	//初始化楼层选择
 	void InitLayerWidget(QDockWidget* from);

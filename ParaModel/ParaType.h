@@ -79,9 +79,19 @@ typedef struct TopoUnit
 	int nUnitAngle;				// 0 90度 两种 后续可能扩展为 45度 任意角度
 	int nCenPos[4];				// 基本构件单元的中心线下点 和上点高度  Y值表示高度
 }TopoUnit;
+
+
+// 楼层拓扑单元
+typedef struct LayerUnit
+{
+	QString sLayerName;			// 楼层名称
+	QString sVersion;			// 版本号
+	QString sIcon;				// 楼层版本号 
+	vector<TopoUnit> vLayerTopo;	// 楼层拓扑
+}LayerUnit;
+
 typedef vector<TopoUnit> VTOPOTABLE;
-typedef vector<TopoUnit> VLAYERTOPO;
-typedef vector<VLAYERTOPO> VBUILDTOPO;
+typedef vector<LayerUnit> VBUILDTOPO;
 
 // 整体建筑信息描述结构
 typedef struct BuildProj
@@ -92,7 +102,7 @@ typedef struct BuildProj
 	int nCalDrawData;				// 几何数据计算标志 0 未计算 vPlaneDraw无数据
 	VINT vPlaneTopoIdx;				// 拓扑图应用楼层ID
 	VINT vLayerHigh;				// 楼层顶板高度 从第一层地面起算 总数=楼层+1
-	VLAYERTOPO vPlaneTopo;			// 楼层拓扑图 可能有多种拓扑
+	LayerUnit vPlaneTopo;			// 楼层拓扑图 可能有多种拓扑
 	VSHAPE     vPlaneDraw;			// 楼层具体几何数据 对应拓扑图 待议
 	QString sBuildName;				// 建筑名称
 	QString sProjFileName;			// 工程文件名称

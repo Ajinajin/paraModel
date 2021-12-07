@@ -49,8 +49,60 @@ void ParaModel::InitLayerWidget(QDockWidget* from)
 	from->setWindowTitle("建筑楼层");
 }
 
+//初始化系统平面模型窗口
+void ParaModel::InitSysLayerWidget(QDockWidget* from)
+{
+	QWidget* mytreewidget = new QWidget();
+	pLayerModelTreeWidget = new QTreeWidget(mytreewidget);
+	pLayerModelTreeWidget->setHeaderHidden(true);
+	from->setWidget(mytreewidget);
+	from->setFixedWidth(300);
+	from->setWindowTitle("系统平面图库");
+	 
+	for (vector<LayerUnit>::const_iterator iter = vBuildTopo.begin(); iter != vBuildTopo.end(); iter++)
+	{
+		QTreeWidgetItem* rootItem = new QTreeWidgetItem(pLayerModelTreeWidget);
+		rootItem->setText(0, iter->sLayerName);
+		rootItem->setData(0, Qt::UserRole, iter->sLayerName);
+	}
+	//树按钮响应
+	connect(pLayerModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column)
+		{
+			if (if_data == 0)
+			{
+				MyLogOutput("当前无画布信息，请新建或者打开后在操作");
+				return;
+			}
+			//if (vModelTmpl.size() > 0)
+			//{
+			//	//弹出提示框是否替换当前数据 
+			//	return;
+			//}
+
+			QVariant variant = item->data(0, Qt::UserRole);
+			QString LayerName = variant.value<QString>();
+			QString msg;
+			vModelTmpl.clear();
+			for (vector<LayerUnit>::const_iterator iter = vBuildTopo.begin(); iter != vBuildTopo.end(); iter++)
+			{
+				if (iter->sLayerName == LayerName)
+				{
+					vModelTmpl.assign(iter->vLayerTopo.begin(), iter->vLayerTopo.end());
+					break;
+				}
+			}
+			vLoadModelData[SelectLayer-1].vLayerTopo= vModelTmpl;
+			RefreshSceneData();
+			msg = item->text(0) + "楼层模板加载完成";
+			MyLogOutput(msg);
+
+		});
+	from->setWidget(pLayerModelTreeWidget);
+	pLayerModelTreeWidget->expandAll();
+}
+
 //初始化系统模型窗口
-void ParaModel::InitSysWidget(QDockWidget* from)
+void ParaModel::InitSysUnitWidget(QDockWidget* from)
 {
 	QWidget* mytreewidget = new QWidget();
 	pModelTreeWidget = new QTreeWidget(mytreewidget);
@@ -316,7 +368,10 @@ void ParaModel::InitCentralWidget()
 	setDockNestingEnabled(true);
 
 	QDockWidget* sysWidget = new QDockWidget(this);
-	InitSysWidget(sysWidget);
+	InitSysUnitWidget(sysWidget);
+
+	QDockWidget* sysLayerWidget = new QDockWidget(this);
+	InitSysLayerWidget(sysLayerWidget);
 
 	QDockWidget* oglWidget = new QDockWidget(this);
 	InitOglManagerWidget(oglWidget);
@@ -332,15 +387,16 @@ void ParaModel::InitCentralWidget()
 
 
 
-	addDockWidget(Qt::LeftDockWidgetArea, sysWidget);
-
-	splitDockWidget(sysWidget, oglWidget, Qt::Horizontal);
+	addDockWidget(Qt::LeftDockWidgetArea, sysLayerWidget);
+	splitDockWidget(sysLayerWidget, oglWidget, Qt::Horizontal);
 	splitDockWidget(oglWidget, logWidget, Qt::Vertical);
 	addDockWidget(Qt::RightDockWidgetArea, loadModelWidget);
 	splitDockWidget(loadModelWidget, layerWidget, Qt::Vertical);
 	//tabifyDockWidget(loadModelWidget, propertyWidget);
-	loadModelWidget->raise();
+	//loadModelWidget->raise();
 
+	tabifyDockWidget(sysLayerWidget, sysWidget);
+	sysLayerWidget->raise();
 
 	SelectLayer = 0;
 	RefreshLayerWidget();
@@ -786,13 +842,14 @@ void ParaModel::ShowAllUnitSelectWindow()
 ParaModel::ParaModel(QWidget* parent)
 	: SARibbonMainWindow(parent)
 {
-	myLogOutLabel = new QTextEdit();
-	pSceneOffset = 4700;
-	pAuxiliaryLine = 20000;
+	//初始化系统变量
+	InitSysData();
 	//初始化系统路径
 	InitPath();
 	//初始化系统数据
 	InitUnitLib();
+	//初始化系统图库数据
+	InitLayerUnitLib();
 
 	//初始化界面
 	InitWindow();
@@ -814,7 +871,13 @@ void ParaModel::NewFileAction()
 	if_data = 1;
 	SelectLayer = 1;
 	vModelTmpl.clear();
-	vLoadModelData.push_back(vModelTmpl);
+
+	LayerUnit lay;
+	lay.sIcon = "";
+	lay.sVersion = "1.0";
+	lay.sLayerName = QString("1");
+	lay.vLayerTopo = vModelTmpl;
+	vLoadModelData.push_back(lay);
 
 	//给画布中心绘制十字线， 点击后可以添加
 	QPen pen = QPen(Qt::yellow);
@@ -824,7 +887,7 @@ void ParaModel::NewFileAction()
 	for (size_t i = 0; i < 2; i++)
 	{
 		BRectangle* divideLineH = new BRectangle(
-			1, 5000,
+			1, pAuxiliaryLine/2,
 			pAuxiliaryLine, 2,
 			BGraphicsItem::ItemType::Rectangle);
 		divideLineH->isAuxiliary = true;
@@ -846,7 +909,7 @@ void ParaModel::NewFileAction()
 	{
 
 		BRectangle* divideLineV = new BRectangle(
-			5000, 1,
+			pAuxiliaryLine / 2, 1,
 			2, pAuxiliaryLine,
 			BGraphicsItem::ItemType::Rectangle);
 		divideLineV->isAuxiliary = true;
@@ -936,7 +999,7 @@ void ParaModel::OpenFileAction()
 		return;
 	}
 	QTextStream readStream(&file);
-
+	vModelTmpl.clear();
 	int parsingState = 0;
 	while (!readStream.atEnd()) {
 		QString content = readStream.readLine();
@@ -1006,8 +1069,16 @@ void ParaModel::OpenFileAction()
 
 	pCalShapeData = new DimDataConvert();
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
-	vLoadModelData.push_back(vModelTmpl);
+
 	SelectLayer = SelectLayer + 1;
+	LayerUnit lay;
+	lay.sIcon = "";
+	lay.sVersion = "1.0";
+	lay.sLayerName = QString(SelectLayer);
+	lay.vLayerTopo = vModelTmpl;
+	vLoadModelData.push_back(lay);
+
+
 	ParaModel::AddSceneData();
 	ParaModel::AddSceneXData();
 	ParaModel::RefreshLayerWidget();
@@ -1135,7 +1206,7 @@ void ParaModel::RefreshLayerWidget()
 	QFormLayout* pLayout = new QFormLayout();
 	pLayout->addRow(pCopyLayerBtn);
 	pLayout->addRow(layerlbl);
-	if (SelectLayer == 1)
+	if (SelectLayer == 1 && vLoadModelData.size()==0)
 	{
 		for (size_t i = 0; i < 1; i++)
 		{
@@ -1200,7 +1271,12 @@ void ParaModel::CopyLayerAction()
 	SelectLayer = SelectLayer + 1;
 	VTOPOTABLE x;
 	x.assign(vModelTmpl.begin(), vModelTmpl.end());
-	vLoadModelData.push_back(x);
+	LayerUnit lay;
+	lay.sIcon = "";
+	lay.sVersion = "1.0";
+	lay.sLayerName = QString(SelectLayer);
+	lay.vLayerTopo = x;
+	vLoadModelData.push_back(lay);
 	ParaModel::RefreshLayerWidget();
 	return;
 }
@@ -1208,9 +1284,9 @@ void ParaModel::CopyLayerAction()
 void ParaModel::ChangeLayerAction(int layer)
 {
 	//TODO::将数据保存到操作的层中
-	vLoadModelData[SelectLayer - 1].assign(vModelTmpl.begin(), vModelTmpl.end());
+	vLoadModelData[SelectLayer - 1].vLayerTopo.assign(vModelTmpl.begin(), vModelTmpl.end());
 	SelectLayer = layer + 1;
-	vModelTmpl.assign(vLoadModelData[layer].begin(), vLoadModelData[layer].end());
+	vModelTmpl.assign(vLoadModelData[layer].vLayerTopo.begin(), vLoadModelData[layer].vLayerTopo.end());
 	RefreshSceneData();
 	ParaModel::RefreshLayerWidget();
 	return;
@@ -1223,17 +1299,25 @@ void ParaModel::DeleteLayerAction(int layer)
 	if (vLoadModelData.size() == 0)
 	{
 		vModelTmpl.clear();
-		vLoadModelData.push_back(vModelTmpl);
+		LayerUnit lay;
+		lay.sIcon = "";
+		lay.sVersion = "1.0";
+		lay.sLayerName = QString("1");
+		lay.vLayerTopo = vModelTmpl;
+		vLoadModelData.push_back(lay);
 		SelectLayer = 1;
+		ParaModel::RefreshLayerWidget();
 		return;
 	}
 	//如果删除的是当前楼层
 	if (SelectLayer == layer + 1)
 	{
 		//将数据变成第一层
-		vModelTmpl.assign(vLoadModelData[0].begin(), vLoadModelData[0].end());
+		vModelTmpl.assign(vLoadModelData[0].vLayerTopo.begin(), vLoadModelData[0].vLayerTopo.end());
 		SelectLayer = 1;
-	}
+		ParaModel::RefreshLayerWidget();
+		return;
+	} 
 	ParaModel::RefreshLayerWidget();
 	return;
 }
@@ -1249,7 +1333,17 @@ void ParaModel::drawWall(const std::vector<float>& points) {
 #pragma endregion
 
 #pragma region 初始化数据
-
+// 初始化路径 
+int ParaModel::InitSysData()
+{ 
+	myLogOutLabel = new QTextEdit();
+	pSceneOffset = 4700;
+	pAuxiliaryLine = 20000;
+	if_data = 0;
+	nMoveXY[0] = 0;
+	nMoveXY[1] = 0;
+	return 1;
+}
 int InitUnitPara(QStringList listInfo, BasicUnit& oUnit)
 {
 	// 0-6 柱梁板墙门窗
@@ -1332,9 +1426,114 @@ int ParaModel::InitPath()
 int ParaModel::InitLayerUnitLib()
 {
 	QString Path = QString::fromStdString(oPath.sTopoLayerDir);
-	QFile file(Path);
-	//遍历该路径下的所有文件夹
+	QDir cfgPathDir = Path;
+	if (!cfgPathDir.exists()) {
+		MyLogOutput("系统无法找到系统平面图库！");
+		return 0;
+	}
+	QStringList filters;
+	filters << QString("*.txt");
+	cfgPathDir.setFilter(QDir::Files | QDir::NoSymLinks); //设置类型过滤器，只为文件格式
+	cfgPathDir.setNameFilters(filters);                   //设置文件名称过滤器，只为filters格式
+	int dirCount = cfgPathDir.count();
+	if (dirCount <= 0) {
+		MyLogOutput("系统平面图库中无数据！");
+		return 0;
+	}
 
+	//遍历该路径下的所有文件夹 
+	for (int i = 0; i < dirCount; i++) {
+
+		QString Path = QString("%1/%2").arg(QString::fromStdString(oPath.sTopoLayerDir)).arg(cfgPathDir[i]);
+		QFile file(Path);
+		if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		{
+			QMessageBox::information(NULL, "信息提示", "系统平面库解析失败！");
+			MyLogOutput("系统平面库解析失败！");
+			return 0;
+		}
+
+		QTextStream readStream(&file);
+
+		int parsingState = 0;
+		while (!readStream.atEnd()) {
+			QString content = readStream.readLine();
+			QStringList list = content.split(' ');
+			bool verify;
+			QString str = list[0];
+			if (list[0] == "*Topo")
+			{
+				parsingState = 1;
+				continue;
+			}
+			float  locationX = str.toInt(&verify);
+			if (!verify)
+				continue;
+			TopoUnit Topo;
+			Topo.nUnitType = 0;
+			Topo.nCenUnitIdx = 0;
+			for (size_t i = 0; i < 12; i++)
+			{
+				Topo.nAdjUnitIdx[i] = -1;
+			}
+			Topo.nEdgeType = 0;
+			Topo.nStatusFlag = 0;
+			Topo.nUnitAngle = 0;
+			for (size_t i = 0; i < 4; i++)
+			{
+				Topo.nCenPos[i] = 0;
+			}
+			if (parsingState == 0)
+			{
+				Topo.nUnitType = GetUnitTypeCode(list[1]);
+				Topo.nCenUnitIdx = list[2].toInt();
+				Topo.nTopoIdx = list[0].toInt();
+				if (list.size() >= 4)
+				{
+					Topo.nCenPos[0] = list[3].toInt();
+				}
+				if (list.size() >= 5)
+				{
+					Topo.nCenPos[1] = list[4].toInt();
+				}
+				if (list.size() >= 6)
+				{
+					Topo.nCenPos[2] = list[5].toInt();
+				}
+				if (list.size() >= 7)
+				{
+					Topo.nCenPos[3] = list[6].toInt();
+				}
+				vModelTmpl.push_back(Topo);
+			}
+			else
+			{
+				for (size_t i = 0; i < vModelTmpl.size(); i++)
+				{
+					if (vModelTmpl[i].nTopoIdx == list[1].toInt())
+					{
+						for (size_t j = 0; j < list.size() - 2; j++)
+						{
+							vModelTmpl[i].nAdjUnitIdx[j] = list[j + 2].toInt();
+						}
+					}
+				}
+			}
+
+		}
+		VTOPOTABLE x;
+		x.assign(vModelTmpl.begin(), vModelTmpl.end());
+		LayerUnit lay;
+		lay.sIcon = "";
+		lay.sVersion = "1.0";
+		int lastPoint = cfgPathDir[i].lastIndexOf(".");
+		QString fileNameNoExt = cfgPathDir[i].left(lastPoint);
+		lay.sLayerName = fileNameNoExt;
+		lay.vLayerTopo = x;
+		vBuildTopo.push_back(lay); 
+		vModelTmpl.clear();
+	}
+	return 1;
 }
 // 初始化基本构件库 
 int ParaModel::InitUnitLib()
@@ -1346,8 +1545,7 @@ int ParaModel::InitUnitLib()
 		QMessageBox::information(NULL, "信息提示", "系统基本构建库解析失败！");
 		MyLogOutput("系统基本构建库解析失败！");
 		return 0;
-	}
-
+	} 
 	QTextStream readStream(&file);
 	while (!readStream.atEnd()) {
 		QString content = readStream.readLine();
@@ -1435,12 +1633,7 @@ int ParaModel::InitUnitLib()
 		vBaseUnit.push_back(basic);
 	}
 	return 1;
-}
-// 初始化平面图库
-int ParaModel::InitPlaneDrawLib()
-{
-	return 0;
-}
+} 
 // 初始化参数化生成模板
 int ParaModel::InitParaTmpl()
 {
@@ -1638,10 +1831,13 @@ void ParaModel::RefreshSceneData()
 {
 	if (if_data == 0)
 		return;
-	// 计算移动后的新坐标
-	pCalShapeData->MoveBaseUnit(SelectUnitIdx, nMoveXY[0], nMoveXY[1], vModelTmpl, viewShape, vBaseUnit);
-	nMoveXY[0] = 0;
-	nMoveXY[1] = 0;
+	if (nMoveXY[0] != 0 || nMoveXY[1] != 0)
+	{
+		// 计算移动后的新坐标
+		pCalShapeData->MoveBaseUnit(SelectUnitIdx, nMoveXY[0], nMoveXY[1], vModelTmpl, viewShape, vBaseUnit);
+		nMoveXY[0] = 0;
+		nMoveXY[1] = 0;
+	}
 	// 转为绘图坐标
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 	AddSceneData();
