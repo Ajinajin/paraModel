@@ -246,9 +246,8 @@ void ParaModel::InitSysUnitWidget(QDockWidget* from)
 
 //初始化已加载的模型窗口
 void ParaModel::InitLoadModelWidget(QDockWidget* from)
-{
-
-	from->setMaximumWidth(350);
+{ 
+	from->setFixedWidth(550);
 	from->setMaximumHeight(380);
 	from->setWindowTitle("二维视图");
 	//layout布局
@@ -848,7 +847,8 @@ void ParaModel::ShowAllUnitSelectWindow()
 		pCalShapeData->selectUnitIdx = SelectUnitIdx;
 		//添加构建入拓扑图
 		pCalShapeData->AddBaseUnit(oAddUnit, pos, vBaseUnit, vModelTmpl, viewShape);
-		 
+		RefreshSceneData();
+
 		unitSelectWidget->hide();
 		});
 
@@ -1730,7 +1730,7 @@ int ParaModel::InitSysData()
 	pRoomEdit[3] = new QLineEdit();
 
 	myLogOutLabel = new QTextEdit();
-	pSceneOffset = 4700;
+	pSceneOffset = 4900;
 	pAuxiliaryLine = 20000;
 	if_data = 0;
 	nMoveXY[0] = 0;
