@@ -63,10 +63,11 @@ private:
 	QLabel* pXImg;									// 二维显示窗口俯视角
 	QLabel* pYImg;									// 二维显示窗口正视角
 
-	int if_data;									// 0是未加载数据。1是有数据
-	SysPath oPath;									// 系统路径
-	int pSceneOffset;								// 绘制图像偏移
-	int pAuxiliaryLine;								// 辅助线长度
+	int if_data;									//0是未加载数据。1是有数据
+	SysPath oPath;									//系统路径
+	QString existPath;								//当前程序正在打开的路径
+	int pSceneOffset;								//绘制图像偏移
+	int pAuxiliaryLine;								//辅助线长度
 
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
 	int MainDockState;								// 0是X视图 1是Y视图 2是Z视图 3是三维视图

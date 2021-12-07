@@ -255,7 +255,7 @@ void ParaOGLManager::paintGL()
 	//update
 	this->updateGL();
 
-	int layerHeight;
+	int layerHeight = 0;
 	int boardHeight;
 	int columnHeight = 250;
 
@@ -300,7 +300,7 @@ void ParaOGLManager::paintGL()
 					thickness = info.oShape.nShapeRange[3] - info.oShape.nShapeRange[1];
 
 					x = oglTopTable.at(i).nCenPos[0];
-					y = columnHeight / 2;
+					y = columnHeight / 2 + layerHeight;
 					z = oglTopTable.at(i).nCenPos[2];
 
 					InitAndDrawCuboid(x, y, z, length, thickness, height,1);
@@ -313,7 +313,7 @@ void ParaOGLManager::paintGL()
 				{
 					float x, y, z, radius, height;
 					x = oglTopTable.at(i).nCenPos[0];
-					y = columnHeight / 2;
+					y = columnHeight / 2 + layerHeight;
 					
 					z = oglTopTable.at(i).nCenPos[2];
 					height = oglTopTable.at(i).nCenPos[3];
@@ -394,14 +394,14 @@ void ParaOGLManager::paintGL()
 						if (columnPoints[0].x < columnPoints[1].x)
 						{
 							x = columnPoints[0].x + (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2 + length / 2;
-							y = columnHeight - height / 2;
+							y = columnHeight - height / 2 + layerHeight;
 							z = columnPoints[0].z;
 							InitAndDrawCuboid(x, y, z, length, thickness, height,2);
 						}
 						else
 						{
 							x = columnPoints[1].x + (Columns[1].oShape.nShapeRange[2] - Columns[1].oShape.nShapeRange[0]) / 2 + length / 2;
-							y = columnHeight - height / 2;
+							y = columnHeight - height / 2 + layerHeight;
 							z = columnPoints[1].z;
 							InitAndDrawCuboid(x, y, z, length, thickness, height,2);
 						}
@@ -412,14 +412,14 @@ void ParaOGLManager::paintGL()
 						if (columnPoints[0].z < columnPoints[1].z)
 						{
 							x = columnPoints[0].x;
-							y = columnHeight - height / 2;
+							y = columnHeight - height / 2 + layerHeight;
 							z = columnPoints[1].z - (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2 - length / 2;
 							InitAndDrawCuboid(x, y, z, thickness, length, height,2);
 						}
 						else
 						{
 							x = columnPoints[1].x;
-							y = columnHeight - height / 2;
+							y = columnHeight - height / 2 + layerHeight;
 							z = columnPoints[0].z - (Columns[0].oShape.nShapeRange[3] - Columns[0].oShape.nShapeRange[1]) / 2 - length / 2;
 							InitAndDrawCuboid(x, y, z, thickness, length, height,2);
 						}
@@ -489,7 +489,7 @@ void ParaOGLManager::paintGL()
 					width += (columns[2].oShape.nShapeRange[3] - columns[2].oShape.nShapeRange[1]) / 2;
 
 					x = columnPoints[3].x - (columns[3].oShape.nShapeRange[2] - columns[3].oShape.nShapeRange[0]) / 2 + length / 2;
-					y = columnHeight + thickness / 2;
+					y = columnHeight + thickness / 2 + layerHeight;
 					z = columnPoints[3].z + (columns[3].oShape.nShapeRange[3] - columns[3].oShape.nShapeRange[1]) / 2 - width / 2;
 
 					InitAndDrawCuboid(x, y, z, length, width, thickness, 3);
@@ -531,7 +531,7 @@ void ParaOGLManager::paintGL()
 				height = columnHeight;
 
 				//查找墙连接的两个柱之间的距离
-				vPoint columnPoints;		//记录两个柱的中心点
+				vPoint columnPoints;		//记录两个柱的中心点下点
 				vector<BasicUnit> Columns;	//墙连接的柱子
 				int j = 0;
 				while (oglTopTable.at(i).nAdjUnitIdx[j] != -1)
@@ -570,14 +570,14 @@ void ParaOGLManager::paintGL()
 					if (columnPoints[0].x < columnPoints[1].x)
 					{
 						x = columnPoints[0].x + (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2 + length / 2;
-						y = columnHeight / 2;
+						y = columnHeight / 2 + layerHeight;
 						z = columnPoints[0].z;
 						InitAndDrawCuboid(x, y, z, length, thickness, height,4);
 					}
 					else
 					{
 						x = columnPoints[1].x + (Columns[1].oShape.nShapeRange[2] - Columns[1].oShape.nShapeRange[0]) / 2 + length / 2;
-						y = columnHeight / 2;
+						y = columnHeight / 2 + layerHeight;
 						z = columnPoints[1].z;
 						InitAndDrawCuboid(x, y, z, length, thickness, height,4);
 					}
@@ -588,14 +588,14 @@ void ParaOGLManager::paintGL()
 					if (columnPoints[0].z < columnPoints[1].z)
 					{
 						x = columnPoints[0].x;
-						y = columnHeight / 2;
+						y = columnHeight / 2 + layerHeight;
 						z = columnPoints[1].z - (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2 - length / 2;
 						InitAndDrawCuboid(x, y, z, thickness, length, height,4);
 					}
 					else
 					{
 						x = columnPoints[1].x;
-						y = columnHeight / 2;
+						y = columnHeight / 2 + layerHeight;
 						z = columnPoints[0].z - (Columns[0].oShape.nShapeRange[3] - Columns[0].oShape.nShapeRange[1]) / 2 - length / 2;
 						InitAndDrawCuboid(x, y, z, thickness, length, height,4);
 					}
@@ -673,9 +673,9 @@ void ParaOGLManager::paintGL()
 
 						}
 
-						//门的坐标
+						//门窗的坐标
 						x = wallX + oglTopTable.at(i).nCenPos[0] + length / 2;
-						y = oglTopTable.at(i).nCenPos[1] + height / 2;
+						y = oglTopTable.at(i).nCenPos[1] + height / 2 + layerHeight;
 						z = wallZ - thickness / 2;
 
 						InitAndDrawCuboid(x, y, z, length, thickness, height, oglTopTable.at(i).nUnitType);
@@ -697,9 +697,9 @@ void ParaOGLManager::paintGL()
 
 						}
 
-						//门的坐标
+						//门窗的坐标
 						x = wallX + thickness / 2;
-						y = oglTopTable.at(i).nCenPos[1] + height / 2;
+						y = oglTopTable.at(i).nCenPos[1] + height / 2 + layerHeight;
 						z = wallZ - oglTopTable.at(i).nCenPos[0] - length / 2;
 
 						InitAndDrawCuboid(x, y, z, thickness, length, height, oglTopTable.at(i).nUnitType);
