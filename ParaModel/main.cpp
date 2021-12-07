@@ -11,7 +11,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    ParaModel w;
+	ParaModel w;
 	w.show();
 	//计时开始
 	LARGE_INTEGER litmp;
