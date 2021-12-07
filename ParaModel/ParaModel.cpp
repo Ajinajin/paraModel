@@ -252,8 +252,7 @@ void ParaModel::InitOglManagerWidget(QDockWidget* from)
 	MainDockWidget = from;
 
 	graphicsViewMain = new BQGraphicsView();
-
-	graphicsViewMain->setScene(&pSceneMain);
+	graphicsViewMain->setScene(&pSceneMain); 
 	pSceneMain.setBackgroundBrush(Qt::darkGray);
 
 	MainDockWidget->setWindowTitle("当前编辑视图 （三维）");
@@ -664,7 +663,8 @@ ParaModel::ParaModel(QWidget* parent)
 	: SARibbonMainWindow(parent)
 {
 	myLogOutLabel = new QTextEdit();
-	pSceneOffset = 700;
+	pSceneOffset = 4700;
+	pAuxiliaryLine = 20000;
 	//初始化系统路径
 	InitPath();
 	//初始化系统数据
@@ -700,8 +700,8 @@ void ParaModel::NewFileAction()
 	for (size_t i = 0; i < 2; i++)
 	{
 		BRectangle* divideLineH = new BRectangle(
-			1, 1000,
-			8000, 2,
+			1, 5000,
+			pAuxiliaryLine, 2,
 			BGraphicsItem::ItemType::Rectangle);
 		divideLineH->isAuxiliary = true;
 		divideLineH->nUnitType = 0;
@@ -722,8 +722,8 @@ void ParaModel::NewFileAction()
 	{
 
 		BRectangle* divideLineV = new BRectangle(
-			1000, 1,
-			2, 8000,
+			5000, 1,
+			2, pAuxiliaryLine,
 			BGraphicsItem::ItemType::Rectangle);
 		divideLineV->isAuxiliary = true;
 		divideLineV->nUnitType = 0;
@@ -1569,20 +1569,21 @@ void ParaModel::AddSceneData()
 	//清除画布
 	SceneMainClear();
 
+
 	//加载标准线
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
-		//如果当前要渲染的是强
 		if (viewShape[i].unitType == 1)
 		{
-			int coordX = viewShape[i].nCen[0] + pSceneOffset;
-			int coordY = viewShape[i].nCen[1] + pSceneOffset;
 
 			QPen pen = QPen(Qt::blue);
 			pen.setStyle(Qt::DashLine);
+
+			int coordX = viewShape[i].nCen[0] + pSceneOffset;
+			int coordY = viewShape[i].nCen[1] + pSceneOffset;
 			BRectangle* divideLineH = new BRectangle(
 				1, coordY,
-				8000, 2,
+				pAuxiliaryLine, 2,
 				BGraphicsItem::ItemType::Rectangle);
 			divideLineH->isAuxiliary = true;
 			divideLineH->nUnitType = 0;
@@ -1594,15 +1595,17 @@ void ParaModel::AddSceneData()
 
 			BRectangle* divideLineV = new BRectangle(
 				coordX, 1,
-				2, 8000,
+				2, pAuxiliaryLine,
 				BGraphicsItem::ItemType::Rectangle);
 			divideLineV->isAuxiliary = true;
 			divideLineV->nUnitType = 0;
+			divideLineV->graphAngle = vModelTmpl[viewShape[i].unitIdx].nUnitAngle;
 			divideLineV->nUnitIdx = viewShape[i].unitIdx;
 			divideLineV->setPen(pen);
 			connect(divideLineV, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
 			connect(divideLineV, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
 			pSceneMain.addItem(divideLineV);
+
 		}
 		//如果当前要渲染的是强
 		if (viewShape[i].unitType == 4)
@@ -1614,7 +1617,7 @@ void ParaModel::AddSceneData()
 			{
 				BRectangle* divideLine = new BRectangle(
 					1, coordY,
-					8000, 2,
+					pAuxiliaryLine, 2,
 					BGraphicsItem::ItemType::Rectangle);
 				divideLine->isAuxiliary = true;
 				divideLine->nUnitType = 0;
@@ -1633,10 +1636,11 @@ void ParaModel::AddSceneData()
 			{
 				BRectangle* divideLine = new BRectangle(
 					coordX, 1,
-					2, 8000,
+					2, pAuxiliaryLine,
 					BGraphicsItem::ItemType::Rectangle);
 				divideLine->isAuxiliary = true;
 				divideLine->nUnitType = 0;
+				divideLine->graphAngle = vModelTmpl[viewShape[i].unitIdx].nUnitAngle;
 				divideLine->nUnitIdx = viewShape[i].unitIdx;
 				/*QBrush b = (Qt::DashLine);
 				b.setColor(ColorHelper(viewShape[i].unitType));
@@ -1654,10 +1658,6 @@ void ParaModel::AddSceneData()
 	//根据数据绘制图形
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
-		if (viewShape[i].unitIdx == 15)
-		{
-			int k = 0;
-		}
 		//绘制柱、墙、门、窗
 		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
 		{
@@ -1670,6 +1670,7 @@ void ParaModel::AddSceneData()
 			viewItem->isAuxiliary = false;
 			viewItem->nUnitType = viewShape[i].unitType;
 			viewItem->nUnitIdx = viewShape[i].unitIdx;
+			viewItem->graphAngle = vModelTmpl[viewShape[i].unitIdx].nUnitAngle;
 			viewItem->setBrush(ColorHelper(viewShape[i].unitType));
 			connect(viewItem, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
 			connect(viewItem, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
@@ -1699,6 +1700,40 @@ void ParaModel::AddSceneXData()
 	//加载标准线
 	for (size_t i = 0; i < viewShape.size(); i++)
 	{
+		if (viewShape[i].unitType == 1)
+		{
+
+			QPen pen = QPen(Qt::blue);
+			pen.setStyle(Qt::DashLine);
+
+			int coordX = viewShape[i].nCen[0] + pSceneOffset;
+			int coordY = viewShape[i].nCen[1] + pSceneOffset;
+			BRectangle* divideLineH = new BRectangle(
+				1, coordY,
+				pAuxiliaryLine, 2,
+				BGraphicsItem::ItemType::Rectangle);
+			divideLineH->isAuxiliary = true;
+			divideLineH->nUnitType = 0;
+			divideLineH->nUnitIdx = viewShape[i].unitIdx;
+			divideLineH->setPen(pen);
+			connect(divideLineH, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+			connect(divideLineH, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+			pSceneX.addItem(divideLineH);
+
+			BRectangle* divideLineV = new BRectangle(
+				coordX, 1,
+				2, pAuxiliaryLine,
+				BGraphicsItem::ItemType::Rectangle);
+			divideLineV->isAuxiliary = true;
+			divideLineV->nUnitType = 0;
+			divideLineV->graphAngle = vModelTmpl[viewShape[i].unitIdx].nUnitAngle;
+			divideLineV->nUnitIdx = viewShape[i].unitIdx; 
+			divideLineV->setPen(pen);
+			connect(divideLineV, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
+			connect(divideLineV, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
+			pSceneX.addItem(divideLineV);
+
+		}
 		//如果当前要渲染的是强
 		if (viewShape[i].unitType == 4)
 		{
@@ -1709,7 +1744,7 @@ void ParaModel::AddSceneXData()
 			{
 				BRectangle* divideLine = new BRectangle(
 					1, coordY,
-					8000, 2,
+					pAuxiliaryLine, 2,
 					BGraphicsItem::ItemType::Rectangle);
 				divideLine->isAuxiliary = true;
 				divideLine->nUnitType = 0;
@@ -1728,10 +1763,11 @@ void ParaModel::AddSceneXData()
 			{
 				BRectangle* divideLine = new BRectangle(
 					coordX, 1,
-					2, 8000,
+					2, pAuxiliaryLine,
 					BGraphicsItem::ItemType::Rectangle);
 				divideLine->isAuxiliary = true;
 				divideLine->nUnitType = 0;
+				divideLine->graphAngle = vModelTmpl[viewShape[i].unitIdx].nUnitAngle;
 				divideLine->nUnitIdx = viewShape[i].unitIdx;
 				/*QBrush b = (Qt::DashLine);
 				b.setColor(ColorHelper(viewShape[i].unitType));
@@ -1748,11 +1784,7 @@ void ParaModel::AddSceneXData()
 	}
 	//根据数据绘制图形
 	for (size_t i = 0; i < viewShape.size(); i++)
-	{
-		if (viewShape[i].unitIdx == 15)
-		{
-			int k = 0;
-		}
+	{ 
 		//绘制柱、墙、门、窗
 		if (viewShape[i].unitType == 1 || viewShape[i].unitType == 4 || viewShape[i].unitType == 5 || viewShape[i].unitType == 6)
 		{
@@ -1765,6 +1797,7 @@ void ParaModel::AddSceneXData()
 			viewItem->isAuxiliary = false;
 			viewItem->nUnitType = viewShape[i].unitType;
 			viewItem->nUnitIdx = viewShape[i].unitIdx;
+			viewItem->graphAngle= vModelTmpl[viewShape[i].unitIdx].nUnitAngle;
 			viewItem->setBrush(ColorHelper(viewShape[i].unitType));
 			connect(viewItem, &BRectangle::SceneItemMove, this, &ParaModel::SceneItemMoveAction);
 			connect(viewItem, &BRectangle::SceneMenuAddClick, this, &ParaModel::SceneMenuAddClickAction);
@@ -1810,7 +1843,7 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 			int center = (width / 2);
 			BRectangle* divideLine = new BRectangle(
 				1, pSceneOffset + x + center,
-				8000, 2,
+				pAuxiliaryLine, 2,
 				BGraphicsItem::ItemType::Rectangle);
 			divideLine->isAuxiliary = true;
 			divideLine->nUnitIdx = nUnitIdx;
@@ -1825,7 +1858,7 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 			int center = (height / 2);
 			BRectangle* divideLine = new BRectangle(
 				pSceneOffset + y + center, 1,
-				2, 8000,
+				2, pAuxiliaryLine,
 				BGraphicsItem::ItemType::Rectangle);
 			divideLine->isAuxiliary = true;
 			divideLine->nUnitIdx = nUnitIdx;
@@ -1845,34 +1878,34 @@ void ParaModel::UpdataSceneItem(int nUnitIdx, int x, int y, int width, int heigh
 //清除画布数据
 void ParaModel::SceneMainClear()
 {
-	pSceneMain.clear();
-	for (int x = 0; x <= 2000; x += 10)
-		pSceneMain.addLine(0, x, 2000, x, QPen(Qt::red));
-	for (int y = 0; y <= 2000; y += 10)
-		pSceneMain.addLine(y, 0, y, 2000, QPen(Qt::red));
+	pSceneMain.clear(); 
+	for (int x = 0; x <= 10000; x += 10)
+		pSceneMain.addLine(0, x, 10000, x, QPen(Qt::red));
+	for (int y = 0; y <= 10000; y += 10)
+		pSceneMain.addLine(y, 0, y, 10000, QPen(Qt::red));
 }
 void ParaModel::SceneXClear()
 {
 	pSceneX.clear();
-	for (int x = 0; x <= 2000; x += 10)
-		pSceneX.addLine(0, x, 2000, x, QPen(Qt::red));
-	for (int y = 0; y <= 2000; y += 10)
-		pSceneX.addLine(y, 0, y, 2000, QPen(Qt::red));
+	for (int x = 0; x <= 10000; x += 10)
+		pSceneX.addLine(0, x, 10000, x, QPen(Qt::red));
+	for (int y = 0; y <= 10000; y += 10)
+		pSceneX.addLine(y, 0, y, 10000, QPen(Qt::red));
 }
 void ParaModel::SceneYClear()
 {
 	pSceneY.clear();
-	for (int x = 0; x <= 2000; x += 10)
-		pSceneY.addLine(0, x, 2000, x, QPen(Qt::red));
-	for (int y = 0; y <= 2000; y += 10)
-		pSceneY.addLine(y, 0, y, 2000, QPen(Qt::red));
+	for (int x = 0; x <= 10000; x += 10)
+		pSceneY.addLine(0, x, 10000, x, QPen(Qt::red));
+	for (int y = 0; y <= 10000; y += 10)
+		pSceneY.addLine(y, 0, y, 10000, QPen(Qt::red));
 }
 void ParaModel::SceneZClear()
 {
 	pSceneZ.clear();
-	for (int x = 0; x <= 2000; x += 10)
-		pSceneZ.addLine(0, x, 2000, x, QPen(Qt::red));
-	for (int y = 0; y <= 2000; y += 10)
-		pSceneZ.addLine(y, 0, y, 2000, QPen(Qt::red));
+	for (int x = 0; x <= 10000; x += 10)
+		pSceneZ.addLine(0, x, 10000, x, QPen(Qt::red));
+	for (int y = 0; y <= 10000; y += 10)
+		pSceneZ.addLine(y, 0, y, 10000, QPen(Qt::red));
 }
 #pragma endregion

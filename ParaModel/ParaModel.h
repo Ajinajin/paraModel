@@ -64,7 +64,8 @@ private:
 
 	int if_data;									//0是未加载数据。1是有数据
 	SysPath oPath;									//系统路径
-	int pSceneOffset;
+	int pSceneOffset;								//绘制图像偏移
+	int pAuxiliaryLine;								//辅助线长度
 
 	int nMoveXY[2];
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
