@@ -90,11 +90,16 @@ void ParaModel::InitSysLayerWidget(QDockWidget* from)
 			{
 				if (iter->sLayerName == LayerName)
 				{
+					vLoadModelData[SelectLayer - 1].sIcon = iter->sIcon;
+					vLoadModelData[SelectLayer - 1].sLayerName = iter->sLayerName;
+					vLoadModelData[SelectLayer - 1].sVersion = iter->sVersion;
 					vModelTmpl.assign(iter->vLayerTopo.begin(), iter->vLayerTopo.end());
+					vLoadModelData[SelectLayer - 1].vLayerTopo = vModelTmpl;
+					pModelEdit[0]->setText(iter->sLayerName);
+					pModelEdit[1]->setText(iter->sIcon);
 					break;
 				}
 			}
-			vLoadModelData[SelectLayer-1].vLayerTopo= vModelTmpl;
 			RefreshSceneData();
 			msg = item->text(0) + "楼层模板加载完成";
 			MyLogOutput(msg);
@@ -880,6 +885,8 @@ void ParaModel::NewFileAction()
 	lay.sVersion = "1.0";
 	lay.sLayerName = QString("1");
 	lay.vLayerTopo = vModelTmpl;
+	pModelEdit[0]->setText("1");
+	pModelEdit[1]->setText("");
 	vLoadModelData.push_back(lay);
 
 	//给画布中心绘制十字线， 点击后可以添加
@@ -1111,12 +1118,25 @@ void ParaModel::OpenFileAction()
 	QTextStream readStream(&file);
 	vModelTmpl.clear();
 	int parsingState = 0;
+	QString iconStr = "";
+	QString versionStr = "";
 	while (!readStream.atEnd()) {
 		QString content = readStream.readLine();
 		QStringList list = content.split(' ');
 		bool verify;
 		QString str = list[0];
-		if (list[0] == "*Topo")
+		if (list[0].toLower() == "*version")
+		{
+			versionStr = list[1];
+			continue;
+		}
+		if (list[0].toLower() == "*icon")
+		{
+			iconStr = list[1];
+			continue;
+		}
+
+		if (list[0].toLower() == "*topo")
 		{
 			parsingState = 1;
 			continue;
@@ -1182,9 +1202,14 @@ void ParaModel::OpenFileAction()
 
 	SelectLayer = SelectLayer + 1;
 	LayerUnit lay;
-	lay.sIcon = "";
-	lay.sVersion = "1.0";
+	lay.sIcon = iconStr;
+	lay.sVersion = versionStr;
 	lay.sLayerName = QString(SelectLayer);
+	 
+	int lastPoint = file.fileName().lastIndexOf(".");
+	QString fileNameNoExt = file.fileName().left(lastPoint);
+	pModelEdit[0]->setText(fileNameNoExt);
+	pModelEdit[1]->setText(iconStr);
 	lay.vLayerTopo = vModelTmpl;
 	vLoadModelData.push_back(lay);
 
@@ -1289,7 +1314,7 @@ void ParaModel::MyLogOutput(QString myLogout)
 	}
 	else
 	{
-		myLogOutLabel->setText(myLogOutLabel->toPlainText() + "\r\n" + myLogout);
+		myLogOutLabel->setText(myLogout + "\r\n" + myLogOutLabel->toPlainText());
 	}
 }
 //刷新楼层窗口
@@ -1298,8 +1323,14 @@ void ParaModel::RefreshLayerWidget()
 	QWidget* temp = new QWidget();
 	QPushButton* pCopyLayerBtn = new QPushButton("复制当前楼层", this);
 	pCopyLayerBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-	pCopyLayerBtn->setFixedWidth(150);
+	pCopyLayerBtn->setFixedWidth(100);
 	connect(pCopyLayerBtn, &QPushButton::clicked, this, &ParaModel::CopyLayerAction);
+
+	QPushButton* pSaveLayerInfoBtn = new QPushButton("保存楼层信息", this);
+	pSaveLayerInfoBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
+	pSaveLayerInfoBtn->setFixedWidth(100);
+
+	connect(pSaveLayerInfoBtn, &QPushButton::clicked, this, &ParaModel::SaveLayerInfoAction);
 
 	QString layerDetail;
 	if (SelectLayer == 0)
@@ -1311,10 +1342,19 @@ void ParaModel::RefreshLayerWidget()
 		layerDetail = QString("已有楼层：%1  当前编辑楼层：%2").arg(vLoadModelData.size()).arg(SelectLayer);
 	}
 	QLabel* layerlbl = new QLabel(layerDetail);
-	layerlbl->setFixedWidth(500);
+	layerlbl->setFixedWidth(300);
+
+
+	QLabel* layerlName = new QLabel("楼层名称：");
+	layerlName->setFixedWidth(100);
+
+	QLabel* layerlIcon = new QLabel("楼层图标：");
+	layerlIcon->setFixedWidth(100);
 
 	QFormLayout* pLayout = new QFormLayout();
-	pLayout->addRow(pCopyLayerBtn);
+	pLayout->addRow(layerlName, pModelEdit[0]);
+	pLayout->addRow(layerlIcon, pModelEdit[1]);
+	pLayout->addRow(pSaveLayerInfoBtn, pCopyLayerBtn);
 	pLayout->addRow(layerlbl);
 	if (SelectLayer == 1 && vLoadModelData.size()==0)
 	{
@@ -1370,6 +1410,23 @@ void ParaModel::RefreshLayerWidget()
 	temp->setLayout(pLayout);
 	layerWidget->setWidget(temp);
 }
+// 保存楼层信息
+void ParaModel::SaveLayerInfoAction()
+{
+	if (SelectLayer == 0)
+	{
+		MyLogOutput("当前没有选中的楼层请加载数据后在选择");
+		return;
+	}
+	if (vLoadModelData.size()==0)
+	{
+		MyLogOutput("当前没有楼层信息，请新建或者打开楼层!");
+		return;
+	}
+	vLoadModelData[SelectLayer - 1].sLayerName = pModelEdit[0]->text();
+	vLoadModelData[SelectLayer - 1].sIcon = pModelEdit[1]->text();
+	MyLogOutput("保存楼层信息成功！");
+}
 // 复制楼层数据
 void ParaModel::CopyLayerAction()
 {
@@ -1382,9 +1439,9 @@ void ParaModel::CopyLayerAction()
 	VTOPOTABLE x;
 	x.assign(vModelTmpl.begin(), vModelTmpl.end());
 	LayerUnit lay;
-	lay.sIcon = "";
 	lay.sVersion = "1.0";
-	lay.sLayerName = QString(SelectLayer);
+	lay.sIcon = pModelEdit[1]->text();
+	lay.sLayerName = pModelEdit[0]->text();
 	lay.vLayerTopo = x;
 	vLoadModelData.push_back(lay);
 	ParaModel::RefreshLayerWidget();
@@ -1409,10 +1466,12 @@ void ParaModel::DeleteLayerAction(int layer)
 	if (vLoadModelData.size() == 0)
 	{
 		vModelTmpl.clear();
-		LayerUnit lay;
-		lay.sIcon = "";
+		LayerUnit lay; 
 		lay.sVersion = "1.0";
-		lay.sLayerName = QString("1");
+		pModelEdit[0]->setText("1");
+		pModelEdit[1]->setText("");
+		lay.sIcon = pModelEdit[1]->text();
+		lay.sLayerName = pModelEdit[0]->text();
 		lay.vLayerTopo = vModelTmpl;
 		vLoadModelData.push_back(lay);
 		SelectLayer = 1;
@@ -1443,9 +1502,11 @@ void ParaModel::drawWall(const std::vector<float>& points) {
 #pragma endregion
 
 #pragma region 初始化数据
-// 初始化路径 
+// 初始化系统变量 
 int ParaModel::InitSysData()
 { 
+	pModelEdit[0] = new QLineEdit();
+	pModelEdit[1] = new QLineEdit();
 	myLogOutLabel = new QTextEdit();
 	pSceneOffset = 4700;
 	pAuxiliaryLine = 20000;
@@ -1566,12 +1627,25 @@ int ParaModel::InitLayerUnitLib()
 		QTextStream readStream(&file);
 
 		int parsingState = 0;
+		QString iconStr = "";
+		QString versionStr = "";
 		while (!readStream.atEnd()) {
 			QString content = readStream.readLine();
 			QStringList list = content.split(' ');
 			bool verify;
 			QString str = list[0];
-			if (list[0] == "*Topo")
+			if (list[0].toLower() == "*version")
+			{
+				versionStr = list[1];
+				continue;
+			}
+			if (list[0].toLower() == "*icon")
+			{
+				iconStr = list[1];
+				continue;
+			}
+
+			if (list[0].toLower() == "*topo")
 			{
 				parsingState = 1;
 				continue;
@@ -1634,8 +1708,8 @@ int ParaModel::InitLayerUnitLib()
 		VTOPOTABLE x;
 		x.assign(vModelTmpl.begin(), vModelTmpl.end());
 		LayerUnit lay;
-		lay.sIcon = "";
-		lay.sVersion = "1.0";
+		lay.sIcon = iconStr;
+		lay.sVersion = versionStr;
 		int lastPoint = cfgPathDir[i].lastIndexOf(".");
 		QString fileNameNoExt = cfgPathDir[i].left(lastPoint);
 		lay.sLayerName = fileNameNoExt;

@@ -42,8 +42,7 @@ public:
 private:
 	QStatusBar* winStatus;							//状态栏
 	QLabel* pTipBar;								// 状态栏中文字显示
-	QLineEdit* pModelEdit[7];						// 战斗部属性编辑框 当量 弹片数量 弹片质量 分布角度1 分布角度2
-	QLineEdit* pArmHeadEdit[5];						// 算法信息
+	QLineEdit* pModelEdit[2];						// 模型信息
 	QTreeWidget* pModelTreeWidget;					// 系统模型树
 	QTreeWidget* pLayerModelTreeWidget;				// 系统模型树
 	QTreeWidget* pModelUnitTreeWidget;				// 可替换的模型树
@@ -199,6 +198,7 @@ public slots:
 
 
 	void CopyLayerAction();					//复制当前层数据
+	void SaveLayerInfoAction();				//保存楼层信息
 	void DeleteLayerAction(int layer);		//删除当前层数据
 	void ChangeLayerAction(int layer);		//修改画布显示层数据
 };
