@@ -715,7 +715,7 @@ void ParaOGLManager::paintGL()
 
 		if (outFlag != -1) { outFlag++; }
 	}
-
+	
 
 	//此时0 1 2是暂时的，1说明所有的点信息已存储，等于2说明所有的solid信息已存储(此时可输出到K文件了)
 
