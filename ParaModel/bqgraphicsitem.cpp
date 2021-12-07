@@ -593,4 +593,68 @@ void BPolygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 }
 
 //------------------------------------------------------------------------------
+ 
+BLine::BLine(ItemType type)
+	: BGraphicsItem(QPointF(0, 0), QPointF(0, 0), type)
+{
+	 
+}
+   
+QRectF BLine::boundingRect() const
+{
+	return QRectF(m_center.x() , m_center.y() , 1,  1);
+}
 
+void BLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+	Q_UNUSED(option);
+	Q_UNUSED(widget);
+	painter->setPen(this->pen());
+	painter->setBrush(this->brush());
+	//给出的关键点绘制线
+	/*static QList<QPointF> points = QList<QPointF>() << QPointF(10, 40) << QPointF(100, 100) << QPointF(200, 100)
+		<< QPointF(300, 100) << QPointF(330, 80) << QPointF(350, 70);*/
+
+	QPainterPath path(this->point[0]);
+	for (int i = 1; i < point.size(); ++i)
+	{
+		path.lineTo(point[i]);
+	}
+	painter->drawPath(path);
+}
+
+//------------------------------------------------------------------------------
+
+
+BPoint::BPoint(ItemType type)
+	: BGraphicsItem(QPointF(0, 0), QPointF(0, 0), type)
+{
+
+}
+
+QRectF BPoint::boundingRect() const
+{
+	return QRectF(m_center.x() , m_center.y() ,1, 1);
+}
+
+void BPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+	Q_UNUSED(option);
+	Q_UNUSED(widget);
+	painter->setPen(this->pen());
+	painter->setBrush(this->brush());
+	//给出的关键点绘制线 
+
+	int ellipse_size = 4;
+	for (int i = 0; i < this->point.size(); ++i) {
+		painter->drawEllipse(this->point[i], ellipse_size, ellipse_size);
+		/*QString text = QString::number(points[i].y());
+		QFontMetrics fm = painter->fontMetrics();
+		int height_font = fm.height();
+		int width_text = fm.width(text);
+		QPointF textPos(points[i].x() - (width_text / 2), points[i].y() - (ellipse_size / 2) - (height_font / 2));
+		painter->drawText(textPos, text);*/
+	}
+}
+
+//------------------------------------------------------------------------------

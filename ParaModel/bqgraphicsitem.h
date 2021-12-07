@@ -19,6 +19,8 @@ public:
 		Rectangle,          // 矩形
 		Square,             // 正方形
 		Polygon,            // 多边形
+		Line,				// 线
+		Point,            // 点
 	};
 	QPointF m_oldleftup;       //中心点，拖动图形
 	QPointF m_center;          //中心点，拖动图形
@@ -161,6 +163,53 @@ protected:
 
 protected:
 	qreal m_radius;
+};
+
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+
+// 线
+class BLine : public BGraphicsItem
+{
+	Q_OBJECT
+public:
+	BLine(ItemType type);
+	QList<QPointF> point;
+
+protected:
+
+	virtual QRectF boundingRect() const override;
+
+	virtual void paint(QPainter* painter,
+		const QStyleOptionGraphicsItem* option,
+		QWidget* widget) override;
+	 
+};
+
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+
+// 点
+class BPoint : public BGraphicsItem
+{
+	Q_OBJECT
+public:
+	BPoint(ItemType type);
+	QList<QPointF> point;
+
+protected:
+	virtual QRectF boundingRect() const override;
+
+	virtual void paint(QPainter* painter,
+		const QStyleOptionGraphicsItem* option,
+		QWidget* widget) override;
+	 
 };
 
 //------------------------------------------------------------------------------

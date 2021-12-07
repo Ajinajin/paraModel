@@ -47,7 +47,7 @@
 #pragma region 初始化窗口
 //初始化建筑楼层窗口
 void ParaModel::InitLayerWidget(QDockWidget* from)
-{ 
+{
 	from->setWindowTitle("建筑楼层");
 }
 
@@ -246,98 +246,39 @@ void ParaModel::InitSysUnitWidget(QDockWidget* from)
 
 //初始化已加载的模型窗口
 void ParaModel::InitLoadModelWidget(QDockWidget* from)
-{   
-	 
+{ 
+	from->setFixedWidth(550);
+	from->setMaximumHeight(380);
 	from->setWindowTitle("二维视图");
 	//layout布局
 
 	QWidget* visutal = new QWidget();
-
-
-	QGridLayout* myLayout = new QGridLayout();
-
-	QHBoxLayout* hLayout = new QHBoxLayout();
-	QWidget* temp = new QWidget();
-	//增加两个按钮
-	QPushButton* pBtn = new QPushButton("顶视图", this);
-	pBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-	pBtn->setFixedWidth(100);
-	connect(pBtn, &QPushButton::clicked, this, &ParaModel::ChangeTopImgAction);
-	hLayout->addWidget(pBtn,0, Qt::AlignLeft | Qt::AlignCenter);
-
-	pBtn = new QPushButton("底视图", this);
-	pBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-	pBtn->setFixedWidth(100);
-	connect(pBtn, &QPushButton::clicked, this, &ParaModel::ChangeBottomImgAction);	
-	hLayout->addWidget(pBtn, 0, Qt::AlignLeft | Qt::AlignCenter);
-	temp->setLayout(hLayout);
-	myLayout->addWidget(temp);
+	QFormLayout* pLayout = new QFormLayout();
+	cXbox = new QComboBox();
+	cXbox->addItem("顶视图");
+	cXbox->addItem("底视图");
+	connect(cXbox, &QComboBox::currentTextChanged, this, &ParaModel::ChangeXImgAction);
+	pLayout->addRow(cXbox);
 
 	//增加图片
-	QImage* img = new QImage;
-	if (!(img->load(":/qss/res/qss/White/save.png"))) //加载图像
-	{
-		QMessageBox::information(this,
-			tr("打开图像失败"),
-			tr("打开图像失败!"));
-		delete img;
-		return;
-	}
+
 	pXImg = new QLabel();
-	pXImg->setMaximumHeight(100);
-	pXImg->setPixmap(QPixmap::fromImage(*img));
-	myLayout->addWidget(pXImg);
+	pXImg->setMinimumHeight(150);
+	pLayout->addRow(pXImg);
 
 
-	QWidget* tempx = new QWidget();
-	hLayout = new QHBoxLayout();
-	//增加四个按钮
-    pBtn = new QPushButton("前视图", this);
-	pBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-	pBtn->setFixedWidth(100);
-	connect(pBtn, &QPushButton::clicked, this, &ParaModel::ChangeFrontImgAction);
-	hLayout->addWidget(pBtn, 0, Qt::AlignLeft | Qt::AlignCenter);
+	cYbox = new QComboBox();
+	cYbox->addItem("前视图");
+	cYbox->addItem("后视图");
+	cYbox->addItem("左视图");
+	cYbox->addItem("右视图");
+	connect(cYbox, &QComboBox::currentTextChanged, this, &ParaModel::ChangeYImgAction);
+	pLayout->addRow(cYbox);
 
-
-	pBtn = new QPushButton("后视图", this);
-	pBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-	pBtn->setFixedWidth(100);
-	connect(pBtn, &QPushButton::clicked, this, &ParaModel::ChangeBackImgAction);
-	hLayout->addWidget(pBtn, 0, Qt::AlignLeft | Qt::AlignCenter);
-
-
-	pBtn = new QPushButton("左视图", this);
-	pBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-	pBtn->setFixedWidth(100);
-	connect(pBtn, &QPushButton::clicked, this, &ParaModel::ChangeLeftImgAction);
-	hLayout->addWidget(pBtn, 0, Qt::AlignLeft | Qt::AlignCenter);
-
-
-	pBtn = new QPushButton("右视图", this);
-	pBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-	pBtn->setFixedWidth(100);
-	connect(pBtn, &QPushButton::clicked, this, &ParaModel::ChangeRightImgAction);
-	hLayout->addWidget(pBtn, 0, Qt::AlignLeft | Qt::AlignCenter);
-	tempx->setLayout(hLayout);
-	myLayout->addWidget(tempx);
-
-
-	//增加图片 
-	img = new QImage;
-	if (!(img->load(":/qss/res/qss/White/save.png"))) //加载图像
-	{
-		QMessageBox::information(this,
-			tr("打开图像失败"),
-			tr("打开图像失败!"));
-		delete img;
-		return;
-	}
 	pYImg = new QLabel();
-	pYImg->setMaximumHeight(100);
-	pYImg->setPixmap(QPixmap::fromImage(*img));
-	myLayout->addWidget(pYImg);
-
-	visutal->setLayout(myLayout);
+	pYImg->setMinimumHeight(150);
+	pLayout->addRow(pYImg);
+	visutal->setLayout(pLayout);
 	from->setWidget(visutal);
 
 }
@@ -411,19 +352,20 @@ void ParaModel::InitCentralWidget()
 	QDockWidget* editManagerWidget = new QDockWidget(this);
 	InitEditManagerWidget(editManagerWidget);
 
-	QDockWidget* loadModelWidget = new QDockWidget(this);
-	InitLoadModelWidget(loadModelWidget);
 
 
 	QDockWidget* openglWidget = new QDockWidget(this);
 	InitOpenGlWidget(openglWidget);
 
+	QDockWidget* logWidget = new QDockWidget(this);
+	InitLogWidget(logWidget);
+
+	QDockWidget* loadModelWidget = new QDockWidget(this);
+	InitLoadModelWidget(loadModelWidget);
+
 
 	layerWidget = new QDockWidget(this);
 	InitLayerWidget(layerWidget);
-
-	QDockWidget* logWidget = new QDockWidget(this);
-	InitLogWidget(logWidget);
 
 
 
@@ -567,14 +509,14 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	act = new QAction(this);
 	act->setObjectName(("载入建筑"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("载入建筑")); 
+	act->setText(("载入建筑"));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::OpenLayerDataAction);
 
 	act = new QAction(this);
 	act->setObjectName(("载入楼层平面图"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("载入楼层平面图")); 
+	act->setText(("载入楼层平面图"));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &ParaModel::OpenFileAction);
 
@@ -809,7 +751,7 @@ void ParaModel::ShowUnitSelectWindow()
 		}
 		msg = item->text(0) + "构件更换成功";
 		MyLogOutput(msg);
-
+		 
 		unitSelectWidget->hide();
 		});
 	unitSelectWidget->setWindowModality(Qt::ApplicationModal);
@@ -905,6 +847,7 @@ void ParaModel::ShowAllUnitSelectWindow()
 		pCalShapeData->selectUnitIdx = SelectUnitIdx;
 		//添加构建入拓扑图
 		pCalShapeData->AddBaseUnit(oAddUnit, pos, vBaseUnit, vModelTmpl, viewShape);
+		RefreshSceneData();
 
 		unitSelectWidget->hide();
 		});
@@ -939,98 +882,26 @@ ParaModel::ParaModel(QWidget* parent)
 /// <summary>
 /// 切换顶视图图片
 /// </summary>
-void ParaModel::ChangeTopImgAction()
+void ParaModel::ChangeXImgAction()
 {
-	QImage* img = new QImage;
-	if (!(img->load(":/qss/res/qss/White/warning.png"))) //加载图像
-	{
-		QMessageBox::information(this,
-			tr("打开图像失败"),
-			tr("打开图像失败!"));
-		delete img;
+	if (if_data == 0)
 		return;
-	} 
-	pXImg->setPixmap(QPixmap::fromImage(*img));
+	if (vModelTmpl.size() == 0)
+		return;
+	int state = cXbox->currentIndex();
+	pXImg->setPixmap(QPixmap::fromImage(getStandardPic(paraOglmanagerMain)[state]));
 }
 /// <summary>
 /// 切换顶底图图片
 /// </summary>
-void ParaModel::ChangeBottomImgAction()
+void ParaModel::ChangeYImgAction()
 {
-	QImage* img = new QImage;
-	if (!(img->load(":/qss/res/qss/White/success.png"))) //加载图像
-	{
-		QMessageBox::information(this,
-			tr("打开图像失败"),
-			tr("打开图像失败!"));
-		delete img;
+	if (if_data == 0)
 		return;
-	} 
-	pXImg->setPixmap(QPixmap::fromImage(*img));
-}
-/// <summary>
-/// 切换前视图图片
-/// </summary>
-void ParaModel::ChangeFrontImgAction()
-{
-	QImage* img = new QImage;
-	if (!(img->load(":/qss/res/qss/White/question.png"))) //加载图像
-	{
-		QMessageBox::information(this,
-			tr("打开图像失败"),
-			tr("打开图像失败!"));
-		delete img;
+	if (vModelTmpl.size() == 0)
 		return;
-	} 
-	pYImg->setPixmap(QPixmap::fromImage(*img));
-}
-/// <summary>
-/// 切换后视图图片
-/// </summary>
-void ParaModel::ChangeBackImgAction()
-{
-	QImage* img = new QImage;
-	if (!(img->load(":/qss/res/qss/White/506511.png"))) //加载图像
-	{
-		QMessageBox::information(this,
-			tr("打开图像失败"),
-			tr("打开图像失败!"));
-		delete img;
-		return;
-	} 
-	pYImg->setPixmap(QPixmap::fromImage(*img));
-}
-/// <summary>
-/// 切换左视图图片
-/// </summary>
-void ParaModel::ChangeLeftImgAction()
-{
-	QImage* img = new QImage;
-	if (!(img->load(":/qss/res/qss/White/506514.png"))) //加载图像
-	{
-		QMessageBox::information(this,
-			tr("打开图像失败"),
-			tr("打开图像失败!"));
-		delete img;
-		return;
-	} 
-	pYImg->setPixmap(QPixmap::fromImage(*img));
-}
-/// <summary>
-/// 切换右视图图片
-/// </summary>
-void ParaModel::ChangeRightImgAction()
-{
-	QImage* img = new QImage;
-	if (!(img->load(":/qss/res/qss/White/506461.png"))) //加载图像
-	{
-		QMessageBox::information(this,
-			tr("打开图像失败"),
-			tr("打开图像失败!"));
-		delete img;
-		return;
-	} 
-	pYImg->setPixmap(QPixmap::fromImage(*img));
+	int state = cYbox->currentIndex()+2;
+	pYImg->setPixmap(QPixmap::fromImage(getStandardPic(paraOglmanagerMain)[state]));
 }
 /// <summary>
 /// 新建场景
@@ -1102,14 +973,14 @@ void ParaModel::NewFileAction()
 /// 保存原来txt文件
 /// </summary>
 void ParaModel::SaveFileAction()
-{	
+{
 	if (if_data == 0)
 	{
 		QMessageBox::information(NULL, "信息提示", "当前并无数据可保存");
 	}
 	else
 	{
-		
+
 		fstream outfile;
 		outfile.open(existPath.toStdString(), fstream::out);
 
@@ -1345,7 +1216,7 @@ vQImage ParaModel::getStandardPic(ParaOGLManager* oglManager)
 	//return
 	oglManager->view = oldView;
 	oglManager->if_change_view = GL_FALSE;
-	
+
 	return res;
 }
 
@@ -1358,7 +1229,7 @@ void ParaModel::CloseFileAction()
 	SelectLayer = 0;
 	vModelTmpl.clear();
 	vLoadModelData.clear();
-	SceneMainClear(); 
+	SceneMainClear();
 	MyLogOutput("清除数据成功");
 	ParaModel::RefreshLayerWidget();
 }
@@ -1391,7 +1262,7 @@ void ParaModel::OpenLayerDataAction()
 	while (!readStream.atEnd()) {
 		QString content = readStream.readLine();
 		QStringList list = content.split(' ');
-	
+
 	}
 
 	MainDockState = 0;
@@ -1405,14 +1276,14 @@ void ParaModel::OpenLayerDataAction()
 /// 创建平面图
 /// </summary>
 void ParaModel::CreateLayerAction()
-{ 
+{
 	GenerateLayerTipWidget->show();
 }
 /// <summary>
 /// 生成楼层房间
 /// </summary>
 void ParaModel::GenerateLayerAction()
-{  
+{
 	//从pRoomEdit 中获取数据 0-横向房间数量 1-纵向房间数据 2-房间长cm 3-房间宽-cm
 	//验证输入信息是否都为数字，如果不是数字返回提示 XX需要输入数字 并return;
 	//生成房间信息 存储到vModelTmpl中
@@ -1556,6 +1427,7 @@ void ParaModel::OpenFileAction()
 
 	ParaModel::AddSceneData();
 	ParaModel::RefreshLayerWidget();
+	ParaModel::RefreshViewData();
 }
 
 void ParaModel::GraphicsViewXFocus(bool b)
@@ -1869,7 +1741,7 @@ int ParaModel::InitSysData()
 	pRoomEdit[3] = new QLineEdit();
 
 	myLogOutLabel = new QTextEdit();
-	pSceneOffset = 4700;
+	pSceneOffset = 4900;
 	pAuxiliaryLine = 20000;
 	if_data = 0;
 	nMoveXY[0] = 0;
@@ -2354,7 +2226,7 @@ void ParaModel::ReleaseUISource()
 	// 释放各种资源
 	FREEPTR(pTipBar);
 	FREEPTR(myLogOutLabel);
-	FREEPTR(graphicsViewMain); 
+	FREEPTR(graphicsViewMain);
 	return;
 }
 
@@ -2368,6 +2240,17 @@ void ParaModel::ReleaseSysModel()
 
 #pragma region 画布操作
 
+// 刷新视图数据
+void ParaModel::RefreshViewData()
+{
+	vQImage img=getStandardPic(paraOglmanagerMain);
+	int stateX = cXbox->currentIndex();
+	pXImg->setPixmap(QPixmap::fromImage(img[stateX]));
+
+	int stateY = cYbox->currentIndex() + 2;
+	pYImg->setPixmap(QPixmap::fromImage(img[stateY]));
+	return;
+}
 // 刷新画布数据
 void ParaModel::RefreshSceneData()
 {
@@ -2383,6 +2266,7 @@ void ParaModel::RefreshSceneData()
 	// 转为绘图坐标
 	pCalShapeData->CalPlaneData(vModelTmpl, viewShape, vBaseUnit);
 	AddSceneData();
+	RefreshViewData();
 	return;
 }
 //画布移动元素
@@ -2418,6 +2302,8 @@ void ParaModel::SceneMenuDeleteClickAction(int nUnitType, int nUnitIdx)
 	SelectUnitType = nUnitType;
 
 	pCalShapeData->DelBaseUnit(nUnitIdx, vModelTmpl, 0);
+
+	ParaModel::RefreshSceneData(); 
 	return;
 }
 //增加
@@ -2431,6 +2317,7 @@ void ParaModel::SceneMenuAddClickAction(int nUnitType, int nUnitIdx)
 	moveXY[0] = proxyWidget->nOriPos[0];
 	moveXY[1] = proxyWidget->nOriPos[1];
 	ShowAllUnitSelectWindow();
+
 	return;
 }
 //画布增加数据
