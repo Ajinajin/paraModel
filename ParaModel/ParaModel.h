@@ -51,7 +51,8 @@ private:
 	QDockWidget* MainDockWidget;					// 界面显示窗口 
 	BQGraphicsView* graphicsViewMain;				// 二维模型三维视图
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布 
-
+	QComboBox* cXbox;
+	QComboBox* cYbox;
 	QAction* pSceneBtn10;							// 10米画布按钮
 	QAction* pSceneBtn20;							// 20米画布按钮
 	QAction* pSceneBtn50;							// 50米画布按钮
@@ -161,10 +162,15 @@ private:
 	void SceneMainClear(); 
 	//刷新画布
 	void RefreshSceneData();
+	// 刷新视图数据
+	void RefreshViewData();
 	//刷新楼层数据
 	void RefreshLayerWidget();
 	//更新画布元素
 	void UpdataSceneItem(int nUnitIdx, int x, int y, int width, int height);
+
+
+	vQImage getStandardPic(ParaOGLManager* oglManager);				//得到六面图   上 下 前 后 左 右
 public:
 	VSHAPE viewShape;
 	DimDataConvert* pCalShapeData;
@@ -202,13 +208,8 @@ public slots:
 	void DeleteLayerAction(int layer);		//删除当前层数据
 	void ChangeLayerAction(int layer);		//修改画布显示层数据
 
-	void ChangeTopImgAction();				//切换顶视图
-	void ChangeBottomImgAction();			//切换底视图
-	void ChangeFrontImgAction();			//切换前视图图片
-	void ChangeBackImgAction();				//切换后视图图片
-	void ChangeLeftImgAction();				//切换左视图图片
-	void ChangeRightImgAction();			//切换右视图图片
-	vQImage getStandardPic(ParaOGLManager* oglManager);				//得到六张视图图片
+	void ChangeXImgAction();				//切换顶视图
+	void ChangeYImgAction();				//切换侧视图 
 
 	void GenerateLayerAction();				//生成楼层房间
 };

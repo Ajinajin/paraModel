@@ -166,4 +166,54 @@ protected:
 //------------------------------------------------------------------------------
 
 
+
+//------------------------------------------------------------------------------
+
+// 线
+class BLine : public BGraphicsItem
+{
+	Q_OBJECT
+public:
+	BLine(ItemType type);
+	QList<QPointF> point;
+
+protected:
+	virtual QRectF boundingRect() const override;
+
+	virtual void paint(QPainter* painter,
+		const QStyleOptionGraphicsItem* option,
+		QWidget* widget) override;
+
+protected:
+	qreal m_radius;
+};
+
+//------------------------------------------------------------------------------
+
+
+
+//------------------------------------------------------------------------------
+
+// 点
+class BPoint : public BGraphicsItem
+{
+	Q_OBJECT
+public:
+	BPoint(ItemType type);
+	QList<QPointF> point;
+
+protected:
+	virtual QRectF boundingRect() const override;
+
+	virtual void paint(QPainter* painter,
+		const QStyleOptionGraphicsItem* option,
+		QWidget* widget) override;
+
+protected:
+	qreal m_radius;
+};
+
+//------------------------------------------------------------------------------
+
+
 #endif // BQGRAPHICSITEM_H
