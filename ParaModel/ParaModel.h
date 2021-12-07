@@ -70,6 +70,7 @@ private:
 
 	int if_data;									//0是未加载数据。1是有数据
 	SysPath oPath;									//系统路径
+	QString existPath;								//当前程序正在打开的路径
 	int pSceneOffset;								//绘制图像偏移
 	int pAuxiliaryLine;								//辅助线长度
 

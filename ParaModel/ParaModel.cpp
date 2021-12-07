@@ -946,6 +946,71 @@ void ParaModel::NewFileAction()
 /// </summary>
 void ParaModel::SaveFileAction()
 {	
+	if (if_data == 0)
+	{
+		QMessageBox::information(NULL, "信息提示", "当前并无数据可保存");
+	}
+	else
+	{
+		
+		fstream outfile;
+		outfile.open(existPath.toStdString(), fstream::out);
+
+		QString tmp = "*Unit Sets 构件集";
+		outfile << tmp.toLocal8Bit().data() << endl;
+		tmp = "* 构件序号 构件类型名称 构件在系统构件库中的Idx 构件中心点/基准点的放置位置 门和窗为 距离墙起始点左下数值 及高度";
+		outfile << tmp.toLocal8Bit().data() << endl;
+
+		for (int i = 0; i < vModelTmpl.size(); i++)
+		{
+			QString typeName;
+			if (vModelTmpl[i].nUnitType == 1) { typeName = "柱"; }
+			if (vModelTmpl[i].nUnitType == 2) { typeName = "梁"; }
+			if (vModelTmpl[i].nUnitType == 3) { typeName = "板"; }
+			if (vModelTmpl[i].nUnitType == 4) { typeName = "墙"; }
+			if (vModelTmpl[i].nUnitType == 5) { typeName = "门"; }
+			if (vModelTmpl[i].nUnitType == 6) { typeName = "窗"; }
+
+
+			outfile << vModelTmpl[i].nTopoIdx << " " << typeName.toLocal8Bit().data() << " " << vModelTmpl[i].nCenUnitIdx;
+			if (vModelTmpl[i].nUnitType == 1)
+			{
+				outfile << " " << vModelTmpl[i].nCenPos[0] << " " << vModelTmpl[i].nCenPos[1] << " " << vModelTmpl[i].nCenPos[2];
+			}
+			if (vModelTmpl[i].nUnitType == 5 || vModelTmpl[i].nUnitType == 6)
+			{
+				outfile << " " << vModelTmpl[i].nCenPos[0] << " " << vModelTmpl[i].nCenPos[1];
+			}
+			outfile << endl;
+		}
+
+		tmp = "*Topo Sets 拓扑关系集";
+		outfile << tmp.toLocal8Bit().data() << endl;
+		tmp = "* 拓扑序号 当前构件序号 关联构件序号";
+		outfile << tmp.toLocal8Bit().data() << endl;
+
+		for (int i = 0; i < vModelTmpl.size(); i++)
+		{
+			outfile << i << " " << vModelTmpl[i].nTopoIdx;
+			for (int j = 0; j < 12; j++)
+			{
+				if (vModelTmpl[i].nAdjUnitIdx[j] != -1)
+				{
+					outfile << " " << vModelTmpl[i].nAdjUnitIdx[j];
+				}
+			}
+			outfile << endl;
+		}
+
+		MyLogOutput("当前文件保存成功");
+	}
+	return;
+}
+/// <summary>
+/// 保存原来txt文件
+/// </summary>
+void ParaModel::SaveasFileAction()
+{
 	//让用户选择文件夹，在选择的文件夹中保存文件,可以指定名字
 	if (if_data == 0)
 	{
@@ -964,10 +1029,10 @@ void ParaModel::SaveFileAction()
 		outfile.open(dirpath.toStdString(), fstream::out);
 
 		QString tmp = "*Unit Sets 构件集";
-		outfile << tmp.toLocal8Bit().data()<< endl;
+		outfile << tmp.toLocal8Bit().data() << endl;
 		tmp = "* 构件序号 构件类型名称 构件在系统构件库中的Idx 构件中心点/基准点的放置位置 门和窗为 距离墙起始点左下数值 及高度";
 		outfile << tmp.toLocal8Bit().data() << endl;
-		
+
 		for (int i = 0; i < vModelTmpl.size(); i++)
 		{
 			QString typeName;
@@ -978,11 +1043,11 @@ void ParaModel::SaveFileAction()
 			if (vModelTmpl[i].nUnitType == 5) { typeName = "门"; }
 			if (vModelTmpl[i].nUnitType == 6) { typeName = "窗"; }
 
-			
+
 			outfile << vModelTmpl[i].nTopoIdx << " " << typeName.toLocal8Bit().data() << " " << vModelTmpl[i].nCenUnitIdx;
 			if (vModelTmpl[i].nUnitType == 1)
 			{
-				outfile <<" "<< vModelTmpl[i].nCenPos[0] << " " << vModelTmpl[i].nCenPos[1] << " " << vModelTmpl[i].nCenPos[2];
+				outfile << " " << vModelTmpl[i].nCenPos[0] << " " << vModelTmpl[i].nCenPos[1] << " " << vModelTmpl[i].nCenPos[2];
 			}
 			if (vModelTmpl[i].nUnitType == 5 || vModelTmpl[i].nUnitType == 6)
 			{
@@ -992,16 +1057,16 @@ void ParaModel::SaveFileAction()
 		}
 
 		tmp = "*Topo Sets 拓扑关系集";
-		outfile <<  tmp.toLocal8Bit().data()<< endl;
+		outfile << tmp.toLocal8Bit().data() << endl;
 		tmp = "* 拓扑序号 当前构件序号 关联构件序号";
-		outfile <<tmp.toLocal8Bit().data()<< endl;
+		outfile << tmp.toLocal8Bit().data() << endl;
 
 		for (int i = 0; i < vModelTmpl.size(); i++)
 		{
 			outfile << i << " " << vModelTmpl[i].nTopoIdx;
 			for (int j = 0; j < 12; j++)
 			{
-				if(vModelTmpl[i].nAdjUnitIdx[j] != -1)
+				if (vModelTmpl[i].nAdjUnitIdx[j] != -1)
 				{
 					outfile << " " << vModelTmpl[i].nAdjUnitIdx[j];
 				}
@@ -1009,17 +1074,8 @@ void ParaModel::SaveFileAction()
 			outfile << endl;
 		}
 
-		MyLogOutput("当前文件保存成功");
+		MyLogOutput("文件另存成功");
 	}
-
-	return;
-}
-/// <summary>
-/// 保存原来txt文件
-/// </summary>
-void ParaModel::SaveasFileAction()
-{
-	//TODO::如果没有打开文件的路径，就让用户选择文件路径，如果有保存成对应的txt格式
 	return;
 }
 /// <summary>
@@ -1115,6 +1171,8 @@ void ParaModel::OpenFileAction()
 		MyLogOutput("数据加载失败,请检查文件。");
 		return;
 	}
+	existPath = filePath;
+
 	QTextStream readStream(&file);
 	vModelTmpl.clear();
 	int parsingState = 0;
