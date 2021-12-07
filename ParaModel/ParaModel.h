@@ -40,50 +40,45 @@ public:
 	~ParaModel();
 
 private:
-	QStatusBar* winStatus;							//状态栏
+	QWidget* GenerateLayerTipWidget;					// 层
+	QStatusBar* winStatus;							// 状态栏
 	QLabel* pTipBar;								// 状态栏中文字显示
 	QLineEdit* pModelEdit[2];						// 模型信息
+	QLineEdit* pRoomEdit[4];						// 房间信息
 	QTreeWidget* pModelTreeWidget;					// 系统模型树
 	QTreeWidget* pLayerModelTreeWidget;				// 系统模型树
 	QTreeWidget* pModelUnitTreeWidget;				// 可替换的模型树
-	QDockWidget* MainDockWidget;					// 界面显示窗口
-	BQGraphicsView* graphicsViewX;					// 二维模型X视图
-	BQGraphicsView* graphicsViewY;					// 二维模型Y视图
-	BQGraphicsView* graphicsViewZ;					// 二维模型Z视图
+	QDockWidget* MainDockWidget;					// 界面显示窗口 
 	BQGraphicsView* graphicsViewMain;				// 二维模型三维视图
-	BQGraphicsView* graphicsViewOgl;				// 三位模型展示视图
+	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布 
 
-	BQGraphicsScene pSceneX;						// 二维模型X视图画布
-	BQGraphicsScene pSceneY;						// 二维模型Y视图画布
-	BQGraphicsScene pSceneZ;						// 二维模型Z视图画布
-	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布
+	QAction* pSceneBtn10;							// 10米画布按钮
+	QAction* pSceneBtn20;							// 20米画布按钮
+	QAction* pSceneBtn50;							// 50米画布按钮
+	QAction* pSceneBtn100;							// 100米画布按钮
+	QAction* pSceneBtn200;							// 200米画布按钮
 
-	QAction* pSceneBtn10;									//10米画布按钮
-	QAction* pSceneBtn20;									//20米画布按钮
-	QAction* pSceneBtn50;									//50米画布按钮
-	QAction* pSceneBtn100;									//100米画布按钮
-	QAction* pSceneBtn200;									//200米画布按钮
-
-	ParaOGLManager* paraOglmanager;					// 三维显示窗口类
-	ParaOGLManager* paraOglmanagerMain;				// 三维显示窗口大屏幕主类
+	ParaOGLManager* paraOglmanagerMain;				// 三维显示
 	QDockWidget* layerWidget;						// 层
+	QLabel* pXImg;									// 二维显示窗口俯视角
+	QLabel* pYImg;									// 二维显示窗口正视角
 
-	int if_data;									//0是未加载数据。1是有数据
-	SysPath oPath;									//系统路径
-	int pSceneOffset;								//绘制图像偏移
-	int pAuxiliaryLine;								//辅助线长度
+	int if_data;									// 0是未加载数据。1是有数据
+	SysPath oPath;									// 系统路径
+	int pSceneOffset;								// 绘制图像偏移
+	int pAuxiliaryLine;								// 辅助线长度
 
-	int nMoveXY[2];
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
 	int MainDockState;								// 0是X视图 1是Y视图 2是Z视图 3是三维视图
 
 	// mainLabel显示的图像
-	QMenu* popMenu_In_ListWidget_;					/*弹出菜单被使用无法删除*/
+	QMenu* popMenu_In_ListWidget_;					/* 弹出菜单被使用无法删除*/
 
-	int SelectUnitIdx;								//当前选中的楼层
-	int SelectUnitType;								//当前选中的楼层
-	int moveXY[2];
-	int SelectLayer;								//当前选中的楼层
+	int SelectUnitIdx;								// 当前选中的构件id
+	int SelectUnitType;								// 当前选中的构件类型
+	int nMoveXY[2];									// 记录鼠标移动的位置
+	int moveXY[2];									// 记录鼠标点击的位置
+	int SelectLayer;								// 当前选中的楼层
 
 
 
@@ -105,7 +100,11 @@ private:
 	//初始化内容区域
 	void InitCentralWidget();
 	//初始化中间独立窗口
-	void InitOglManagerWidget(QDockWidget* from);
+	void InitEditManagerWidget(QDockWidget* from);
+
+	//初始化三维显示窗口
+	void InitOpenGlWidget(QDockWidget* from);
+
 	//初始化日志窗口
 	void InitLogWidget(QDockWidget* from);
 	//初始化已加载的模型窗口
@@ -130,6 +129,8 @@ private:
 
 	//初始化弹出窗口
 	void InitTipWindow();
+	//初始化创建图层窗口
+	void InitTipCreateLayer();
 
 	//构件选择窗口
 	void ShowUnitSelectWindow();
@@ -156,10 +157,7 @@ private:
 	void ReleaseSysModel();
 
 	//清除画布
-	void SceneMainClear();
-	void SceneXClear();
-	void SceneYClear();
-	void SceneZClear();
+	void SceneMainClear(); 
 	//刷新画布
 	void RefreshSceneData();
 	//刷新楼层数据
@@ -180,11 +178,12 @@ public slots:
 
 	void GraphicsViewOgl(bool b);	//opengl旁侧图
 	void updateOGL();				//更新三维窗口内容
-	void AddSceneData();				//更新画布内容
-	void AddSceneXData();				//更新画布X内容
+	void AddSceneData();				//更新画布内容 
 
 	void NewFileAction();			//新建楼层户型数据
 	void OpenFileAction();			//外部打开楼层户型数据
+	void OpenLayerDataAction();		//外部打开建筑数据
+	void CreateLayerAction();		//创建平面图
 	void CloseFileAction();			//清空所有数据
 	void SaveFileAction();			//保存当前数据
 	void SaveasFileAction();		//另存当前数据
@@ -201,4 +200,13 @@ public slots:
 	void SaveLayerInfoAction();				//保存楼层信息
 	void DeleteLayerAction(int layer);		//删除当前层数据
 	void ChangeLayerAction(int layer);		//修改画布显示层数据
+
+	void ChangeTopImgAction();				//切换顶视图
+	void ChangeBottomImgAction();			//切换底视图
+	void ChangeFrontImgAction();			//切换前视图图片
+	void ChangeBackImgAction();				//切换后视图图片
+	void ChangeLeftImgAction();				//切换左视图图片
+	void ChangeRightImgAction();			//切换右视图图片
+
+	void GenerateLayerAction();				//生成楼层房间
 };
