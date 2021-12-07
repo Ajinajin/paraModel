@@ -35,4 +35,6 @@ debug
 Release
 obj/
 .vs/
-/HS.rar
+/ParaModel/ParaModel.vcxproj
+/ParaModel/ParaModel.vcxproj.filters
+/ParaModel/ParaModel.vcxproj.user
