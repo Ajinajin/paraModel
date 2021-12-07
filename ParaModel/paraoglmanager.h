@@ -15,6 +15,8 @@
 #include "camera.h"
 #include <ShaderProc.h>
 
+typedef vector<QImage> vQImage;
+
 struct Point		//点结构(二维)
 {
 	int x;
@@ -76,7 +78,7 @@ public:
 	void InitAndDrawCuboid(int x, int y, int z, int length, int thickness, int height, int type);
 	
 	void outputKFile();
-	
+	//返回六个视图图片
 	
 	VTOPOTABLE oglTopTable;		//绘制所需的拓扑结构表
 	VUNITTABLE oglUnitTable;	//绘制所需的结构单元表
@@ -101,9 +103,11 @@ public:
 	GLfloat lastFrame;											//上一帧
 
 	//模型旋转相关参数
-	QMatrix4x4 targetModel;//模型的模型GLSL矩阵
+	QMatrix4x4 targetModel;										//模型的模型GLSL矩阵
 	QMatrix4x4 targetModelsave;
 	QMatrix4x4 targetModeluse;
+	QMatrix4x4 view;											//内部的总体渲染观察矩阵
+	GLboolean if_change_view;									//从外部更改三维显示观察矩阵 标志位
 
 	GLfloat rotateRaw;											//每次对模型的raw旋转
 	GLfloat rotatePitch;										//每次对模型的pitch旋转

@@ -11,7 +11,7 @@
 
 
 // 定义全局变量 后期修改
-const QVector3D CAMERA_POSITION(200.0f, 100.0f, 1000.0f);
+const QVector3D CAMERA_POSITION(300, 130, 1000.0f);
 const QVector3D LIGHT_POSITION(0.0f, 1.0f, 0.0f);
 
 const int OGLMANAGER_WIDTH = 1200;
@@ -180,7 +180,8 @@ void ParaOGLManager::initializeGL()
 	//
 	allNodes.resize(0);
 	allSolids.resize(0);
-
+	//
+	if_change_view = GL_FALSE;
 	/************ 载入shader ***********/
 
 	ResourceManager::loadShader("coordinate", ":/shaders/res/shaders/coordinate.vert", ":/shaders/res/shaders/coordinate.frag");
@@ -268,6 +269,7 @@ void ParaOGLManager::paintGL()
 	float transOfDoor = 1.0;
 	float transOfWindow = 0.25;
 
+	
 	//绘制三维模型
 	if (!oglUnitTable.empty() && !oglTopTable.empty())
 	{
@@ -748,38 +750,41 @@ void ParaOGLManager::processInput(GLfloat dt)
 void ParaOGLManager::updateGL()
 {
 
-	QMatrix4x4 projection, view;
+	QMatrix4x4 projection;
 	GLfloat a = width();
 	GLfloat b = height();
 	projection.perspective(camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 2000.f);
-	//projection.frustum(-10000, 10000, -10000, 10000, -10000, 10000);
-	//projection.ortho(-100,100,-100,100,-1,-1000);
+	
 
-	switch (switchView)
+	//switch (switchView)
+	//{
+	//case FRONT_VIEW:
+	//	view.lookAt(QVector3D(0, 0, 5), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//前视图
+	//	break;
+	//case BACK_VIEW:
+	//	view.lookAt(QVector3D(0, 0, -5), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//后视图
+	//	break;
+	//case LEFT_VIEW:
+	//	view.lookAt(QVector3D(-5, 0, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//左视图
+	//	break;
+	//case RIGHT_VIEW:
+	//	view.lookAt(QVector3D(5, 0, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//右视图
+	//	break;
+	//case TOP_VIEW:
+	//	view.lookAt(QVector3D(0, 5, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(1.0f, 0.0f, -90.0f));					//俯视图
+	//	break;
+	//case BOTTOM_VIEW:
+	//	view.lookAt(QVector3D(0, -5, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(1.0f, 0.0f, 90.0f));					//底视图
+	//	break;
+	//default:
+	//	view = camera->getViewMatrix();
+	//	break;
+	//}
+
+	if (!if_change_view)
 	{
-	case FRONT_VIEW:
-		view.lookAt(QVector3D(0, 0, 5), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//前视图
-		break;
-	case BACK_VIEW:
-		view.lookAt(QVector3D(0, 0, -5), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//后视图
-		break;
-	case LEFT_VIEW:
-		view.lookAt(QVector3D(-5, 0, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//左视图
-		break;
-	case RIGHT_VIEW:
-		view.lookAt(QVector3D(5, 0, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//右视图
-		break;
-	case TOP_VIEW:
-		view.lookAt(QVector3D(0, 5, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(1.0f, 0.0f, -90.0f));					//俯视图
-		break;
-	case BOTTOM_VIEW:
-		view.lookAt(QVector3D(0, -5, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(1.0f, 0.0f, 90.0f));					//底视图
-		break;
-	default:
 		view = camera->getViewMatrix();
-		break;
 	}
-
 
 	ResourceManager::getShader("coordinate").use().setMatrix4f("projection", projection);
 	ResourceManager::getShader("coordinate").use().setMatrix4f("view", view);

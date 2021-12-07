@@ -208,6 +208,7 @@ public slots:
 	void ChangeBackImgAction();				//切换后视图图片
 	void ChangeLeftImgAction();				//切换左视图图片
 	void ChangeRightImgAction();			//切换右视图图片
+	vQImage getStandardPic(ParaOGLManager* oglManager);				//得到六张视图图片
 
 	void GenerateLayerAction();				//生成楼层房间
 };
