@@ -1282,11 +1282,60 @@ void ParaModel::ExportFileAction()
 
 		MyLogOutput("K文件导出成功");
 
-		QImage image = paraOglmanagerMain->grabFramebuffer();
-		image.save("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/1.jpg");
+
+		getStandardPic(paraOglmanagerMain);
 	}
 
 	return;
+}
+
+vQImage ParaModel::getStandardPic(ParaOGLManager* oglManager)
+{
+	vQImage res;
+	QImage image;
+
+
+	QMatrix4x4 oldView = oglManager->camera->getViewMatrix();
+	oglManager->if_change_view = GL_TRUE;
+
+
+	//Top
+	oglManager->view.lookAt(QVector3D(0, 5, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(1.0f, 0.0f, -90.0f));
+	image = oglManager->grabFramebuffer();
+	res.push_back(image);
+
+	//Bottom
+	oglManager->view.lookAt(QVector3D(0, -5, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(1.0f, 0.0f, 90.0f));
+	image = oglManager->grabFramebuffer();
+	res.push_back(image);
+
+	//Front
+	oglManager->view.lookAt(QVector3D(0, 0, 5), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));
+	image = oglManager->grabFramebuffer();
+	//image.save("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/1.jpg");
+	res.push_back(image);
+
+	//Back
+	oglManager->view.lookAt(QVector3D(0, 0, -5), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));
+	image = oglManager->grabFramebuffer();
+	res.push_back(image);
+
+	//Left
+	oglManager->view.lookAt(QVector3D(-5, 0, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));
+	image = oglManager->grabFramebuffer();
+	res.push_back(image);
+
+	//Right
+	oglManager->view.lookAt(QVector3D(5, 0, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));
+	image = oglManager->grabFramebuffer();
+	res.push_back(image);
+
+
+	//return
+	oglManager->view = oldView;
+	oglManager->if_change_view = GL_FALSE;
+	
+	return res;
 }
 
 /// <summary>
