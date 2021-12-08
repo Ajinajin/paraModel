@@ -21,7 +21,7 @@ int WarheadDataConvert::CalPlaneData(ArmHeadTopo& vArmHeadTopo, VSHAPE& vPlaneDr
 	//清空画布数据
 	vPlaneDraw.clear();
 	//设坐标原点为 200,200
-	QPointF f = QPointF(500, 500);
+	QPointF f = QPointF(600, 300);
 	//战斗部宽度为 弹体上或下边长+前盖厚度+后盖厚度
 
 	//前盖为 厚度25 绘制宽25 高 前盖半径*2 中心点坐标为 1000-25/2,1000
