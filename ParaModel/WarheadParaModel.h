@@ -23,7 +23,7 @@
 #include "SARibbonMainWindow.h"
 #include <ParaType.h>
 
-#include "DimDataConvert.h"
+#include "WarheadDataConvert.h"
 #include <QFormLayout>
 
 class QMenu;
@@ -42,11 +42,14 @@ public:
 private:
 	QStatusBar* winStatus;							// 状态栏
 	QLabel* pTipBar;								// 状态栏中文字显示
-	QLineEdit* pModelEdit[6];						// 模型信息
+	// 战斗部属性编辑框 当量 弹片数量 弹片质量 分布角度1 分布角度2
+	vector<QLineEdit*> pArmHeadEdit;
 	QDockWidget* MainDockWidget;					// 界面显示窗口 
+	QDockWidget* LoadModeTreeWidget;				// 已载入的模型树 
+	QDockWidget* LoadModeTreeProperty;				// 已载入的模型树 
+
 	BQGraphicsView* graphicsViewMain;				// 二维模型三维视图
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布 
-
 	ParaOGLManager* paraOglmanagerMain;				// 三维显示
 
 
@@ -64,12 +67,15 @@ private:
 
 
 public:
-	VUNITTABLE vBaseUnit;					// 系统基本构件库 
+	VARMHEAD vWarhead;						// 系统战斗部库 
+	ArmHeadTopo vLoadWarhead;				// 载入的战斗部 
 	int InitSysData();						// 初始化系统变量
 	int InitPath();							// 初始化路径
-	int InitUnitLib();						// 初始化基本构件库  
+	int InitWarheadLib();						// 初始化基本构件库  
 	int InitParaTmpl();						// 初始化参数化生成模板
-
+private :
+	VSHAPE viewShape;
+	WarheadDataConvert DataConvert;
 private:
 	//初始化窗口
 	void InitWindow();
@@ -87,8 +93,6 @@ private:
 	void InitLoadModelWidget(QDockWidget* from);
 	//初始化系统构件模型窗口
 	void InitSysUnitWidget(QDockWidget* from);
-	//初始化系统平面模型窗口
-	void InitSysLayerWidget(QDockWidget* from);
 
 	//初始化楼层选择
 	void InitWarheadWidget(QDockWidget* from);
@@ -100,8 +104,6 @@ private:
 	void InitSARibbon();
 	//初始化Ribbon中的文件菜单
 	void InitCategoryMain(SARibbonCategory* page);
-	//初始化Ribbon中的画布大小
-	void InitCategoryScene(SARibbonCategory* page);
 
 	//初始化弹出窗口
 	void InitTipWindow();
@@ -112,8 +114,11 @@ private:
 	void ReleaseSysModel();
 
 	//清除画布
-	void SceneMainClear(); 
-	 
+	void SceneMainClear();
+	QColor ColorHelper(int unitIdx);
+	void ReLoadModelTree();			//重新加载模型树
+	void ReLoadModelProperty();		//重新加载模型属性
+
 public slots:
 	void MyLogOutput(QString myLogout);         //输出日志
 	
@@ -127,4 +132,5 @@ public slots:
 	void SaveFileAction();			//保存当前数据
 	void SaveasFileAction();		//另存当前数据
 	void ExportFileAction();		//导出成k文件
+	void ApplyDataAction();			//保存战斗部信息
 };

@@ -1432,9 +1432,8 @@ void ParaModel::OpenFileAction()
 	lay.sVersion = versionStr;
 	lay.sLayerName = QString(SelectLayer);
 
-	int lastPoint = file.fileName().lastIndexOf(".");
-	QString fileNameNoExt = file.fileName().left(lastPoint);
-	pModelEdit[0]->setText(fileNameNoExt);
+	QFileInfo fileInfo(file.fileName()); 
+	pModelEdit[0]->setText(fileInfo.baseName());
 	pModelEdit[1]->setText(iconStr);
 	lay.vLayerTopo = vModelTmpl;
 	vLoadModelData.push_back(lay);

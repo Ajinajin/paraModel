@@ -99,6 +99,9 @@
     <ClInclude Include="DimDataConvert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WarheadDataConvert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="bqgraphicsscene.h">
@@ -118,6 +121,12 @@
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shaders\GLSL_YELLOW.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\GLSL_YELLOW.vert">
+      <Filter>Resource Files</Filter>
+    </None>
     <None Include="res\shaders\coordinate.frag">
       <Filter>Resource Files</Filter>
     </None>
