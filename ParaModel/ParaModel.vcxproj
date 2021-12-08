@@ -106,6 +106,7 @@
     <ClCompile Include="ParaModel.cpp" />
     <ClCompile Include="resourcemanager.cpp" />
     <ClCompile Include="ShaderProc.cpp" />
+    <ClCompile Include="WarheadParaModel.cpp" />
     <QtRcc Include="ParaModel.qrc" />
     <QtUic Include="ParaModel.ui" />
     <QtMoc Include="ParaModel.h" />
@@ -117,6 +118,7 @@
     <ClInclude Include="ParaType.h" />
     <ClInclude Include="resourcemanager.h" />
     <ClInclude Include="ShaderProc.h" />
+    <QtMoc Include="WarheadParaModel.h" />
     <QtMoc Include="bqgraphicsscene.h" />
     <QtMoc Include="bqgraphicsitem.h" />
     <QtMoc Include="bpointitem.h" />
