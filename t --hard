@@ -1,0 +1,84 @@
+[33m4180721[m[33m ([m[1;36mHEAD -> [m[1;32m1201[m[33m)[m HEAD@{0}: revert: Revert "ZDB参建模界面布局及交互事件预留完成"
+[33mcaaab6f[m HEAD@{1}: reset: moving to caaab6f1e9a618bc886e354d65819674361edc50
+[33mcaaab6f[m HEAD@{2}: reset: moving to caaab6f1e9a618bc886e354d65819674361edc50
+[33mcaaab6f[m HEAD@{3}: reset: moving to caaab6f1e9a618bc886e354d65819674361edc50
+[33mcaaab6f[m HEAD@{4}: commit: ZDB参建模界面布局及交互事件预留完成
+[33m33c6ee7[m[33m ([m[1;31morigin/1201[m[33m)[m HEAD@{5}: commit: ZDB绘制线
+[33m19a541f[m HEAD@{6}: commit: 合并
+[33mce83c27[m HEAD@{7}: commit: 切换二维视图图片实现
+[33m1d5586c[m HEAD@{8}: pull --verbose --progress --no-edit --no-stat --recurse-submodules=no origin: Merge made by the 'recursive' strategy.
+[33m587de64[m HEAD@{9}: commit: 新增加ZDB参数建模界面
+[33m31b84b2[m HEAD@{11}: commit (merge): 合并
+[33m10882ba[m HEAD@{12}: commit: 增加生成平面图操作
+[33mc3ed044[m HEAD@{13}: commit: 增加楼层信息维护
+[33mb124868[m HEAD@{14}: pull --verbose --progress --no-edit --no-stat --recurse-submodules=no origin: Merge made by the 'recursive' strategy.
+[33m2bbdec0[m HEAD@{15}: commit: 平面图库基础处理
+[33m54be1cf[m HEAD@{17}: commit: 增加画布大小修改菜单
+[33mc4495c7[m HEAD@{18}: commit: 画布大小漏提交项
+[33m374f831[m HEAD@{19}: commit: 修改画布大小为10000 100米
+[33m9dba4c5[m HEAD@{20}: commit: 楼层信息维护
+[33m31dad72[m HEAD@{21}: commit: 合并
+[33m3db5b74[m HEAD@{22}: pull --verbose --progress --no-edit --no-stat --recurse-submodules=no origin: Merge made by the 'recursive' strategy.
+[33m9a94fd0[m HEAD@{23}: commit: 合并
+[33m174d896[m HEAD@{24}: commit: 合并
+[33mafa3dff[m HEAD@{25}: pull --verbose --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33m6486239[m HEAD@{26}: commit: 新建画布增加水平垂直线
+[33mdf545c6[m HEAD@{27}: commit: 修改绘制计算
+[33me76babe[m HEAD@{28}: pull --verbose --progress --no-edit --no-stat --recurse-submodules=no origin: Merge made by the 'recursive' strategy.
+[33ma123b1e[m HEAD@{29}: commit: 合并
+[33mc1dac53[m HEAD@{30}: commit: 修改画布移动
+[33mb1abc22[m HEAD@{31}: pull --verbose --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33m0255dcb[m HEAD@{32}: commit: 门
+[33mb7112a4[m HEAD@{33}: commit: 垂直移动修改
+[33mcba108b[m HEAD@{34}: commit (merge): 1
+[33m31217c0[m HEAD@{35}: commit: 移动算法修改
+[33m54aa1ed[m HEAD@{36}: commit: 2
+[33m01bd4e8[m HEAD@{37}: commit (merge): 1
+[33ma36bfd2[m HEAD@{38}: commit: 2021年12月4日 中午合并
+[33mabaf7cb[m HEAD@{39}: commit: 陈：合并修改
+[33mb2170c5[m HEAD@{40}: commit (merge): 合并
+[33mb82f896[m HEAD@{41}: commit: 合并
+[33m52940c5[m HEAD@{42}: commit: 给画布增加平移清除功能
+[33mb2a1976[m HEAD@{43}: commit: 增加 系统平面图库
+[33me4a7c3f[m HEAD@{44}: commit: 修复 二维窗户计算 错误
+[33mfa9ff31[m HEAD@{45}: commit: 修复 门计算偏 错误
+[33mc9af831[m HEAD@{46}: commit: 完善计算方形图
+[33mfdd3981[m HEAD@{47}: pull --verbose --progress --no-edit --no-stat --recurse-submodules=no origin: Merge made by the 'recursive' strategy.
+[33m71e049d[m HEAD@{48}: commit: 合并
+[33m8feb9f2[m HEAD@{49}: commit: 参数设置
+[33m78231d7[m HEAD@{50}: commit: 增加信号处理
+[33m5993523[m HEAD@{51}: commit: 2021年12月3日早上合并
+[33me754b37[m HEAD@{52}: pull --verbose --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33m0190314[m HEAD@{53}: commit: 绘制二维修改
+[33mf2f908a[m HEAD@{54}: commit: 发布版本V1.0
+[33meb49475[m HEAD@{55}: pull --verbose --progress --no-edit --no-stat --recurse-submodules=no origin: Merge made by the 'recursive' strategy.
+[33mdaf5c7c[m HEAD@{57}: commit: 合并
+[33m0a8699e[m HEAD@{58}: commit: 合并
+[33md1c52d7[m HEAD@{59}: commit: 合并
+[33m749486f[m HEAD@{60}: commit: 初始化简化
+[33mfbfc6f3[m HEAD@{61}: commit: 合并
+[33mbb3aff9[m HEAD@{62}: commit: 基础绘制完成
+[33me869b73[m HEAD@{63}: pull --verbose --progress --no-edit --no-stat --recurse-submodules=no origin: Merge made by the 'recursive' strategy.
+[33mef18082[m HEAD@{64}: commit: 1
+[33mf6bc127[m HEAD@{65}: commit: 2021年12月1日21点 算法调试中提交
+[33mf4d5da2[m HEAD@{66}: commit: 取消绘制放大功能
+[33m1420d14[m HEAD@{67}: commit: 生成
+[33m509a482[m HEAD@{68}: commit: 打开文件绘制柱子
+[33m1890910[m HEAD@{69}: commit: 简化代码。修改开拓扑文件
+[33m68e6ea4[m HEAD@{70}: reset: moving to 68e6ea48cd42783fe9fb8c41f24fc630a6012676
+[33md09e114[m HEAD@{71}: reset: moving to d09e1140a6a6f9d27401f171374540a88dc737da
+[33md09e114[m HEAD@{72}: reset: moving to d09e1140a6a6f9d27401f171374540a88dc737da
+[33md09e114[m HEAD@{73}: revert: Revert "修改日志记录及初始化系统目录"
+[33m68e6ea4[m HEAD@{74}: reset: moving to 68e6ea48cd42783fe9fb8c41f24fc630a6012676
+[33m68e6ea4[m HEAD@{75}: commit: 修改日志记录及初始化系统目录
+[33m1de97b4[m HEAD@{76}: checkout: moving from 1129 to 1201
+[33mdc00a9e[m[33m ([m[1;31morigin/1129[m[33m, [m[1;32m1129[m[33m)[m HEAD@{77}: reset: moving to HEAD
+[33mdc00a9e[m[33m ([m[1;31morigin/1129[m[33m, [m[1;32m1129[m[33m)[m HEAD@{78}: commit: 修改日志记录及初始化系统目录
+[33m6088a2e[m HEAD@{79}: commit: 打开文件功能-加载建筑文件完成
+[33m3a95b34[m HEAD@{80}: commit: 解析基础构建数据
+[33m2fce4f7[m HEAD@{81}: commit: 合并林老师代码， 增加存储库结构
+[33mda3c938[m HEAD@{82}: commit: 修改三视图窗口背景颜色
+[33mbe1107b[m HEAD@{83}: commit: 修改三视图窗口背景颜色
+[33mbd7752b[m HEAD@{84}: commit: 添加视图切换及三视图窗口背景颜色修改
+[33m84de2fb[m HEAD@{85}: commit: 测试修改
+[33m46b6c99[m HEAD@{86}: checkout: moving from main to 1129
