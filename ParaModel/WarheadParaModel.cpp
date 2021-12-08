@@ -50,6 +50,82 @@ void WarheadParaModel::InitWarheadWidget(QDockWidget* from)
 {
 	from->setWindowTitle("战斗部属性");
 	from->setFixedWidth(300);
+	from->setFixedHeight(300);
+
+	// 当前选择弹的战斗部
+	QLabel* lbl5 = new QLabel("当量Kg");
+	pArmHeadEdit[0] = new QLineEdit;
+	pArmHeadEdit[0]->setText("100");
+	QLabel* lbl6 = new QLabel("弹片数量");
+	pArmHeadEdit[1] = new QLineEdit;
+	pArmHeadEdit[1]->setText("1000");
+	QLabel* lbl7 = new QLabel(QWidget::tr("弹片质量g"));
+	pArmHeadEdit[2] = new QLineEdit;
+	pArmHeadEdit[2]->setText("20");
+	QLabel* lbl8 = new QLabel(QWidget::tr("分布角"));
+	pArmHeadEdit[3] = new QLineEdit;
+	pArmHeadEdit[4] = new QLineEdit;
+	pArmHeadEdit[3]->setText("60");
+	pArmHeadEdit[4]->setText("20");
+	QWidget* mywidget = new QWidget;
+	QVBoxLayout* myVBoxLayout = new QVBoxLayout();
+	QHBoxLayout* myHBoxLayout = new QHBoxLayout();
+
+	QVBoxLayout* myLayout = new QVBoxLayout();
+
+
+	QWidget* temp = new QWidget();
+	lbl5->setFixedWidth(56);
+	lbl6->setFixedWidth(56);
+	lbl7->setFixedWidth(56);
+	lbl8->setFixedWidth(56);
+
+	myHBoxLayout = new QHBoxLayout();
+	myVBoxLayout->addWidget(temp);
+	myHBoxLayout->addWidget(lbl5);
+	myHBoxLayout->addWidget(pArmHeadEdit[0]);
+	temp->setLayout(myHBoxLayout);
+	myLayout->addWidget(temp);
+
+
+	temp = new QWidget();
+	myHBoxLayout = new QHBoxLayout();
+	myVBoxLayout->addWidget(temp);
+	myHBoxLayout->addWidget(lbl6);
+	myHBoxLayout->addWidget(pArmHeadEdit[1]);
+	temp->setLayout(myHBoxLayout);
+	myLayout->addWidget(temp);
+
+
+	temp = new QWidget();
+	myHBoxLayout = new QHBoxLayout();
+	myVBoxLayout->addWidget(temp);
+	myHBoxLayout->addWidget(lbl7);
+	myHBoxLayout->addWidget(pArmHeadEdit[2]);
+	temp->setLayout(myHBoxLayout);
+	myLayout->addWidget(temp);
+
+	temp = new QWidget();
+	myHBoxLayout = new QHBoxLayout();
+	myVBoxLayout->addWidget(temp);
+	myHBoxLayout->addWidget(lbl8);
+	myHBoxLayout->addWidget(pArmHeadEdit[3]);
+	myHBoxLayout->addWidget(pArmHeadEdit[4]);
+	temp->setLayout(myHBoxLayout);
+	myLayout->addWidget(temp);
+
+
+	QPushButton* pApplyBtn = new QPushButton("应用", this);
+	pApplyBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
+	pApplyBtn->setFixedWidth(100);
+	temp = new QWidget();
+	myHBoxLayout = new QHBoxLayout();
+	myHBoxLayout->addWidget(pApplyBtn);
+	temp->setLayout(myHBoxLayout);
+	myLayout->addWidget(temp);
+	mywidget->setLayout(myLayout);
+	from->setWidget(mywidget);
+	connect(pApplyBtn, &QPushButton::clicked, this, &WarheadParaModel::ApplyDataAction);
 }
 
 //初始化系统模型窗口
@@ -57,16 +133,40 @@ void WarheadParaModel::InitSysUnitWidget(QDockWidget* from)
 {
 	from->setFixedWidth(300);
 	from->setWindowTitle("系统战斗部模型");
+
+	QWidget* mytreewidget = new QWidget();
+	QTreeWidget* pWarheadModelTreeWidget = new QTreeWidget(mytreewidget);
+	pWarheadModelTreeWidget->setHeaderHidden(true);
+	for (vector<ArmHeadTopo>::const_iterator iter = vWarhead.begin(); iter != vWarhead.end(); iter++)
+	{
+		QTreeWidgetItem* rootItem = new QTreeWidgetItem(pWarheadModelTreeWidget);
+		rootItem->setText(0, iter->sArmHeadName);
+		rootItem->setData(0, Qt::UserRole, iter->nArmHeadIdx);
+	}
+	//树按钮响应
+	connect(pWarheadModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column)
+		{
+			QVariant variant = item->data(0, Qt::UserRole);
+			int nArmHeadIdx = variant.value<int>();
+			vLoadWarhead = vWarhead[nArmHeadIdx];
+			ReLoadModelTree();
+			if (if_data == 0)
+			{
+				MyLogOutput("当前无画布信息，请新建或者打开后在操作");
+				return;
+			}
+		});
+	from->setWidget(pWarheadModelTreeWidget);
+	pWarheadModelTreeWidget->expandAll();
 }
 
 //初始化已加载的模型窗口
 void WarheadParaModel::InitLoadModelWidget(QDockWidget* from)
 {
-
-	from->setWindowTitle("模型结构树");
-	from->setFixedWidth(300);
+	LoadModeTreeWidget = from;
+	LoadModeTreeWidget->setWindowTitle("模型结构树");
+	LoadModeTreeWidget->setFixedWidth(300);
 	//layout布局 
-
 }
 
 //初始化日志窗口
@@ -307,7 +407,7 @@ WarheadParaModel::WarheadParaModel(QWidget* parent)
 	//初始化系统路径
 	InitPath();
 	//初始化系统数据
-	InitUnitLib();
+	InitWarheadLib();
 
 	//初始化界面
 	InitWindow();
@@ -315,6 +415,8 @@ WarheadParaModel::WarheadParaModel(QWidget* parent)
 }
 
 #pragma region 界面交互
+
+
 /// <summary>
 /// 新建场景
 /// </summary>
@@ -401,6 +503,13 @@ void WarheadParaModel::CloseFileAction()
 }
 
 /// <summary>
+/// 保存战斗部信息
+/// </summary>
+void WarheadParaModel::ApplyDataAction()
+{
+	return;
+}
+/// <summary>
 /// 打开场景
 /// </summary>
 void WarheadParaModel::OpenFileAction()
@@ -441,6 +550,7 @@ void WarheadParaModel::OpenFileAction()
 }
 
 
+
 void WarheadParaModel::MyLogOutput(QString myLogout)
 {
 	if (myLogOutLabel->toPlainText() == "")
@@ -459,8 +569,6 @@ void WarheadParaModel::MyLogOutput(QString myLogout)
 // 初始化系统变量 
 int WarheadParaModel::InitSysData()
 {
-	pModelEdit[0] = new QLineEdit();
-	pModelEdit[1] = new QLineEdit();
 	myLogOutLabel = new QTextEdit();
 	pSceneOffset = 4700;
 	pAuxiliaryLine = 20000;
@@ -477,6 +585,7 @@ int WarheadParaModel::InitPath()
 
 	oPath.sTopoUnitDir = oPath.sExeDir + "/TopoUnit";
 	oPath.sTopoLayerDir = oPath.sExeDir + "/TopoLayer";
+	oPath.sWarheadDir = oPath.sExeDir + "/Warhead";
 
 
 	oPath.sBoomLibDir = oPath.sExeDir + "/BoomLib";
@@ -492,21 +601,64 @@ int WarheadParaModel::InitPath()
 }
 
 // 初始化基本构件库 
-int WarheadParaModel::InitUnitLib()
+int WarheadParaModel::InitWarheadLib()
 {
-	QString Path = QString::fromStdString(oPath.sTopoUnitDir + u8"/buildinglib.txt");
-	QFile file(Path);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-	{
-		QMessageBox::information(NULL, "信息提示", "系统基本构建库解析失败！");
-		MyLogOutput("系统基本构建库解析失败！");
+	QString Path = QString::fromStdString(oPath.sWarheadDir);
+	QDir cfgPathDir = Path;
+	if (!cfgPathDir.exists()) {
+		MyLogOutput("系统无法找到系统战斗部库！");
 		return 0;
 	}
-	QTextStream readStream(&file);
-	while (!readStream.atEnd()) {
-		QString content = readStream.readLine();
-		QStringList list = content.split(' ');
+	QStringList filters;
+	filters << QString("*.txt");
+	cfgPathDir.setFilter(QDir::Files | QDir::NoSymLinks); //设置类型过滤器，只为文件格式
+	cfgPathDir.setNameFilters(filters);                   //设置文件名称过滤器，只为filters格式
+	int dirCount = cfgPathDir.count();
+	if (dirCount <= 0) {
+		MyLogOutput("系统战斗部库中无数据！");
+		return 0;
+	}
 
+	//遍历该路径下的所有文件夹 
+	for (int i = 0; i < dirCount; i++) {
+
+		QString Path = QString("%1/%2").arg(QString::fromStdString(oPath.sWarheadDir)).arg(cfgPathDir[i]);
+		QFile file(Path);
+		if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		{
+			QMessageBox::information(NULL, "信息提示", "系统战斗部库解析失败！");
+			MyLogOutput("系统战斗部库解析失败！");
+			return 0;
+		}
+
+		QTextStream readStream(&file);
+		QString versionStr = "";
+		vector<PARADES> plist;
+		while (!readStream.atEnd()) {
+			QString content = readStream.readLine();
+			QStringList list = content.split(' ');
+			bool verify;
+			QString str = list[0];
+			if (list[0].toLower() == "*version")
+			{
+				versionStr = list[1];
+				continue;
+			}
+			float  locationX = str.toInt(&verify);
+			if (!verify)
+				continue;
+			PARADES p;
+			p.sUnitName = QString(list[1]);
+			p.nUnitPropty = list[2].toFloat();
+			plist.push_back(p);
+		}
+		ArmHeadTopo t;
+		t.nArmHeadIdx = i;
+		QFileInfo fileInfo(file.fileName());
+		t.sArmHeadName = fileInfo.baseName();
+		t.sArmHeadVersion = versionStr;
+		t.mapArmHead = plist;
+		vWarhead.push_back(t);
 	}
 	return 1;
 }
@@ -566,3 +718,57 @@ void WarheadParaModel::SceneMainClear()
 		pSceneMain.addLine(y, 0, y, pAuxiliaryLine / 2, QPen(Qt::red));
 }
 #pragma endregion
+
+
+void WarheadParaModel::ReLoadModelTree()
+{
+	if (vLoadWarhead.mapArmHead.size() == 0)
+		return;
+	QWidget* mytreewidget = new QWidget();
+	QTreeWidget* pLoadModelTreeWidget = new QTreeWidget(mytreewidget);
+	pLoadModelTreeWidget->setHeaderHidden(true);
+	for (vector<PARADES>::const_iterator iter = vLoadWarhead.mapArmHead.begin(); iter != vLoadWarhead.mapArmHead.end(); iter++)
+	{
+		QTreeWidgetItem* rootItem = new QTreeWidgetItem(pLoadModelTreeWidget);
+		rootItem->setText(0, iter->sUnitName);
+		rootItem->setCheckState(0, Qt::Checked);
+		rootItem->setData(0, Qt::UserRole, iter->sUnitName);
+	}
+	//复选选中
+	connect(pLoadModelTreeWidget, &QTreeWidget::itemChanged, this, [=](QTreeWidgetItem* item, int column)
+		{
+			if (if_data == 0)
+			{
+				MyLogOutput("当前无画布信息，请新建或者打开后在操作");
+				return;
+			}
+			QVariant variant = item->data(0, Qt::UserRole);
+			QString sUnitName = variant.value<QString>();
+			if (item->checkState(0) == Qt::Checked)
+			{
+				//选中
+				int x = 0;
+			}
+			else
+			{
+				//未选中
+				int x = 1;
+			}
+		});
+
+	//树按钮响应
+	connect(pLoadModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column)
+		{
+			if (item->checkState(0) == Qt::Checked)
+			{
+				item->setCheckState(0, Qt::Unchecked);
+			}
+			else
+			{
+				item->setCheckState(0, Qt::Checked);
+			}
+		});
+
+	LoadModeTreeWidget->setWidget(pLoadModelTreeWidget);
+	pLoadModelTreeWidget->expandAll();
+}

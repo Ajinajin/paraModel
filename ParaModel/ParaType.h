@@ -133,6 +133,7 @@ typedef struct SysPath
 	string sExeDir;				// 可执行文件所在目录完整路径
 	string sTopoUnitDir;		// 系统拓扑构建库路径
 	string sTopoLayerDir;		// 系统平面图库路径
+	string sWarheadDir;			// 系统战斗部路径
 
 
 	string sProcLibDir;			// 算法库路径
@@ -159,9 +160,11 @@ typedef struct ArmHeadTopo
 {
 	int nArmHeadIdx;				// 战斗部类型索引
 	int nArrangeType;				// 破片排布类型 0 默认最优排布 1 对齐排布
+	//vector<QPoint> PointF;			// 拐点
 	FragDes oFragInfo;				// 破片信息 0 1 2 球形 方形 圆柱形
 	VFLOAT vFragPos;				// 每个破片中心点位置和姿态角度 方形有6个 球形1个 圆柱形3个
 	vector<PARADES> mapArmHead;		// 战斗部名称 R1
 	QString sArmHeadName;			// 名称 类型和对象不分 限制为单个战斗部编辑
+	QString sArmHeadVersion;			// 名称 类型和对象不分 限制为单个战斗部编辑
 }ArmHeadTopo;
 typedef vector<ArmHeadTopo> VARMHEAD;

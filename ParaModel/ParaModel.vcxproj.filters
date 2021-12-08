@@ -70,6 +70,9 @@
     <ClCompile Include="DimDataConvert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WarheadParaModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLWidget.h">
@@ -110,8 +113,17 @@
     <QtMoc Include="bqgraphicsview.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="WarheadParaModel.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shaders\GLSL_YELLOW.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\GLSL_YELLOW.vert">
+      <Filter>Resource Files</Filter>
+    </None>
     <None Include="res\shaders\coordinate.frag">
       <Filter>Resource Files</Filter>
     </None>
