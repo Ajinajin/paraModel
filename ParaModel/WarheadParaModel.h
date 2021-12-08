@@ -113,6 +113,7 @@ private:
 
 	//清除画布
 	void SceneMainClear();
+	QColor ColorHelper(int unitIdx);
 	void ReLoadModelTree();			//更新加载的模型数据
 
 public slots:

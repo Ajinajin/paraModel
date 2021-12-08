@@ -150,6 +150,7 @@ void WarheadParaModel::InitSysUnitWidget(QDockWidget* from)
 			int nArmHeadIdx = variant.value<int>();
 			vLoadWarhead = vWarhead[nArmHeadIdx];
 			ReLoadModelTree();
+			AddSceneData();
 			if (if_data == 0)
 			{
 				MyLogOutput("当前无画布信息，请新建或者打开后在操作");
@@ -570,8 +571,8 @@ void WarheadParaModel::MyLogOutput(QString myLogout)
 int WarheadParaModel::InitSysData()
 {
 	myLogOutLabel = new QTextEdit();
-	pSceneOffset = 4700;
-	pAuxiliaryLine = 20000;
+	pSceneOffset = 300;
+	pAuxiliaryLine = 1500;
 	if_data = 0;
 	return 1;
 }
@@ -618,7 +619,6 @@ int WarheadParaModel::InitWarheadLib()
 		MyLogOutput("系统战斗部库中无数据！");
 		return 0;
 	}
-
 	//遍历该路径下的所有文件夹 
 	for (int i = 0; i < dirCount; i++) {
 
@@ -630,7 +630,7 @@ int WarheadParaModel::InitWarheadLib()
 			MyLogOutput("系统战斗部库解析失败！");
 			return 0;
 		}
-
+		vector<QPointF> turnPoint;
 		QTextStream readStream(&file);
 		QString versionStr = "";
 		vector<PARADES> plist;
@@ -651,12 +651,21 @@ int WarheadParaModel::InitWarheadLib()
 			p.sUnitName = QString(list[1]);
 			p.nUnitPropty = list[2].toFloat();
 			plist.push_back(p);
+
+			if (list[1] == "外壳Shell")
+			{
+				for (size_t j = 0; j < list.size() - 3; j = j + 2)
+				{
+					turnPoint.push_back(QPointF(list[j + 3].toFloat(), list[j + 4].toFloat()));
+				}
+			}
 		}
 		ArmHeadTopo t;
 		t.nArmHeadIdx = i;
 		QFileInfo fileInfo(file.fileName());
 		t.sArmHeadName = fileInfo.baseName();
 		t.sArmHeadVersion = versionStr;
+		t.vTurnPoint = turnPoint;
 		t.mapArmHead = plist;
 		vWarhead.push_back(t);
 	}
@@ -695,18 +704,67 @@ void WarheadParaModel::ReleaseSysModel()
 }
 #pragma endregion
 
+
+
 #pragma region 画布操作
 
 //画布增加数据
 void WarheadParaModel::AddSceneData()
 {
-	if (if_data == 0)
-		return;
-	//清除画布
+	/*if (if_data == 0)
+		return;*/
+		//清除画布
 	SceneMainClear();
 	DataConvert.CalPlaneData(vLoadWarhead, viewShape);
-	 
+
 	//根据viewShape 绘制界面 
+	for (size_t i = 0; i < viewShape.size(); i++)
+	{
+		if (viewShape[i].unitType == 1)//绘制矩形
+		{
+			BRectangle* viewItem = new BRectangle(
+				viewShape[i].nCen[0], viewShape[i].nCen[1],
+				viewShape[i].nWH[0], viewShape[i].nWH[1],
+				BGraphicsItem::ItemType::Rectangle);
+			viewItem->isAuxiliary = false;
+			viewItem->nUnitType = viewShape[i].unitType;
+			viewItem->nUnitIdx = viewShape[i].unitIdx;
+			viewItem->setBrush(ColorHelper(viewShape[i].unitIdx));
+			pSceneMain.addItem(viewItem);
+		}
+		else if (viewShape[i].unitType == 2)//绘制圆形
+		{
+
+		}
+		else if (viewShape[i].unitType == 3)//绘制多边形
+		{
+
+		}
+		else if (viewShape[i].unitType == 4)//绘制多边形
+		{
+
+			BLine* m_line = new BLine(BGraphicsItem::ItemType::Line);
+
+			QPen pen = QPen(ColorHelper(viewShape[i].unitIdx), viewShape[i].nWH[0]);
+			pen.setStyle(Qt::SolidLine);
+			m_line->setPen(pen);
+			if (viewShape[i].unitIdx == 7 || viewShape[i].unitIdx == 4)
+			{ 
+				m_line->setBrush(ColorHelper(viewShape[i].unitIdx));
+			}
+			for (size_t j = 0; j < viewShape[i].vCorner.size(); j++)
+			{
+				m_line->point.push_back(QPointF(viewShape[i].vCorner[j].nXY[0], viewShape[i].vCorner[j].nXY[1]));
+				//m_line->lineWidth.push_back(viewShape[i].vCorner[j].nLineWidth);
+			}
+			pSceneMain.addItem(m_line);
+		}
+	}
+
+
+
+	graphicsViewMain->hide();
+	graphicsViewMain->show();
 }
 
 //清除画布数据
@@ -720,6 +778,60 @@ void WarheadParaModel::SceneMainClear()
 		pSceneMain.addLine(y, 0, y, pAuxiliaryLine / 2, QPen(Qt::red));
 }
 #pragma endregion
+
+
+QColor WarheadParaModel::ColorHelper(int unitIdx)
+{
+	if (unitIdx == 1)
+	{
+		return QColor(47, 65, 80);
+	}
+	else if (unitIdx == 2)
+	{
+		return QColor(69, 173, 206);
+	}
+	else if (unitIdx == 3)
+	{
+		return QColor(62, 179, 203);
+	}
+	else if (unitIdx == 4)
+	{
+		return QColor(255, 255, 255);
+	}
+	else if (unitIdx == 5)
+	{
+		return QColor(232, 220, 102);
+	}
+	else if (unitIdx == 6)
+	{
+		return QColor(170, 101, 96);
+	}
+	else if (unitIdx == 7)
+	{
+		return QColor(254, 235, 248);
+	}
+	else if (unitIdx == 8)
+	{
+		return QColor(204, 178, 102);
+	}
+	else if (unitIdx == 9)
+	{
+		return QColor(255, 127, 0);
+	}
+	else if (unitIdx == 11)
+	{
+		return QColor(255, 131, 158);
+	}
+	else if (unitIdx == 12)
+	{
+		return QColor(255, 255, 122);
+	}
+	else if (unitIdx == 13)
+	{
+		return QColor(190, 255, 255);
+	}
+	return QColor(72, 104, 146);
+}
 
 /// <summary>
 /// 从新加载模型树

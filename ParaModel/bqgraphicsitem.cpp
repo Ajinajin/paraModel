@@ -614,11 +614,23 @@ void BLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWi
 	//给出的关键点绘制线
 	/*static QList<QPointF> points = QList<QPointF>() << QPointF(10, 40) << QPointF(100, 100) << QPointF(200, 100)
 		<< QPointF(300, 100) << QPointF(330, 80) << QPointF(350, 70);*/
-
 	QPainterPath path(this->point[0]);
+	int twidth = 1;
 	for (int i = 1; i < point.size(); ++i)
 	{
 		path.lineTo(point[i]);
+		if (lineWidth.size() != 0)
+		{
+			if (twidth != lineWidth[i])
+			{
+				twidth = lineWidth[i];
+				this->pen().setWidth(lineWidth[i]);
+				painter->setPen(this->pen());
+				painter->drawPath(path);
+				QPainterPath tpath(point[i]);
+				path = tpath;
+			}
+		}
 	}
 	painter->drawPath(path);
 }

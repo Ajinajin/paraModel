@@ -178,6 +178,7 @@ class BLine : public BGraphicsItem
 public:
 	BLine(ItemType type);
 	QList<QPointF> point;
+	QList<float> lineWidth;
 
 protected:
 
