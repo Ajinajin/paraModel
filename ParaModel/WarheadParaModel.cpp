@@ -48,84 +48,9 @@
 //初始化建筑楼层窗口
 void WarheadParaModel::InitWarheadWidget(QDockWidget* from)
 {
-	from->setWindowTitle("战斗部属性");
-	from->setFixedWidth(300);
-	from->setFixedHeight(300);
-
-	// 当前选择弹的战斗部
-	QLabel* lbl5 = new QLabel("当量Kg");
-	pArmHeadEdit[0] = new QLineEdit;
-	pArmHeadEdit[0]->setText("100");
-	QLabel* lbl6 = new QLabel("弹片数量");
-	pArmHeadEdit[1] = new QLineEdit;
-	pArmHeadEdit[1]->setText("1000");
-	QLabel* lbl7 = new QLabel(QWidget::tr("弹片质量g"));
-	pArmHeadEdit[2] = new QLineEdit;
-	pArmHeadEdit[2]->setText("20");
-	QLabel* lbl8 = new QLabel(QWidget::tr("分布角"));
-	pArmHeadEdit[3] = new QLineEdit;
-	pArmHeadEdit[4] = new QLineEdit;
-	pArmHeadEdit[3]->setText("60");
-	pArmHeadEdit[4]->setText("20");
-	QWidget* mywidget = new QWidget;
-	QVBoxLayout* myVBoxLayout = new QVBoxLayout();
-	QHBoxLayout* myHBoxLayout = new QHBoxLayout();
-
-	QVBoxLayout* myLayout = new QVBoxLayout();
-
-
-	QWidget* temp = new QWidget();
-	lbl5->setFixedWidth(56);
-	lbl6->setFixedWidth(56);
-	lbl7->setFixedWidth(56);
-	lbl8->setFixedWidth(56);
-
-	myHBoxLayout = new QHBoxLayout();
-	myVBoxLayout->addWidget(temp);
-	myHBoxLayout->addWidget(lbl5);
-	myHBoxLayout->addWidget(pArmHeadEdit[0]);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-
-
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myVBoxLayout->addWidget(temp);
-	myHBoxLayout->addWidget(lbl6);
-	myHBoxLayout->addWidget(pArmHeadEdit[1]);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-
-
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myVBoxLayout->addWidget(temp);
-	myHBoxLayout->addWidget(lbl7);
-	myHBoxLayout->addWidget(pArmHeadEdit[2]);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myVBoxLayout->addWidget(temp);
-	myHBoxLayout->addWidget(lbl8);
-	myHBoxLayout->addWidget(pArmHeadEdit[3]);
-	myHBoxLayout->addWidget(pArmHeadEdit[4]);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-
-
-	QPushButton* pApplyBtn = new QPushButton("应用", this);
-	pApplyBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-	pApplyBtn->setFixedWidth(100);
-	temp = new QWidget();
-	myHBoxLayout = new QHBoxLayout();
-	myHBoxLayout->addWidget(pApplyBtn);
-	temp->setLayout(myHBoxLayout);
-	myLayout->addWidget(temp);
-	mywidget->setLayout(myLayout);
-	from->setWidget(mywidget);
-	connect(pApplyBtn, &QPushButton::clicked, this, &WarheadParaModel::ApplyDataAction);
+	LoadModeTreeProperty = from;
+	LoadModeTreeProperty->setWindowTitle("战斗部属性");
+	LoadModeTreeProperty->setFixedWidth(300);
 }
 
 //初始化系统模型窗口
@@ -150,6 +75,7 @@ void WarheadParaModel::InitSysUnitWidget(QDockWidget* from)
 			int nArmHeadIdx = variant.value<int>();
 			vLoadWarhead = vWarhead[nArmHeadIdx];
 			ReLoadModelTree();
+			ReLoadModelProperty();
 			AddSceneData();
 			if (if_data == 0)
 			{
@@ -378,21 +304,7 @@ void WarheadParaModel::InitWindow()
 	//QElapsedTimer cost;
 	//int lastTimes = 0;
 	//cost.start();
-
-
-
-
-	BLine* m_rectangle = new BLine(BGraphicsItem::ItemType::Line);
-	m_rectangle->point = QList<QPointF>() << QPointF(10, 40) << QPointF(100, 100) << QPointF(200, 100)
-		<< QPointF(300, 100) << QPointF(330, 80) << QPointF(350, 70);
-	pSceneMain.addItem(m_rectangle);
-
-	BPoint* m_point = new BPoint(BGraphicsItem::ItemType::Point);
-	m_point->point = QList<QPointF>() << QPointF(10, 40) << QPointF(100, 100) << QPointF(200, 100)
-		<< QPointF(300, 100) << QPointF(330, 80) << QPointF(350, 70);
-	pSceneMain.addItem(m_point);
-
-
+	 
 }
 //初始化弹出窗口
 void WarheadParaModel::InitTipWindow()
@@ -508,6 +420,13 @@ void WarheadParaModel::CloseFileAction()
 /// </summary>
 void WarheadParaModel::ApplyDataAction()
 {
+	if (pArmHeadEdit.size() == 0)
+		return;
+	for (size_t i = 0; i < pArmHeadEdit.size()-1; i++)
+	{
+		vLoadWarhead.mapArmHead[i].nUnitPropty= pArmHeadEdit[i]->text().toFloat();
+	} 
+	AddSceneData();
 	return;
 }
 /// <summary>
@@ -749,7 +668,7 @@ void WarheadParaModel::AddSceneData()
 			pen.setStyle(Qt::SolidLine);
 			m_line->setPen(pen);
 			if (viewShape[i].unitIdx == 7 || viewShape[i].unitIdx == 4)
-			{ 
+			{
 				m_line->setBrush(ColorHelper(viewShape[i].unitIdx));
 			}
 			for (size_t j = 0; j < viewShape[i].vCorner.size(); j++)
@@ -832,9 +751,39 @@ QColor WarheadParaModel::ColorHelper(int unitIdx)
 	}
 	return QColor(72, 104, 146);
 }
+//重新加载模型属性
+void WarheadParaModel::ReLoadModelProperty()
+{
+	if (vLoadWarhead.mapArmHead.size() == 0)
+		return;
+	QWidget* temp = new QWidget();
+	pArmHeadEdit.clear();
+	QFormLayout* pLayout = new QFormLayout();
+	for (vector<PARADES>::const_iterator iter = vLoadWarhead.mapArmHead.begin(); iter != vLoadWarhead.mapArmHead.end(); iter++)
+	{ 
+		QLabel* unitName = new QLabel(iter->sUnitName);
+		unitName->setFixedWidth(100);
+		QLineEdit* txt = new QLineEdit(QString("%1").arg(iter->nUnitPropty));
+		pLayout->addRow(unitName, txt);
+		pArmHeadEdit.push_back(txt);
+	}
 
+	QLabel* unitName = new QLabel("曲线点");
+	unitName->setFixedWidth(100);
+	QLineEdit* txt = new QLineEdit(QString("%1").arg(5));
+	pLayout->addRow(unitName, txt);
+	pArmHeadEdit.push_back(txt);
+
+	QPushButton* pApplyBtn = new QPushButton("应用", this);
+	pApplyBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
+	pApplyBtn->setFixedWidth(100);
+	connect(pApplyBtn, &QPushButton::clicked, this, &WarheadParaModel::ApplyDataAction);
+	pLayout->addRow(pApplyBtn);
+	temp->setLayout(pLayout);
+	LoadModeTreeProperty->setWidget(temp);
+}
 /// <summary>
-/// 从新加载模型树
+/// 重新加载模型树
 /// </summary>
 void WarheadParaModel::ReLoadModelTree()
 {

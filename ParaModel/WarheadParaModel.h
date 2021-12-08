@@ -43,9 +43,11 @@ private:
 	QStatusBar* winStatus;							// 状态栏
 	QLabel* pTipBar;								// 状态栏中文字显示
 	// 战斗部属性编辑框 当量 弹片数量 弹片质量 分布角度1 分布角度2
-	QLineEdit* pArmHeadEdit[5];
+	vector<QLineEdit*> pArmHeadEdit;
 	QDockWidget* MainDockWidget;					// 界面显示窗口 
 	QDockWidget* LoadModeTreeWidget;				// 已载入的模型树 
+	QDockWidget* LoadModeTreeProperty;				// 已载入的模型树 
+
 	BQGraphicsView* graphicsViewMain;				// 二维模型三维视图
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布 
 	ParaOGLManager* paraOglmanagerMain;				// 三维显示
@@ -114,7 +116,8 @@ private:
 	//清除画布
 	void SceneMainClear();
 	QColor ColorHelper(int unitIdx);
-	void ReLoadModelTree();			//更新加载的模型数据
+	void ReLoadModelTree();			//重新加载模型树
+	void ReLoadModelProperty();		//重新加载模型属性
 
 public slots:
 	void MyLogOutput(QString myLogout);         //输出日志
