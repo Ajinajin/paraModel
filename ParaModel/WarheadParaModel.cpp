@@ -19,7 +19,7 @@
 
 #include "bqgraphicsitem.h"
 #include "bqgraphicsscene.h"
-#include "DimDataConvert.h"
+#include "WarheadDataConvert.h"
 
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
@@ -704,7 +704,9 @@ void WarheadParaModel::AddSceneData()
 		return;
 	//清除画布
 	SceneMainClear();
-
+	DataConvert.CalPlaneData(vLoadWarhead, viewShape);
+	 
+	//根据viewShape 绘制界面 
 }
 
 //清除画布数据
@@ -719,7 +721,9 @@ void WarheadParaModel::SceneMainClear()
 }
 #pragma endregion
 
-
+/// <summary>
+/// 从新加载模型树
+/// </summary>
 void WarheadParaModel::ReLoadModelTree()
 {
 	if (vLoadWarhead.mapArmHead.size() == 0)

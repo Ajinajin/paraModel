@@ -23,7 +23,7 @@
 #include "SARibbonMainWindow.h"
 #include <ParaType.h>
 
-#include "DimDataConvert.h"
+#include "WarheadDataConvert.h"
 #include <QFormLayout>
 
 class QMenu;
@@ -71,7 +71,9 @@ public:
 	int InitPath();							// 初始化路径
 	int InitWarheadLib();						// 初始化基本构件库  
 	int InitParaTmpl();						// 初始化参数化生成模板
-
+private :
+	VSHAPE viewShape;
+	WarheadDataConvert DataConvert;
 private:
 	//初始化窗口
 	void InitWindow();
