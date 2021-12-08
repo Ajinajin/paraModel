@@ -34,7 +34,6 @@ int WarheadDataConvert::CalPlaneData(ArmHeadTopo& vArmHeadTopo, VSHAPE& vPlaneDr
 	Front.unitIdx = 8;
 	Front.nCen[0] = f.x() - FrontWidth / 2;
 	Front.nCen[1] = f.y();
-	vPlaneDraw.push_back(Front);
 
 	//后盖为 厚度25 绘制宽25 高 后盖半径*2 中心点坐标为 1000-25/2-弹体上或下边长-前盖厚度 /2,1000
 	SimpleShape Break;
@@ -47,7 +46,6 @@ int WarheadDataConvert::CalPlaneData(ArmHeadTopo& vArmHeadTopo, VSHAPE& vPlaneDr
 	Break.unitIdx = 9;
 	Break.nCen[0] = f.x() - BreakWidth / 2 - BulletLength - FrontWidth;
 	Break.nCen[1] = f.y();
-	vPlaneDraw.push_back(Break);
 
 
 #pragma region 外壳
@@ -252,5 +250,11 @@ int WarheadDataConvert::CalPlaneData(ArmHeadTopo& vArmHeadTopo, VSHAPE& vPlaneDr
 
 	vPlaneDraw.push_back(BulletCore);
 
+	vPlaneDraw.push_back(BulletCore);
+	vPlaneDraw[vPlaneDraw.size() - 2].unitIdx = 5;
+
+
+	vPlaneDraw.push_back(Front);
+	vPlaneDraw.push_back(Break);
 	return 1;
 }

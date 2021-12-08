@@ -58,10 +58,10 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	{
 		setSelected(true);
 		return;
-	} 
+	}
 	QList<QGraphicsItem*> itemList = this->scene()->items();
 	for (size_t i = 0; i < itemList.size(); i++)
-	{ 
+	{
 		if (itemList[i]->type() == BGraphicsItem::type())
 		{
 			BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
@@ -76,7 +76,7 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 				itemList[i]->setSelected(true);
 				continue;
 			}
-			if (this->graphAngle ==0 && proxyWidget->getCenter().y()==this->getCenter().y())
+			if (this->graphAngle == 0 && proxyWidget->getCenter().y() == this->getCenter().y())
 			{
 				itemList[i]->setSelected(true);
 				continue;
@@ -303,8 +303,8 @@ void BCircle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 BRectangle::BRectangle(qreal x, qreal y, qreal width, qreal height, ItemType type)
 	: BGraphicsItem(QPointF(x, y), QPointF(x + width / 2, y + height / 2), type)
 {
-	m_leftup.setX(int(m_center.x() - (m_edge.x()- m_center.x())  ));
-	m_leftup.setY(int(m_center.y() - (m_edge.y() - m_center.y()) ));
+	m_leftup.setX(int(m_center.x() - (m_edge.x() - m_center.x())));
+	m_leftup.setY(int(m_center.y() - (m_edge.y() - m_center.y())));
 
 }
 
@@ -319,8 +319,8 @@ void BRectangle::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 	Q_UNUSED(widget);
 	painter->setPen(this->pen());
 	painter->setBrush(this->brush());
-	 
-	QRectF ret(m_leftup.x(), m_leftup.y(), m_edge.x() - m_leftup.x(), m_edge.y()- m_leftup.y());
+
+	QRectF ret(m_leftup.x(), m_leftup.y(), m_edge.x() - m_leftup.x(), m_edge.y() - m_leftup.y());
 	painter->drawRect(ret);
 }
 
@@ -383,7 +383,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	QAction* act = new QAction(this);
 
 	if (nUnitType >= 4)
-	{ 
+	{
 		act->setObjectName((u8"增加构件"));
 		act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
 		act->setText((u8"增加构件"));
@@ -440,7 +440,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 			emit SceneMenuClick(nUnitType, nUnitIdx);
 			});
 		menu->addAction(act);
-	} 
+	}
 	menu->exec(QCursor::pos());
 	delete menu;
 
@@ -593,16 +593,16 @@ void BPolygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 }
 
 //------------------------------------------------------------------------------
- 
+
 BLine::BLine(ItemType type)
 	: BGraphicsItem(QPointF(0, 0), QPointF(0, 0), type)
 {
-	 
+
 }
-   
+
 QRectF BLine::boundingRect() const
 {
-	return QRectF(m_center.x() , m_center.y() , 1,  1);
+	return QRectF(m_center.x(), m_center.y(), 1, 1);
 }
 
 void BLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -616,21 +616,31 @@ void BLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWi
 		<< QPointF(300, 100) << QPointF(330, 80) << QPointF(350, 70);*/
 	QPainterPath path(this->point[0]);
 	int twidth = 1;
+	if (lineWidth.size() != 0)
+	{
+		twidth = lineWidth[0];
+	}
 	for (int i = 1; i < point.size(); ++i)
 	{
-		path.lineTo(point[i]);
 		if (lineWidth.size() != 0)
 		{
 			if (twidth != lineWidth[i])
 			{
-				twidth = lineWidth[i];
-				this->pen().setWidth(lineWidth[i]);
-				painter->setPen(this->pen());
+				QPen pen = QPen(this->pen().color(), twidth);
+				pen.setStyle(Qt::SolidLine);
+				painter->setPen(pen);
+
 				painter->drawPath(path);
-				QPainterPath tpath(point[i]);
+				QPainterPath tpath(point[i-1]);
 				path = tpath;
+				twidth = lineWidth[i];
+				QPen pen1 = QPen(this->pen().color(), twidth);
+				pen1.setStyle(Qt::SolidLine);
+				painter->setPen(pen1);
+
 			}
 		}
+		path.lineTo(point[i]);
 	}
 	painter->drawPath(path);
 }
@@ -646,7 +656,7 @@ BPoint::BPoint(ItemType type)
 
 QRectF BPoint::boundingRect() const
 {
-	return QRectF(m_center.x() , m_center.y() ,1, 1);
+	return QRectF(m_center.x(), m_center.y(), 1, 1);
 }
 
 void BPoint::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)

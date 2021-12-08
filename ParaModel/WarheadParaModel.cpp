@@ -114,8 +114,7 @@ void WarheadParaModel::InitEditManagerWidget(QDockWidget* from)
 
 	graphicsViewMain = new BQGraphicsView();
 	graphicsViewMain->setScene(&pSceneMain);
-	pSceneMain.setBackgroundBrush(Qt::darkGray);
-	MainDockWidget->setMinimumWidth(1310);
+	pSceneMain.setBackgroundBrush(Qt::darkGray); 
 	MainDockWidget->setWindowTitle("编辑视图 （二维X）");
 	MainDockWidget->setWidget(graphicsViewMain);
 	//中间大屏三位窗口
@@ -304,7 +303,7 @@ void WarheadParaModel::InitWindow()
 	//QElapsedTimer cost;
 	//int lastTimes = 0;
 	//cost.start();
-	 
+
 }
 //初始化弹出窗口
 void WarheadParaModel::InitTipWindow()
@@ -422,10 +421,10 @@ void WarheadParaModel::ApplyDataAction()
 {
 	if (pArmHeadEdit.size() == 0)
 		return;
-	for (size_t i = 0; i < pArmHeadEdit.size()-1; i++)
+	for (size_t i = 0; i < pArmHeadEdit.size() - 1; i++)
 	{
-		vLoadWarhead.mapArmHead[i].nUnitPropty= pArmHeadEdit[i]->text().toFloat();
-	} 
+		vLoadWarhead.mapArmHead[i].nUnitPropty = pArmHeadEdit[i]->text().toFloat();
+	}
 	AddSceneData();
 	return;
 }
@@ -666,15 +665,22 @@ void WarheadParaModel::AddSceneData()
 
 			QPen pen = QPen(ColorHelper(viewShape[i].unitIdx), viewShape[i].nWH[0]);
 			pen.setStyle(Qt::SolidLine);
-			m_line->setPen(pen);
-			if (viewShape[i].unitIdx == 7 || viewShape[i].unitIdx == 4)
+			if (viewShape[i].unitIdx == 7 || viewShape[i].unitIdx == 5)
 			{
 				m_line->setBrush(ColorHelper(viewShape[i].unitIdx));
 			}
+			if (viewShape[i].unitIdx == 4)
+			{ 
+				pen.setColor(ColorHelper(viewShape[i].unitIdx)); 
+			}
+			m_line->setPen(pen);
 			for (size_t j = 0; j < viewShape[i].vCorner.size(); j++)
 			{
 				m_line->point.push_back(QPointF(viewShape[i].vCorner[j].nXY[0], viewShape[i].vCorner[j].nXY[1]));
-				//m_line->lineWidth.push_back(viewShape[i].vCorner[j].nLineWidth);
+				if (viewShape[i].unitIdx == 4)
+				{
+					m_line->lineWidth.push_back(viewShape[i].vCorner[j].nLineWidth);
+				}
 			}
 			pSceneMain.addItem(m_line);
 		}
@@ -715,11 +721,11 @@ QColor WarheadParaModel::ColorHelper(int unitIdx)
 	}
 	else if (unitIdx == 4)
 	{
-		return QColor(255, 255, 255);
+		return QColor(255, 0, 255);
 	}
 	else if (unitIdx == 5)
 	{
-		return QColor(232, 220, 102);
+		return QColor(255, 255, 255);
 	}
 	else if (unitIdx == 6)
 	{
@@ -760,7 +766,7 @@ void WarheadParaModel::ReLoadModelProperty()
 	pArmHeadEdit.clear();
 	QFormLayout* pLayout = new QFormLayout();
 	for (vector<PARADES>::const_iterator iter = vLoadWarhead.mapArmHead.begin(); iter != vLoadWarhead.mapArmHead.end(); iter++)
-	{ 
+	{
 		QLabel* unitName = new QLabel(iter->sUnitName);
 		unitName->setFixedWidth(100);
 		QLineEdit* txt = new QLineEdit(QString("%1").arg(iter->nUnitPropty));
