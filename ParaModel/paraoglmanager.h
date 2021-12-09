@@ -47,6 +47,21 @@ public:
 	//void keyReleaseEvent(QKeyEvent* event)override;		//键盘释放事件
 
 
+	GLboolean keys[1024];			// 获取键盘按键，实现多键触控
+
+	enum SwitchView //相机视角枚举，七种视图（一个默认视图加六个标准视图）
+	{
+		NONE,
+		FRONT_VIEW,
+		BACK_VIEW,
+		LEFT_VIEW,
+		RIGHT_VIEW,
+		TOP_VIEW,
+		BOTTOM_VIEW
+	};
+	SwitchView switchView;
+
+
 public:
 	//绘制
 	// 
@@ -62,13 +77,15 @@ public:
 	//长方体（墙、板等）x\y\z 为长方体的中心点
 	void InitAndDrawCuboid(int x, int y, int z, int length, int thickness, int height, int type);
 	
-	
+	void outputKFile();
+	//返回六个视图图片
 	
 	VTOPOTABLE oglTopTable;		//绘制所需的拓扑结构表
 	VUNITTABLE oglUnitTable;	//绘制所需的结构单元表
 	
 	vPoint allNodes;			//存储三维模型的所有节点信息
 	vSolid allSolids;			//存储三维模型内的所有solid信息
+	int outFlag = 0;			//暂时变量，用于只输出一次K文件
 
 
 public:
@@ -91,13 +108,6 @@ public:
 	QMatrix4x4 targetModeluse;
 	QMatrix4x4 view;											//内部的总体渲染观察矩阵
 	GLboolean if_change_view;									//从外部更改三维显示观察矩阵 标志位
-
-	GLboolean if_top_view;
-	GLboolean if_bottom_view;
-	GLboolean if_front_view;
-	GLboolean if_back_view;
-	GLboolean if_left_view;
-	GLboolean if_right_view;
 
 	GLfloat rotateRaw;											//每次对模型的raw旋转
 	GLfloat rotatePitch;										//每次对模型的pitch旋转

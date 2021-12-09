@@ -1117,13 +1117,11 @@ void ParaModel::ExportFileAction()
 	}
 	else
 	{
-		
-		
 		//让用户选择文件夹，在选择的文件夹中导出k文件,可以指定名字
 
 		QString curPath = QCoreApplication::applicationDirPath();
 		QString dlgTitle = "保存文件";
-		QString filter = "k文件(*.k);;所有文件(*.*)";
+		QString filter = "h文件(*.h);;c++文件(*.cpp);;k文件(*.k);;所有文件(*.*)";
 
 		QString dirpath = QFileDialog::getSaveFileName(this, dlgTitle, curPath, filter);
 
@@ -1131,7 +1129,6 @@ void ParaModel::ExportFileAction()
 		fstream outfile;
 		outfile.open(dirpath.toStdString(), fstream::out);
 
-		//已经计算出所有节点信息、solid信息，则输出
 		outfile << "*KEYWORD" << "\n";
 		outfile << "*NODE" << "\n";
 
@@ -1155,11 +1152,8 @@ void ParaModel::ExportFileAction()
 		}
 
 		MyLogOutput("K文件导出成功");
-			
-		
-		outfile.close();
 
-		//
+
 		getStandardPic(paraOglmanagerMain);
 	}
 
@@ -1175,67 +1169,44 @@ vQImage ParaModel::getStandardPic(ParaOGLManager* oglManager)
 	QMatrix4x4 oldView = oglManager->camera->getViewMatrix();
 	oglManager->if_change_view = GL_TRUE;
 
+
 	//Top
-	oglManager->if_top_view = GL_TRUE;
+	oglManager->view.lookAt(QVector3D(0, 5, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(1.0f, 0.0f, -90.0f));
 	image = oglManager->grabFramebuffer();
-	oglManager->if_top_view = GL_FALSE;
-	image.save("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/1.jpg");
 	res.push_back(image);
 
 	//Bottom
-	oglManager->if_bottom_view = GL_TRUE;
+	oglManager->view.lookAt(QVector3D(0, -5, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(1.0f, 0.0f, 90.0f));
 	image = oglManager->grabFramebuffer();
-	oglManager->if_bottom_view = GL_FALSE;
-	image.save("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/2.jpg");
 	res.push_back(image);
 
 	//Front
-	oglManager->if_front_view = GL_TRUE;
+	oglManager->view.lookAt(QVector3D(0, 0, 5), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));
 	image = oglManager->grabFramebuffer();
-	oglManager->if_front_view = GL_FALSE;
-	image.save("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/3.jpg");
+	//image.save("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/1.jpg");
 	res.push_back(image);
 
 	//Back
-	oglManager->if_back_view = GL_TRUE;
+	oglManager->view.lookAt(QVector3D(0, 0, -5), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));
 	image = oglManager->grabFramebuffer();
-	oglManager->if_back_view = GL_FALSE;
-	image.save("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/4.jpg");
 	res.push_back(image);
 
 	//Left
-	oglManager->if_left_view = GL_TRUE;
+	oglManager->view.lookAt(QVector3D(-5, 0, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));
 	image = oglManager->grabFramebuffer();
-	oglManager->if_left_view = GL_FALSE;
-	image.save("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/5.jpg");
 	res.push_back(image);
 
 	//Right
-	oglManager->if_right_view = GL_TRUE;
+	oglManager->view.lookAt(QVector3D(5, 0, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));
 	image = oglManager->grabFramebuffer();
-	oglManager->if_right_view = GL_FALSE;
-	image.save("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/6.jpg");
 	res.push_back(image);
-
 
 
 	//return
 	oglManager->view = oldView;
-
 	oglManager->if_change_view = GL_FALSE;
+
 	return res;
-	
-		
-	
-	
-
-
-	
-
-
-	
-
-	
 }
 
 /// <summary>
@@ -1432,8 +1403,9 @@ void ParaModel::OpenFileAction()
 	lay.sVersion = versionStr;
 	lay.sLayerName = QString(SelectLayer);
 
-	QFileInfo fileInfo(file.fileName()); 
-	pModelEdit[0]->setText(fileInfo.baseName());
+	int lastPoint = file.fileName().lastIndexOf(".");
+	QString fileNameNoExt = file.fileName().left(lastPoint);
+	pModelEdit[0]->setText(fileNameNoExt);
 	pModelEdit[1]->setText(iconStr);
 	lay.vLayerTopo = vModelTmpl;
 	vLoadModelData.push_back(lay);
@@ -2320,7 +2292,7 @@ void ParaModel::SceneMenuDeleteClickAction(int nUnitType, int nUnitIdx)
 
 	pCalShapeData->DelBaseUnit(nUnitIdx, vModelTmpl, 0);
 
-	RefreshSceneData();
+	ParaModel::RefreshSceneData(); 
 	return;
 }
 //增加

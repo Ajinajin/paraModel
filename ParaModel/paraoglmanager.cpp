@@ -11,7 +11,7 @@
 
 
 // 定义全局变量 后期修改
-const QVector3D CAMERA_POSITION(250, 130, 800.0f);
+const QVector3D CAMERA_POSITION(300, 130, 1000.0f);
 const QVector3D LIGHT_POSITION(0.0f, 1.0f, 0.0f);
 
 const int OGLMANAGER_WIDTH = 1200;
@@ -111,14 +111,20 @@ ParaOGLManager::~ParaOGLManager() {
 void ParaOGLManager::handleKeyPressEvent(QKeyEvent* event)
 {
 	GLuint key = event->key();
-	
+	if (key >= 0 && key <= 1024)
+	{
+		this->keys[key] = GL_TRUE;
+	}
 
 }
 
 void ParaOGLManager::handleKeyReleaseEvent(QKeyEvent* event)
 {
 	GLuint key = event->key();
-	
+	if (key >= 0 && key <= 1024)
+	{
+		this->keys[key] = GL_FALSE;
+	}
 }
 
 
@@ -129,6 +135,12 @@ void ParaOGLManager::initializeGL()
 	pCore->glEnable(GL_DEPTH_TEST);
 	pCore->glEnable(GL_PROGRAM_POINT_SIZE);
 
+
+	/*********** 键鼠响应及时间帧数操作  *************/
+	for (GLuint i = 0; i != 1024; ++i) //初始化键盘按键
+	{
+		keys[i] = GL_FALSE;
+	}
 
 	deltaTime = 0.0f;
 	lastFrame = 0.0f;
@@ -151,6 +163,8 @@ void ParaOGLManager::initializeGL()
 	camera = new Camera(CAMERA_POSITION);
 
 
+	//相机视角
+	switchView = NONE;
 
 	VTOPOTABLE *tmp = new VTOPOTABLE;
 	oglTopTable = *tmp;
@@ -168,12 +182,6 @@ void ParaOGLManager::initializeGL()
 	allSolids.resize(0);
 	//
 	if_change_view = GL_FALSE;
-	if_top_view = GL_FALSE;
-	if_bottom_view = GL_FALSE;
-	if_front_view = GL_FALSE;
-	if_back_view = GL_FALSE;
-	if_left_view = GL_FALSE;
-	if_right_view = GL_FALSE;
 	/************ 载入shader ***********/
 
 	ResourceManager::loadShader("coordinate", ":/shaders/res/shaders/coordinate.vert", ":/shaders/res/shaders/coordinate.frag");
@@ -261,9 +269,7 @@ void ParaOGLManager::paintGL()
 	float transOfDoor = 1.0;
 	float transOfWindow = 0.25;
 
-	allNodes.clear();
-	allSolids.clear();
-
+	
 	//绘制三维模型
 	if (!oglUnitTable.empty() && !oglTopTable.empty())
 	{
@@ -707,14 +713,24 @@ void ParaOGLManager::paintGL()
 
 		
 		}
+
+
+		if (outFlag != -1) { outFlag++; }
 	}
 	
 
+	//此时0 1 2是暂时的，1说明所有的点信息已存储，等于2说明所有的solid信息已存储(此时可输出到K文件了)
+
+	//将此三维模型的数据输出到K文件里
+	if (outFlag == 2)
+	{
+		outFlag = -1;
+	}
 }
 
 void ParaOGLManager::processInput(GLfloat dt)
 {
-	/*if (keys[Qt::Key_W])
+	if (keys[Qt::Key_W])
 		camera->processKeyboard(FORWARD, dt);
 	if (keys[Qt::Key_S])
 		camera->processKeyboard(BACKWARD, dt);
@@ -725,7 +741,7 @@ void ParaOGLManager::processInput(GLfloat dt)
 	if (keys[Qt::Key_E])
 		camera->processKeyboard(UP, dt);
 	if (keys[Qt::Key_Q])
-		camera->processKeyboard(DOWN, dt);*/
+		camera->processKeyboard(DOWN, dt);
 
 }
 
@@ -740,37 +756,36 @@ void ParaOGLManager::updateGL()
 	projection.perspective(camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 2000.f);
 	
 
+	//switch (switchView)
+	//{
+	//case FRONT_VIEW:
+	//	view.lookAt(QVector3D(0, 0, 5), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//前视图
+	//	break;
+	//case BACK_VIEW:
+	//	view.lookAt(QVector3D(0, 0, -5), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//后视图
+	//	break;
+	//case LEFT_VIEW:
+	//	view.lookAt(QVector3D(-5, 0, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//左视图
+	//	break;
+	//case RIGHT_VIEW:
+	//	view.lookAt(QVector3D(5, 0, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(0.0f, 1.0f, 0.0f));						//右视图
+	//	break;
+	//case TOP_VIEW:
+	//	view.lookAt(QVector3D(0, 5, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(1.0f, 0.0f, -90.0f));					//俯视图
+	//	break;
+	//case BOTTOM_VIEW:
+	//	view.lookAt(QVector3D(0, -5, 0), QVector3D(0.0f, 0.0f, 0.0f), QVector3D(1.0f, 0.0f, 90.0f));					//底视图
+	//	break;
+	//default:
+	//	view = camera->getViewMatrix();
+	//	break;
+	//}
+
 	if (!if_change_view)
 	{
 		view = camera->getViewMatrix();
 	}
-	else
-	{
-		//计算模型的包围盒，用于确定标准试图时相机的位置
-		int Xmin = 9999, Xmax = -9999, Ymin = 9999, Ymax = -9999, Zmin = 9999, Zmax = -9999;
-		if (/*(outFlag == -1) &&*/ (!allNodes.empty()))//所有节点信息已计算完毕
-		{
-			for (int i = 0; i < allNodes.size(); i++)
-			{
-				if (allNodes[i].x < Xmin) { Xmin = allNodes[i].x; }
-				if (allNodes[i].x > Xmax) { Xmax = allNodes[i].x; }
-				if (allNodes[i].y < Ymin) { Ymin = allNodes[i].y; }
-				if (allNodes[i].y > Ymax) { Ymax = allNodes[i].y; }
-				if (allNodes[i].z < Zmin) { Zmin = allNodes[i].z; }
-				if (allNodes[i].z > Zmax) { Zmax = allNodes[i].z; }
-			}
-		}
 
-		if (if_top_view) { 
-			view.lookAt(QVector3D((Xmax + Xmin) / 2, Ymax + 100, (Zmin + Zmax) / 2), QVector3D((Xmax + Xmin) / 2, (Ymax + Ymin) / 2, (Zmin + Zmax) / 2), QVector3D(0.0f, 0.0f, -1.0f));}
-		if (if_bottom_view) { view.lookAt(QVector3D((Xmax + Xmin) / 2, Ymin - 50, (Zmax + Zmin) / 2), QVector3D((Xmax + Xmin) / 2, (Ymax + Ymin) / 2, (Zmin + Zmax) / 2), QVector3D(0.0f, 0.0f, 1.0f)); }
-		if (if_front_view) { view.lookAt(QVector3D((Xmax + Xmin) / 2, (Ymax + Ymin) / 2, Zmax + 50), QVector3D((Xmax + Xmin) / 2, (Ymax + Ymin) / 2, (Zmin + Zmax) / 2), QVector3D(0.0f, 1.0f, 0.0f)); }
-		if (if_back_view) { view.lookAt(QVector3D((Xmax + Xmin) / 2, (Ymax + Ymin) / 2, Zmin - 50), QVector3D((Xmax + Xmin) / 2, (Ymax + Ymin) / 2, (Zmin + Zmax) / 2), QVector3D(0.0f, 1.0f, 0.0f)); }
-		if (if_left_view) { view.lookAt(QVector3D(Xmin - 50, (Ymax + Ymin) / 2, (Zmax + Zmin) / 2), QVector3D((Xmax + Xmin) / 2, (Ymax + Ymin) / 2, (Zmin + Zmax) / 2), QVector3D(0.0f, 1.0f, 0.0f)); }
-		if (if_right_view) { view.lookAt(QVector3D(Xmax + 50, (Ymax + Ymin) / 2, (Zmax + Zmin) / 2), QVector3D((Xmax + Xmin) / 2, (Ymax + Ymin) / 2, (Zmin + Zmax) / 2), QVector3D(0.0f, 1.0f, 0.0f)); }
-	}
-	
-	
 	ResourceManager::getShader("coordinate").use().setMatrix4f("projection", projection);
 	ResourceManager::getShader("coordinate").use().setMatrix4f("view", view);
 
@@ -962,18 +977,21 @@ void ParaOGLManager::InitAndDrawCuboid(int x, int y, int z, int length, int thic
 
 
 	//存入到点集合中
-
-	for (int i = 0; i < 8; i++)
+	if (outFlag == 0)
 	{
-		allNodes.push_back(points[i]);
+		for (int i = 0; i < 8; i++)
+		{
+			allNodes.push_back(points[i]);
+		}
 	}
-
 	//点已存入完毕，此时开始对每个solid里面的点索引 赋值
+	if (outFlag == 1)
+	{
+		Solid tmp;
+		findIndex(points,allNodes,tmp.idx);
 
-	Solid temp;
-	findIndex(points,allNodes, temp.idx);
-	allSolids.push_back(temp);
-
+		allSolids.push_back(tmp);
+	}
 
 
 	//6个矩形面片 24个点索引

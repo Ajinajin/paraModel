@@ -462,13 +462,21 @@ int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE v
 	vLayerTopo[nNewColIdx].nAdjUnitIdx[1] = nNewWallIdx;
 	vLayerTopo[nNewColIdx].nAdjUnitIdx[2] = nBeamIdx;
 	vLayerTopo[nNewColIdx].nAdjUnitIdx[3] = nNewBeamIdx;
+	vLayerTopo[nNewColIdx].nAdjUnitIdx[4] = nInsWallIdx;
+	vLayerTopo[nNewColIdx].nAdjUnitIdx[5] = nNewWallIdx;
+	vLayerTopo[nNewColIdx].nAdjUnitIdx[6] = nBeamIdx;
+	vLayerTopo[nNewColIdx].nAdjUnitIdx[7] = nNewBeamIdx;
+	vLayerTopo[nNewColIdx].nAdjUnitIdx[8] = nInsWallIdx;
 	// 更新墙拓扑结构
 	UpdateNewAdj(nNewColIdx, vLayerTopo[nInsWallIdx].nAdjUnitIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx, vLayerTopo, 1);
 	UpdateNewAdj(nNewBeamIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx, vLayerTopo, 2);
-
+	UpdateNewAdj(nNewColIdx, vLayerTopo[nInsWallIdx].nAdjUnitIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx, vLayerTopo, 6);
+	UpdateNewAdj(nNewBeamIdx, vLayerTopo[nNewWallIdx].nAdjUnitIdx, vLayerTopo, 7);
 	// 更新梁拓扑结构
 	UpdateNewAdj(nNewColIdx, vLayerTopo[nBeamIdx].nAdjUnitIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx, vLayerTopo, 1);
 	UpdateNewAdj(nNewWallIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx, vLayerTopo, 4);
+	UpdateNewAdj(nNewColIdx, vLayerTopo[nBeamIdx].nAdjUnitIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx, vLayerTopo, 6);
+	UpdateNewAdj(nNewWallIdx, vLayerTopo[nNewBeamIdx].nAdjUnitIdx, vLayerTopo, 8);
 
 	return 0;
 }
@@ -833,7 +841,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 	// 墙只能沿垂直墙方向移动
 	// 墙两端必须有柱子
 	// 得到柱子关联的其他墙
-	int nAdjCol[2];
+	int nAdjCol[4];
 	int nXYMoveRange[2][2];
 	// 	// 计算墙的合规范围
 	nRe = CalWallMoveRange(nMoveUnitIdx, vLayerTopo, vPlaneDraw, nAdjCol, nXYMoveRange);
@@ -851,7 +859,6 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 		MovCol(nAdjCol[i], nMoveX, nMoveY, vLayerTopo);
 	}
 	// 重新计算几何数值
-
 	return 0;
 }
 // 平面图中移动选中单元构件

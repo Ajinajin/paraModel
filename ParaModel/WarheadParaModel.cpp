@@ -19,7 +19,7 @@
 
 #include "bqgraphicsitem.h"
 #include "bqgraphicsscene.h"
-#include "WarheadDataConvert.h"
+#include "DimDataConvert.h"
 
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
@@ -47,53 +47,31 @@
 #pragma region 初始化窗口
 //初始化建筑楼层窗口
 void WarheadParaModel::InitWarheadWidget(QDockWidget* from)
-{
-	LoadModeTreeProperty = from;
-	LoadModeTreeProperty->setWindowTitle("战斗部属性");
-	LoadModeTreeProperty->setFixedWidth(300);
+{ 
+	from->setWindowTitle("战斗部属性");
+	from->setFixedWidth(300);
 }
 
 //初始化系统模型窗口
 void WarheadParaModel::InitSysUnitWidget(QDockWidget* from)
-{
+{  
 	from->setFixedWidth(300);
 	from->setWindowTitle("系统战斗部模型");
-
-	QWidget* mytreewidget = new QWidget();
-	QTreeWidget* pWarheadModelTreeWidget = new QTreeWidget(mytreewidget);
-	pWarheadModelTreeWidget->setHeaderHidden(true);
-	for (vector<ArmHeadTopo>::const_iterator iter = vWarhead.begin(); iter != vWarhead.end(); iter++)
-	{
-		QTreeWidgetItem* rootItem = new QTreeWidgetItem(pWarheadModelTreeWidget);
-		rootItem->setText(0, iter->sArmHeadName);
-		rootItem->setData(0, Qt::UserRole, iter->nArmHeadIdx);
-	}
-	//树按钮响应
-	connect(pWarheadModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column)
-		{
-			QVariant variant = item->data(0, Qt::UserRole);
-			int nArmHeadIdx = variant.value<int>();
-			vLoadWarhead = vWarhead[nArmHeadIdx];
-			ReLoadModelTree();
-			ReLoadModelProperty();
-			AddSceneData();
-			if (if_data == 0)
-			{
-				MyLogOutput("当前无画布信息，请新建或者打开后在操作");
-				return;
-			}
-		});
-	from->setWidget(pWarheadModelTreeWidget);
-	pWarheadModelTreeWidget->expandAll();
 }
 
 //初始化已加载的模型窗口
 void WarheadParaModel::InitLoadModelWidget(QDockWidget* from)
-{
-	LoadModeTreeWidget = from;
-	LoadModeTreeWidget->setWindowTitle("模型结构树");
-	LoadModeTreeWidget->setFixedWidth(300);
-	//layout布局 
+{   
+	 
+	from->setWindowTitle("模型结构树");
+	from->setFixedWidth(300);
+	//layout布局
+
+	QWidget* visutal = new QWidget();
+
+
+	from->setWidget(visutal);
+
 }
 
 //初始化日志窗口
@@ -114,7 +92,8 @@ void WarheadParaModel::InitEditManagerWidget(QDockWidget* from)
 
 	graphicsViewMain = new BQGraphicsView();
 	graphicsViewMain->setScene(&pSceneMain);
-	pSceneMain.setBackgroundBrush(Qt::darkGray); 
+	pSceneMain.setBackgroundBrush(Qt::darkGray);
+
 	MainDockWidget->setWindowTitle("编辑视图 （二维X）");
 	MainDockWidget->setWidget(graphicsViewMain);
 	//中间大屏三位窗口
@@ -155,7 +134,7 @@ void WarheadParaModel::InitCentralWidget()
 
 	QDockWidget* sysWidget = new QDockWidget(this);
 	InitSysUnitWidget(sysWidget);
-
+	 
 
 	QDockWidget* editManagerWidget = new QDockWidget(this);
 	InitEditManagerWidget(editManagerWidget);
@@ -208,14 +187,14 @@ void WarheadParaModel::InitCategoryMain(SARibbonCategory* page)
 	act->setShortcut(QKeySequence(QLatin1String("Ctrl+N")));
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &WarheadParaModel::NewFileAction);
-
+	 
 	act = new QAction(this);
 	act->setObjectName(("打开"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("打开"));
+	act->setText(("打开")); 
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &WarheadParaModel::OpenFileAction);
-
+	 
 
 	act = new QAction(this);
 	act->setObjectName(("保存"));
@@ -249,14 +228,6 @@ void WarheadParaModel::InitCategoryMain(SARibbonCategory* page)
 	pannel->addLargeAction(act);
 	connect(act, &QAction::triggered, this, &WarheadParaModel::CloseFileAction);
 
-
-	act = new QAction(this);
-	act->setObjectName(("刷新"));
-	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
-	act->setText(("刷新"));
-	pannel->addLargeAction(act);
-	connect(act, &QAction::triggered, this, &WarheadParaModel::RefreshAction);
-
 }
 //初始化Ribbon
 void WarheadParaModel::InitSARibbon()
@@ -273,7 +244,7 @@ void WarheadParaModel::InitSARibbon()
 	categoryMain->setObjectName(("categoryMain"));
 	ribbon->addCategoryPage(categoryMain);
 	InitCategoryMain(categoryMain);
-
+	 
 	//初始化顶部快捷菜单
 	//InitQuickAccess(ribbon);
 }
@@ -319,7 +290,7 @@ WarheadParaModel::WarheadParaModel(QWidget* parent)
 	//初始化系统路径
 	InitPath();
 	//初始化系统数据
-	InitWarheadLib();
+	InitUnitLib();
 
 	//初始化界面
 	InitWindow();
@@ -327,8 +298,6 @@ WarheadParaModel::WarheadParaModel(QWidget* parent)
 }
 
 #pragma region 界面交互
-
-
 /// <summary>
 /// 新建场景
 /// </summary>
@@ -341,21 +310,21 @@ void WarheadParaModel::NewFileAction()
 		return;
 	}
 	if_data = 1;
-
+	
 	MyLogOutput("新建场景文件成功");
 }
 /// <summary>
 /// 保存原来txt文件
 /// </summary>
 void WarheadParaModel::SaveFileAction()
-{
+{	
 	if (if_data == 0)
 	{
 		QMessageBox::information(NULL, "信息提示", "当前并无数据可保存");
 	}
 	else
 	{
-
+		
 		MyLogOutput("当前文件保存成功");
 	}
 	return;
@@ -372,7 +341,7 @@ void WarheadParaModel::SaveasFileAction()
 	}
 	else
 	{
-
+		
 		MyLogOutput("文件另存成功");
 	}
 	return;
@@ -395,39 +364,16 @@ void WarheadParaModel::ExportFileAction()
 }
 
 /// <summary>
-/// 刷新画布
-/// </summary>
-void WarheadParaModel::RefreshAction()
-{
-	graphicsViewMain->hide();
-	graphicsViewMain->show();
-}
-
-/// <summary>
 /// 关闭场景
 /// </summary>
 void WarheadParaModel::CloseFileAction()
 {
 	if_data = 0;
-
-	SceneMainClear();
+	
+	SceneMainClear(); 
 	MyLogOutput("清除数据成功");
 }
 
-/// <summary>
-/// 保存战斗部信息
-/// </summary>
-void WarheadParaModel::ApplyDataAction()
-{
-	if (pArmHeadEdit.size() == 0)
-		return;
-	for (size_t i = 0; i < pArmHeadEdit.size() - 1; i++)
-	{
-		vLoadWarhead.mapArmHead[i].nUnitPropty = pArmHeadEdit[i]->text().toFloat();
-	}
-	AddSceneData();
-	return;
-}
 /// <summary>
 /// 打开场景
 /// </summary>
@@ -462,12 +408,11 @@ void WarheadParaModel::OpenFileAction()
 	while (!readStream.atEnd()) {
 		QString content = readStream.readLine();
 		QStringList list = content.split(' ');
-
+	
 	}
 	if_data = 1;
-
+	 
 }
-
 
 
 void WarheadParaModel::MyLogOutput(QString myLogout)
@@ -488,12 +433,14 @@ void WarheadParaModel::MyLogOutput(QString myLogout)
 // 初始化系统变量 
 int WarheadParaModel::InitSysData()
 {
+	pModelEdit[0] = new QLineEdit();
+	pModelEdit[1] = new QLineEdit();
 	myLogOutLabel = new QTextEdit();
-	pSceneOffset = 300;
-	pAuxiliaryLine = 1500;
+	pSceneOffset = 4700;
+	pAuxiliaryLine = 20000;
 	if_data = 0;
 	return 1;
-}
+} 
 // 初始化路径 
 int WarheadParaModel::InitPath()
 {
@@ -504,7 +451,6 @@ int WarheadParaModel::InitPath()
 
 	oPath.sTopoUnitDir = oPath.sExeDir + "/TopoUnit";
 	oPath.sTopoLayerDir = oPath.sExeDir + "/TopoLayer";
-	oPath.sWarheadDir = oPath.sExeDir + "/Warhead";
 
 
 	oPath.sBoomLibDir = oPath.sExeDir + "/BoomLib";
@@ -520,72 +466,21 @@ int WarheadParaModel::InitPath()
 }
 
 // 初始化基本构件库 
-int WarheadParaModel::InitWarheadLib()
+int WarheadParaModel::InitUnitLib()
 {
-	QString Path = QString::fromStdString(oPath.sWarheadDir);
-	QDir cfgPathDir = Path;
-	if (!cfgPathDir.exists()) {
-		MyLogOutput("系统无法找到系统战斗部库！");
+	QString Path = QString::fromStdString(oPath.sTopoUnitDir + u8"/buildinglib.txt");
+	QFile file(Path);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		QMessageBox::information(NULL, "信息提示", "系统基本构建库解析失败！");
+		MyLogOutput("系统基本构建库解析失败！");
 		return 0;
 	}
-	QStringList filters;
-	filters << QString("*.txt");
-	cfgPathDir.setFilter(QDir::Files | QDir::NoSymLinks); //设置类型过滤器，只为文件格式
-	cfgPathDir.setNameFilters(filters);                   //设置文件名称过滤器，只为filters格式
-	int dirCount = cfgPathDir.count();
-	if (dirCount <= 0) {
-		MyLogOutput("系统战斗部库中无数据！");
-		return 0;
-	}
-	//遍历该路径下的所有文件夹 
-	for (int i = 0; i < dirCount; i++) {
-
-		QString Path = QString("%1/%2").arg(QString::fromStdString(oPath.sWarheadDir)).arg(cfgPathDir[i]);
-		QFile file(Path);
-		if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-		{
-			QMessageBox::information(NULL, "信息提示", "系统战斗部库解析失败！");
-			MyLogOutput("系统战斗部库解析失败！");
-			return 0;
-		}
-		vector<QPointF> turnPoint;
-		QTextStream readStream(&file);
-		QString versionStr = "";
-		vector<PARADES> plist;
-		while (!readStream.atEnd()) {
-			QString content = readStream.readLine();
-			QStringList list = content.split(' ');
-			bool verify;
-			QString str = list[0];
-			if (list[0].toLower() == "*version")
-			{
-				versionStr = list[1];
-				continue;
-			}
-			float  locationX = str.toInt(&verify);
-			if (!verify)
-				continue;
-			PARADES p;
-			p.sUnitName = QString(list[1]);
-			p.nUnitPropty = list[2].toFloat();
-			plist.push_back(p);
-
-			if (list[1] == "外壳Shell")
-			{
-				for (size_t j = 0; j < list.size() - 3; j = j + 2)
-				{
-					turnPoint.push_back(QPointF(list[j + 3].toFloat(), list[j + 4].toFloat()));
-				}
-			}
-		}
-		ArmHeadTopo t;
-		t.nArmHeadIdx = i;
-		QFileInfo fileInfo(file.fileName());
-		t.sArmHeadName = fileInfo.baseName();
-		t.sArmHeadVersion = versionStr;
-		t.vTurnPoint = turnPoint;
-		t.mapArmHead = plist;
-		vWarhead.push_back(t);
+	QTextStream readStream(&file);
+	while (!readStream.atEnd()) {
+		QString content = readStream.readLine();
+		QStringList list = content.split(' ');
+	 
 	}
 	return 1;
 }
@@ -610,7 +505,7 @@ void WarheadParaModel::ReleaseUISource()
 	// 释放各种资源
 	FREEPTR(pTipBar);
 	FREEPTR(myLogOutLabel);
-	FREEPTR(graphicsViewMain);
+	FREEPTR(graphicsViewMain); 
 	return;
 }
 
@@ -622,74 +517,16 @@ void WarheadParaModel::ReleaseSysModel()
 }
 #pragma endregion
 
-
-
 #pragma region 画布操作
 
 //画布增加数据
 void WarheadParaModel::AddSceneData()
 {
-	/*if (if_data == 0)
-		return;*/
-		//清除画布
+	if (if_data == 0)
+		return; 
+	//清除画布
 	SceneMainClear();
-	DataConvert.CalPlaneData(vLoadWarhead, viewShape);
 
-	//根据viewShape 绘制界面 
-	for (size_t i = 0; i < viewShape.size(); i++)
-	{
-		if (viewShape[i].unitType == 1)//绘制矩形
-		{
-			BRectangle* viewItem = new BRectangle(
-				viewShape[i].nCen[0], viewShape[i].nCen[1],
-				viewShape[i].nWH[0], viewShape[i].nWH[1],
-				BGraphicsItem::ItemType::Rectangle);
-			viewItem->isAuxiliary = false;
-			viewItem->nUnitType = viewShape[i].unitType;
-			viewItem->nUnitIdx = viewShape[i].unitIdx;
-			viewItem->setBrush(ColorHelper(viewShape[i].unitIdx));
-			pSceneMain.addItem(viewItem);
-		}
-		else if (viewShape[i].unitType == 2)//绘制圆形
-		{
-
-		}
-		else if (viewShape[i].unitType == 3)//绘制多边形
-		{
-
-		}
-		else if (viewShape[i].unitType == 4)//绘制多边形
-		{
-
-			BLine* m_line = new BLine(BGraphicsItem::ItemType::Line);
-
-			QPen pen = QPen(ColorHelper(viewShape[i].unitIdx), viewShape[i].nWH[0]);
-			pen.setStyle(Qt::SolidLine);
-			if (viewShape[i].unitIdx == 7 || viewShape[i].unitIdx == 5)
-			{
-				m_line->setBrush(ColorHelper(viewShape[i].unitIdx));
-			}
-			if (viewShape[i].unitIdx == 4)
-			{ 
-				pen.setColor(ColorHelper(viewShape[i].unitIdx)); 
-			}
-			m_line->setPen(pen);
-			for (size_t j = 0; j < viewShape[i].vCorner.size(); j++)
-			{
-				m_line->point.push_back(QPointF(viewShape[i].vCorner[j].nXY[0], viewShape[i].vCorner[j].nXY[1]));
-				if (viewShape[i].unitIdx == 4)
-				{
-					m_line->lineWidth.push_back(viewShape[i].vCorner[j].nLineWidth);
-				}
-			}
-			pSceneMain.addItem(m_line);
-		}
-	}
-
-
-
-	graphicsViewMain->hide();
-	graphicsViewMain->show();
 }
 
 //清除画布数据
@@ -703,143 +540,3 @@ void WarheadParaModel::SceneMainClear()
 		pSceneMain.addLine(y, 0, y, pAuxiliaryLine / 2, QPen(Qt::red));
 }
 #pragma endregion
-
-
-QColor WarheadParaModel::ColorHelper(int unitIdx)
-{
-	if (unitIdx == 1)
-	{
-		return QColor(47, 65, 80);
-	}
-	else if (unitIdx == 2)
-	{
-		return QColor(69, 173, 206);
-	}
-	else if (unitIdx == 3)
-	{
-		return QColor(62, 179, 203);
-	}
-	else if (unitIdx == 4)
-	{
-		return QColor(255, 0, 255);
-	}
-	else if (unitIdx == 5)
-	{
-		return QColor(255, 255, 255);
-	}
-	else if (unitIdx == 6)
-	{
-		return QColor(170, 101, 96);
-	}
-	else if (unitIdx == 7)
-	{
-		return QColor(254, 235, 248);
-	}
-	else if (unitIdx == 8)
-	{
-		return QColor(204, 178, 102);
-	}
-	else if (unitIdx == 9)
-	{
-		return QColor(255, 127, 0);
-	}
-	else if (unitIdx == 11)
-	{
-		return QColor(255, 131, 158);
-	}
-	else if (unitIdx == 12)
-	{
-		return QColor(255, 255, 122);
-	}
-	else if (unitIdx == 13)
-	{
-		return QColor(190, 255, 255);
-	}
-	return QColor(72, 104, 146);
-}
-//重新加载模型属性
-void WarheadParaModel::ReLoadModelProperty()
-{
-	if (vLoadWarhead.mapArmHead.size() == 0)
-		return;
-	QWidget* temp = new QWidget();
-	pArmHeadEdit.clear();
-	QFormLayout* pLayout = new QFormLayout();
-	for (vector<PARADES>::const_iterator iter = vLoadWarhead.mapArmHead.begin(); iter != vLoadWarhead.mapArmHead.end(); iter++)
-	{
-		QLabel* unitName = new QLabel(iter->sUnitName);
-		unitName->setFixedWidth(100);
-		QLineEdit* txt = new QLineEdit(QString("%1").arg(iter->nUnitPropty));
-		pLayout->addRow(unitName, txt);
-		pArmHeadEdit.push_back(txt);
-	}
-
-	QLabel* unitName = new QLabel("曲线点");
-	unitName->setFixedWidth(100);
-	QLineEdit* txt = new QLineEdit(QString("%1").arg(5));
-	pLayout->addRow(unitName, txt);
-	pArmHeadEdit.push_back(txt);
-
-	QPushButton* pApplyBtn = new QPushButton("应用", this);
-	pApplyBtn->setIcon(QIcon(":/shaders/res/ToolIcon/run.png"));
-	pApplyBtn->setFixedWidth(100);
-	connect(pApplyBtn, &QPushButton::clicked, this, &WarheadParaModel::ApplyDataAction);
-	pLayout->addRow(pApplyBtn);
-	temp->setLayout(pLayout);
-	LoadModeTreeProperty->setWidget(temp);
-}
-/// <summary>
-/// 重新加载模型树
-/// </summary>
-void WarheadParaModel::ReLoadModelTree()
-{
-	if (vLoadWarhead.mapArmHead.size() == 0)
-		return;
-	QWidget* mytreewidget = new QWidget();
-	QTreeWidget* pLoadModelTreeWidget = new QTreeWidget(mytreewidget);
-	pLoadModelTreeWidget->setHeaderHidden(true);
-	for (vector<PARADES>::const_iterator iter = vLoadWarhead.mapArmHead.begin(); iter != vLoadWarhead.mapArmHead.end(); iter++)
-	{
-		QTreeWidgetItem* rootItem = new QTreeWidgetItem(pLoadModelTreeWidget);
-		rootItem->setText(0, iter->sUnitName);
-		rootItem->setCheckState(0, Qt::Checked);
-		rootItem->setData(0, Qt::UserRole, iter->sUnitName);
-	}
-	//复选选中
-	connect(pLoadModelTreeWidget, &QTreeWidget::itemChanged, this, [=](QTreeWidgetItem* item, int column)
-		{
-			if (if_data == 0)
-			{
-				MyLogOutput("当前无画布信息，请新建或者打开后在操作");
-				return;
-			}
-			QVariant variant = item->data(0, Qt::UserRole);
-			QString sUnitName = variant.value<QString>();
-			if (item->checkState(0) == Qt::Checked)
-			{
-				//选中
-				int x = 0;
-			}
-			else
-			{
-				//未选中
-				int x = 1;
-			}
-		});
-
-	//树按钮响应
-	connect(pLoadModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, [=](QTreeWidgetItem* item, int column)
-		{
-			if (item->checkState(0) == Qt::Checked)
-			{
-				item->setCheckState(0, Qt::Unchecked);
-			}
-			else
-			{
-				item->setCheckState(0, Qt::Checked);
-			}
-		});
-
-	LoadModeTreeWidget->setWidget(pLoadModelTreeWidget);
-	pLoadModelTreeWidget->expandAll();
-}
