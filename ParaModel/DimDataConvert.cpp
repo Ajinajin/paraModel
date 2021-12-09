@@ -164,6 +164,8 @@ int DimDataConvert::CalWallShape(int nUnitIdx, VTOPOTABLE& vLayerTopo, VSHAPE& v
 	vPlaneDraw[nUnitIdx] = oWallShape;
 
 	return 0;
+	//
+	int a = 8;
 }
 
 // 基于墙基础上计算门窗
