@@ -103,10 +103,10 @@ void WarheadParaModel::InitEditManagerWidget(QDockWidget* from)
 //初始化三维显示窗口
 void WarheadParaModel::InitOpenGlWidget(QDockWidget* from)
 {
-	paraOglmanagerMain = new ParaOGLManager();
-	paraOglmanagerMain->setMinimumHeight(100);
-	from->setWindowTitle("三维视图");
-	from->setWidget(paraOglmanagerMain);
+	warheadParaOglmanager = new WarheadOGLManager();
+	warheadParaOglmanager->setMinimumHeight(100);
+	from->setWindowTitle("战斗部三维视图");
+	from->setWidget(warheadParaOglmanager);
 	//中间大屏三位窗口
 	from->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
 	QTimer* timer = new QTimer(this);
@@ -118,7 +118,7 @@ void WarheadParaModel::InitOpenGlWidget(QDockWidget* from)
 //更新OpenGL窗口
 void WarheadParaModel::updateOGL()
 {
-	paraOglmanagerMain->update();
+	warheadParaOglmanager->update();
 
 }
 
