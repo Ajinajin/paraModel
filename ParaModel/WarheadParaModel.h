@@ -19,7 +19,7 @@
 #include "bqgraphicsitem.h"
 #include "bqgraphicsscene.h"
 
-#include "paraoglmanager.h"
+#include "WarheadOglManager.h"
 #include "SARibbonMainWindow.h"
 #include <ParaType.h>
 
@@ -50,7 +50,7 @@ private:
 
 	BQGraphicsView* graphicsViewMain;				// 二维模型三维视图
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布 
-	ParaOGLManager* paraOglmanagerMain;				// 三维显示
+	WarheadOGLManager* warheadParaOglmanager;				// 战斗部三维显示
 
 
 	int if_data;									//0是未加载数据。1是有数据
