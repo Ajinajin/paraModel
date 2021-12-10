@@ -138,7 +138,11 @@ void WarheadOGLManager::paintGL()
 
 
 	//DrawRing(center,4,2);
-	DrawFuse(center,2,2,1,2);
+	//DrawFuse(center,2,2,1,2);
+
+
+	//»æÖÆÒ»¸öµ¯
+
 }
 
 
