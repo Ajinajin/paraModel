@@ -31,16 +31,12 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-<<<<<<< HEAD
-    <QtInstall>msvc2017_64</QtInstall>
-=======
     <QtInstall>5.12.11</QtInstall>
->>>>>>> 86c2c30fe7520ea210275a00186eee4dbce59859
     <QtModules>axcontainer;axserver;core;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>msvc2017_64</QtInstall>
+    <QtInstall>5.12.11</QtInstall>
     <QtModules>core;gui;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
@@ -59,30 +55,18 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-<<<<<<< HEAD
-    <IncludePath>D:\gongzuo\paraModel\paraModel-1201\ParaModel\SARibbon\src\SARibbonBar;$(IncludePath)</IncludePath>
-=======
     <IncludePath>D:\Study\Work\HS\Ajinajin\paraModel\ParaModel\SARibbon\src\SARibbonBar;$(IncludePath)</IncludePath>
->>>>>>> 86c2c30fe7520ea210275a00186eee4dbce59859
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link />
     <ClCompile>
-<<<<<<< HEAD
-      <AdditionalIncludeDirectories>C:\Qt\5.12.11\msvc2017_64\lib;C:\Qt\5.12.11\msvc2017_64\include\ActiveQt;C:\Qt\5.12.11\msvc2017_64\include\QtXml;GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Link>
-      <AdditionalLibraryDirectories>C:\openssl\lib;C:\Utils\my_sql\mysql-5.6.11-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>shell32.lib;C:\Qt\5.12.11\msvc2017_64\lib\qtmaind.lib;C:\Qt\5.12.11\msvc2017_64\lib\Qt5AxContainerd.lib;C:\Qt\5.12.11\msvc2017_64\lib\Qt5AxBased.lib;C:\Qt\5.12.11\msvc2017_64\lib\Qt5Xmld.lib;D:\gongzuo\paraModel\paraModel-1201\ParaModel\SARibbon\bin_qt5.12.11_debug_64\SARibbonBard.lib;%(AdditionalDependencies)</AdditionalDependencies>
-=======
       <AdditionalIncludeDirectories>D:\Qt\5.12.11\5.12.11\msvc2017_64\lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\include\ActiveQt;D:\Qt\5.12.11\5.12.11\msvc2017_64\include\QtXml;GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\openssl\lib;C:\Utils\my_sql\mysql-5.6.11-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>shell32.lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\lib\qtmaind.lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\lib\Qt5AxContainerd.lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\lib\Qt5AxBased.lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\lib\Qt5Xmld.lib;D:\Study\Work\HS\Ajinajin\paraModel\ParaModel\SARibbon\bin_qt5.12.11_debug_64\SARibbonBard.lib;%(AdditionalDependencies)</AdditionalDependencies>
->>>>>>> 86c2c30fe7520ea210275a00186eee4dbce59859
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -122,12 +106,9 @@
     <ClCompile Include="ParaModel.cpp" />
     <ClCompile Include="resourcemanager.cpp" />
     <ClCompile Include="ShaderProc.cpp" />
-<<<<<<< HEAD
-=======
     <ClCompile Include="WarheadDataConvert.cpp" />
     <ClCompile Include="WarheadOglManager.cpp" />
     <ClCompile Include="WarheadParaModel.cpp" />
->>>>>>> 86c2c30fe7520ea210275a00186eee4dbce59859
     <QtRcc Include="ParaModel.qrc" />
     <QtUic Include="ParaModel.ui" />
     <QtMoc Include="ParaModel.h" />
@@ -139,12 +120,9 @@
     <ClInclude Include="ParaType.h" />
     <ClInclude Include="resourcemanager.h" />
     <ClInclude Include="ShaderProc.h" />
-<<<<<<< HEAD
-=======
     <ClInclude Include="WarheadDataConvert.h" />
     <ClInclude Include="WarheadOglManager.h" />
     <QtMoc Include="WarheadParaModel.h" />
->>>>>>> 86c2c30fe7520ea210275a00186eee4dbce59859
     <QtMoc Include="bqgraphicsscene.h" />
     <QtMoc Include="bqgraphicsitem.h" />
     <QtMoc Include="bpointitem.h" />
@@ -165,6 +143,8 @@
     <None Include="res\shaders\coordinate.vert" />
     <None Include="res\shaders\door.frag" />
     <None Include="res\shaders\door.vert" />
+    <None Include="res\shaders\GLSL_YELLOW.frag" />
+    <None Include="res\shaders\GLSL_YELLOW.vert" />
     <None Include="res\shaders\wall.frag" />
     <None Include="res\shaders\wall.vert" />
     <None Include="res\shaders\WarheadColumn.frag" />

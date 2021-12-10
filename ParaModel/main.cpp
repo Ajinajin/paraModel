@@ -1,4 +1,4 @@
-//#include "ParaModel.h"
+
 #include "WarheadParaModel.h"
 #include <QtWidgets/QApplication>
 #include <QApplication>
@@ -11,7 +11,6 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-	//ParaModel w;
 	WarheadParaModel w;
 	w.show();
 	//计时开始
