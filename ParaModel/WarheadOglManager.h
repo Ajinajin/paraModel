@@ -89,7 +89,7 @@ public:
 	GLfloat rotateRaw;											//每次对模型的raw旋转
 	GLfloat rotatePitch;										//每次对模型的pitch旋转
 
-
+	
 protected:
 	void mouseMoveEvent(QMouseEvent* event);
 	void wheelEvent(QWheelEvent* event) override;			//滚轮事件
