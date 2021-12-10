@@ -70,6 +70,8 @@
     <ClCompile Include="DimDataConvert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+<<<<<<< HEAD
+=======
     <ClCompile Include="WarheadParaModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -79,6 +81,7 @@
     <ClCompile Include="WarheadOglManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+>>>>>>> 86c2c30fe7520ea210275a00186eee4dbce59859
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLWidget.h">
@@ -105,12 +108,15 @@
     <ClInclude Include="DimDataConvert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+<<<<<<< HEAD
+=======
     <ClInclude Include="WarheadDataConvert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WarheadOglManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+>>>>>>> 86c2c30fe7520ea210275a00186eee4dbce59859
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="bqgraphicsscene.h">
@@ -123,9 +129,6 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="bqgraphicsview.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="WarheadParaModel.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
