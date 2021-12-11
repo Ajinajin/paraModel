@@ -27,8 +27,7 @@ fstream outfile("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/outtest.txt",fstr
 //参数 圆心	圆环大圆半径	圆环小圆半径	球半径	圆柱高度
 VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 {
-	
-	outfile <<  "R1="  << R1 << "R2=" << R2 << "r=" << r << endl;
+
 	
 
 	VFLOAT res;
@@ -51,9 +50,6 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 	//Beta是每个球所占用的弧度
 	float Beta = acos(C);
 
-	outfile << "C=" << C << endl;
-	outfile << "acos(C)=" << acos(C) << endl;
-
 	num = 2 * Pi / Beta;
 
 	for (int f = 0; f < floor; f++)
@@ -73,7 +69,6 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle);
 					resY = center.fXYZ[1] + f * floorheight;
 
-					/*outfile << "R1=" << sqrt((resX- center.fXYZ[0]) * (resX - center.fXYZ[0]) + (resZ - center.fXYZ[2]) * (resZ - center.fXYZ[2])) + r - R1 << endl;*/
 
 					res.push_back(resX);
 					res.push_back(resY);
@@ -82,16 +77,12 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 				else
 				{
 
-					/*outfile << "R2+r=" << R2 + r << " " << (R2 + r) * cos(angle) << " " << (R2 + r) * sin(angle) << " sqrt " <<
-						sqrt((R2 + r) * cos(angle) * (R2 + r) * cos(angle) + (R2 + r) * sin(angle) * (R2 + r) * sin(angle)) << endl;*/
 
 					resX = center.fXYZ[0] + (R2 + r + 0.005) * cos(angle);
 					resZ = center.fXYZ[2] + (R2 + r + 0.005) * sin(angle);
 					resY = center.fXYZ[1] + f * floorheight;
 
-					/*outfile << "R2222222+r=" << R2 + r << " " << (R2 + r) * cos(angle) << " " << (R2 + r) * sin(angle) << " sqrt " <<
-						sqrt((R2 + r) * cos(angle) * (R2 + r) * cos(angle) + (R2 + r) * sin(angle) * (R2 + r) * sin(angle)) << endl;
-					outfile << "R2=" << sqrt((resX - center.fXYZ[0]) * (resX - center.fXYZ[0]) + (resZ - center.fXYZ[2]) * (resZ - center.fXYZ[2])) + r - R1 << endl;*/
+					
 
 					res.push_back(resX);
 					res.push_back(resY);
@@ -111,13 +102,7 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 					resX = center.fXYZ[0] + (R1 - r - 0.005) * cos(angle);
 					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle);
 					resY = center.fXYZ[1] + f * floorheight;
-					//测试
-					/*cout << resX << endl;
-					cout << resY << endl;
-					cout << resZ << endl;
-					cout << "-------------" << endl;*/
 
-					/*outfile << "R1=" << sqrt((resX - center.fXYZ[0]) * (resX - center.fXYZ[0]) + (resZ - center.fXYZ[2]) * (resZ - center.fXYZ[2])) + r - R1 << endl;*/
 
 					res.push_back(resX);
 					res.push_back(resY);
@@ -125,23 +110,12 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 				}
 				else
 				{
-					/*outfile << "R2+r=" << R2 + r << " " << (R2 + r) * cos(angle) << " " << (R2 + r) * sin(angle) << " sqrt " <<
-						sqrt((R2 + r) * cos(angle) * (R2 + r) * cos(angle) + (R2 + r) * sin(angle) * (R2 + r) * sin(angle)) << endl;*/
 
 
 					resX = center.fXYZ[0] + (R2 + r + 0.005) * cos(angle);
 					resZ = center.fXYZ[2] + (R2 + r + 0.005) * sin(angle);
 					resY = center.fXYZ[1] + f * floorheight;
 
-					/*outfile << "R2222222+r=" << R2 + r << " " << (R2 + r) * cos(angle) << " " << (R2 + r) * sin(angle) << " sqrt " <<
-						sqrt((R2 + r) * cos(angle) * (R2 + r) * cos(angle) + (R2 + r) * sin(angle) * (R2 + r) * sin(angle)) << endl;
-					outfile << "R2=" << sqrt((resX ) * (resX ) + (resZ ) * (resZ)) + r - R1 << endl;*/
-
-					//测试
-					/*cout << resX << endl;
-					cout << resY << endl;
-					cout << resZ << endl;
-					cout << "-------------" << endl;*/
 
 					res.push_back(resX);
 					res.push_back(resY);
@@ -373,7 +347,7 @@ void WarheadOGLManager::paintGL()
 	
 	}
 	// 
-	
+	//InitSphere(1, -2, 0, 2);
 }
 
 
@@ -1258,121 +1232,213 @@ void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float hei
 
 void WarheadOGLManager::InitSphere(float centerX, float centerY, float centerZ, float radius)
 {
+	//球由很多层半径不同的圆圈组成,球面由三角面组成
 
-	float nStep = 30;
-	int nLoopNum = 360 / nStep;
-	double fPI = 3.14159265;
-	int nPixelNum = 12;
-	int nPtNum = nLoopNum * nLoopNum / 2 * nPixelNum;
+	int pointsNum = 10;		//每一层圆圈点的个数
+	int angleStep = 20;		//每次循环增加的角度
 
-	float* pSphereSurfaceData = new float[1000 * 3];//绘制球需要的数据集，用作根据三角面画球面
+	int ptNum = pointsNum * (180 / angleStep - 1) * 4;
+	float* pBallData = new float[ptNum * 3];
 
+	
+	vector<vector<Ver3D>> BallPoints;			//存储每一层圆圈上的点
 
-	//直接将点集内存更新
-	int i = 0, j = 0;
-	int nLineNum = nLoopNum * nPixelNum;
-	double fA1, fA2, fA3, fA4;
-	double fSin1, fCos1, fSin2, fCos2, temp, temp1;
-	int nRatio = 1;
-	// 生成球数据
-	for (i = 0; i < nLoopNum / 2; i++)
+	for (int angle = 0; angle < 180; angle += angleStep)
 	{
-		fA1 = i * nStep * fPI / 180.0;
-		fA3 = (i + 1) * nStep * fPI / 180.0;
+		BallPoints.resize(180 / angleStep);
 
-		fSin1 = sin(fA1) / nRatio;
-		fCos1 = cos(fA1) / nRatio;
-
-		for (j = 0; j < nLoopNum; j++)
+		float cirLayR = radius * cos(2 * 3.14 * angle / 180.0);		//每一层圆圈的半径
+		float cirLayY = radius * sin(2 * 3.14 * angle / 180.0) + centerY;		//每一层圆圈的圆心的Y值
+		
+		for (int i = 0; i < pointsNum; i++)
 		{
-			float angle = 60.0;
-			fA2 = j * nStep * fPI / angle;
-			fSin2 = fSin1 * sin(fA2);
-			fCos2 = fSin1 * cos(fA2);
+			Ver3D tmp;
+			tmp.fXYZ[0] = cirLayR * cos(2 * 3.14 * i / pointsNum) + centerX;
+			tmp.fXYZ[1] = cirLayY;
+			tmp.fXYZ[2] = cirLayR * sin(2 * 3.14 * i / pointsNum) + centerZ;
 
-			// 			pSphereData[i*nLineNum + j + 0] = fCos1;
-			// 			pSphereData[i*nLineNum + j + 1] = fSin2;
-			// 			pSphereData[i*nLineNum + j + 2] = fCos2;
-						/*pSphereData[i*nLineNum + j * nPixelNum + 0] = centerX;
-						pSphereData[i*nLineNum + j * nPixelNum + 1] = centerY;
-						pSphereData[i*nLineNum + j * nPixelNum + 2] = centerZ;
-						pSphereData[i*nLineNum + j * nPixelNum + 3] = fCos1;
-						pSphereData[i*nLineNum + j * nPixelNum + 4] = fSin2;
-						pSphereData[i*nLineNum + j * nPixelNum + 5] = fCos2;*/
-
-
-						//pSphereData[i * nLineNum + j + 6] = j % 8 + 1;
-
-
-						//组织球面三角面的各个顶点
-			pSphereSurfaceData[i * nLineNum + j * 18 + 0] = radius * fCos1 + centerX;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 1] = radius * fSin2 + centerY;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 2] = radius * fCos2 + centerZ;
-
-			pSphereSurfaceData[i * nLineNum + j * 18 + 9] = radius * fCos1 + centerX;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 10] = radius * fSin2 + centerY;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 11] = radius * fCos2 + centerZ;
-
-			fA2 = (j + 1) * nStep * fPI / angle;
-			fSin2 = fSin1 * sin(fA2);
-			fCos2 = fSin1 * cos(fA2);
-			pSphereSurfaceData[i * nLineNum + j * 18 + 15] = radius * fCos1 + centerX;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 16] = radius * fSin2 + centerY;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 17] = radius * fCos2 + centerZ;
-
-			temp = sin(fA3) / nRatio;
-			temp1 = cos(fA3) / nRatio;
-			fA2 = (j)*nStep * fPI / angle;
-			fSin2 = temp * sin(fA2);
-			fCos2 = temp * cos(fA2);
-			pSphereSurfaceData[i * nLineNum + j * 18 + 3] = radius * temp1 + centerX;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 4] = radius * fSin2 + centerY;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 5] = radius * fCos2 + centerZ;
-
-			fA2 = (j + 1) * nStep * fPI / angle;
-			fSin2 = temp * sin(fA2);
-			fCos2 = temp * cos(fA2);
-			pSphereSurfaceData[i * nLineNum + j * 18 + 6] = radius * temp1 + centerX;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 7] = radius * fSin2 + centerY;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 8] = radius * fCos2 + centerZ;
-
-			pSphereSurfaceData[i * nLineNum + j * 18 + 12] = radius * temp1 + centerX;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 13] = radius * fSin2 + centerY;
-			pSphereSurfaceData[i * nLineNum + j * 18 + 14] = radius * fCos2 + centerZ;
-
-
+			BallPoints[angle / angleStep].push_back(tmp);
 		}
 	}
 
+	//按画矩形的方式存储数据
+	for (int i = 0; i < BallPoints.size() - 1; i++)
+	{
+		for (int j = 0; j < pointsNum - 1; j++)
+		{
+			pBallData[i * pointsNum * 12 + j * 12] = BallPoints[i][j].fXYZ[0];
+			pBallData[i * pointsNum * 12 + j * 12 + 1] = BallPoints[i][j].fXYZ[1];
+			pBallData[i * pointsNum * 12 + j * 12 + 2] = BallPoints[i][j].fXYZ[2];
 
-	//绘制球面三角面
+			pBallData[i * pointsNum * 12 + j * 12 + 3] = BallPoints[i][j+1].fXYZ[0];
+			pBallData[i * pointsNum * 12 + j * 12 + 4] = BallPoints[i][j+1].fXYZ[1];
+			pBallData[i * pointsNum * 12 + j * 12 + 5] = BallPoints[i][j+1].fXYZ[2];
+
+			pBallData[i * pointsNum * 12 + j * 12 + 6] = BallPoints[i+1][j + 1].fXYZ[0];
+			pBallData[i * pointsNum * 12 + j * 12 + 7] = BallPoints[i+1][j + 1].fXYZ[1];
+			pBallData[i * pointsNum * 12 + j * 12 + 8] = BallPoints[i+1][j + 1].fXYZ[2];
+
+			pBallData[i * pointsNum * 12 + j * 12 + 9] = BallPoints[i + 1][j].fXYZ[0];
+			pBallData[i * pointsNum * 12 + j * 12 + 10] = BallPoints[i + 1][j].fXYZ[1];
+			pBallData[i * pointsNum * 12 + j * 12 + 11] = BallPoints[i + 1][j].fXYZ[2];
+		}
+		//每一层的最后一个面
+		{
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12] = BallPoints[i][pointsNum - 1].fXYZ[0];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 1] = BallPoints[i][pointsNum - 1].fXYZ[1];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 2] = BallPoints[i][pointsNum - 1].fXYZ[2];
+
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 3] = BallPoints[i][0].fXYZ[0];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 4] = BallPoints[i][0].fXYZ[1];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 5] = BallPoints[i][0].fXYZ[2];
+
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 6] = BallPoints[i + 1][0].fXYZ[0];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 7] = BallPoints[i + 1][0].fXYZ[1];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 8] = BallPoints[i + 1][0].fXYZ[2];
+
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 9] = BallPoints[i + 1][pointsNum - 1].fXYZ[0];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 10] = BallPoints[i + 1][pointsNum - 1].fXYZ[1];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 11] = BallPoints[i + 1][pointsNum - 1].fXYZ[2];
+		}
+	}
+	
+
 	pCore->glGenBuffers(1, &VBO);
-
 	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	pCore->glBufferData(GL_ARRAY_BUFFER, nPtNum * sizeof(float), pSphereSurfaceData, GL_STATIC_DRAW);
+	pCore->glBufferData(GL_ARRAY_BUFFER, ptNum * 3 * sizeof(float), pBallData, GL_STATIC_DRAW);
 
-
-
-	//根据三角面片画从圆心爆炸的球
+	//draw
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	pCore->glEnableVertexAttribArray(0);
-	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0 * sizeof(float)));
+	pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-	int nNum = 72 * 72;
+
+
+	pCore->glDrawArrays(GL_QUADS, 0, ptNum);
+	
+
+	//delete
+	pCore->glDeleteBuffers(1, &VBO);
+	delete[] pBallData;
+
+
+	//********************************************************************************************
+
+
+	//float nStep = 30;
+	//int nLoopNum = 360 / nStep;
+	//double fPI = 3.14159265;
+	//int nPixelNum = 12;
+	//int nPtNum = nLoopNum * nLoopNum / 2 * nPixelNum;
+
+	//float* pSphereSurfaceData = new float[1000 * 3];//绘制球需要的数据集，用作根据三角面画球面
+
+
+	////直接将点集内存更新
+	//int i = 0, j = 0;
+	//int nLineNum = nLoopNum * nPixelNum;
+	//double fA1, fA2, fA3, fA4;
+	//double fSin1, fCos1, fSin2, fCos2, temp, temp1;
+	//int nRatio = 1;
+	//// 生成球数据
+	//for (i = 0; i < nLoopNum / 2; i++)
+	//{
+	//	fA1 = i * nStep * fPI / 180.0;
+	//	fA3 = (i + 1) * nStep * fPI / 180.0;
+
+	//	fSin1 = sin(fA1) / nRatio;
+	//	fCos1 = cos(fA1) / nRatio;
+
+	//	for (j = 0; j < nLoopNum; j++)
+	//	{
+	//		float angle = 60.0;
+	//		fA2 = j * nStep * fPI / angle;
+	//		fSin2 = fSin1 * sin(fA2);
+	//		fCos2 = fSin1 * cos(fA2);
+
+	//		// 			pSphereData[i*nLineNum + j + 0] = fCos1;
+	//		// 			pSphereData[i*nLineNum + j + 1] = fSin2;
+	//		// 			pSphereData[i*nLineNum + j + 2] = fCos2;
+	//					/*pSphereData[i*nLineNum + j * nPixelNum + 0] = centerX;
+	//					pSphereData[i*nLineNum + j * nPixelNum + 1] = centerY;
+	//					pSphereData[i*nLineNum + j * nPixelNum + 2] = centerZ;
+	//					pSphereData[i*nLineNum + j * nPixelNum + 3] = fCos1;
+	//					pSphereData[i*nLineNum + j * nPixelNum + 4] = fSin2;
+	//					pSphereData[i*nLineNum + j * nPixelNum + 5] = fCos2;*/
+
+
+	//					//pSphereData[i * nLineNum + j + 6] = j % 8 + 1;
+
+
+	//					//组织球面三角面的各个顶点
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 0] = radius * fCos1 + centerX;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 1] = radius * fSin2 + centerY;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 2] = radius * fCos2 + centerZ;
+
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 9] = radius * fCos1 + centerX;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 10] = radius * fSin2 + centerY;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 11] = radius * fCos2 + centerZ;
+
+	//		fA2 = (j + 1) * nStep * fPI / angle;
+	//		fSin2 = fSin1 * sin(fA2);
+	//		fCos2 = fSin1 * cos(fA2);
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 15] = radius * fCos1 + centerX;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 16] = radius * fSin2 + centerY;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 17] = radius * fCos2 + centerZ;
+
+	//		temp = sin(fA3) / nRatio;
+	//		temp1 = cos(fA3) / nRatio;
+	//		fA2 = (j)*nStep * fPI / angle;
+	//		fSin2 = temp * sin(fA2);
+	//		fCos2 = temp * cos(fA2);
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 3] = radius * temp1 + centerX;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 4] = radius * fSin2 + centerY;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 5] = radius * fCos2 + centerZ;
+
+	//		fA2 = (j + 1) * nStep * fPI / angle;
+	//		fSin2 = temp * sin(fA2);
+	//		fCos2 = temp * cos(fA2);
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 6] = radius * temp1 + centerX;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 7] = radius * fSin2 + centerY;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 8] = radius * fCos2 + centerZ;
+
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 12] = radius * temp1 + centerX;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 13] = radius * fSin2 + centerY;
+	//		pSphereSurfaceData[i * nLineNum + j * 18 + 14] = radius * fCos2 + centerZ;
+
+
+	//	}
+	//}
+
+
+	////绘制球面三角面
+	//pCore->glGenBuffers(1, &VBO);
+
+	//pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//pCore->glBufferData(GL_ARRAY_BUFFER, nPtNum * sizeof(float), pSphereSurfaceData, GL_STATIC_DRAW);
+
+
+
+	////根据三角面片画从圆心爆炸的球
+	//pCore->glEnableVertexAttribArray(0);
+	//pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0 * sizeof(float)));
+
+	//int nNum = 72 * 72;
 
 	//pCore->glDepthMask(GL_FALSE);//取消深度缓冲
 	//pCore->glEnable(GL_BLEND);//开启颜色混合
 	//pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 
-	pCore->glDrawArrays(GL_TRIANGLES, 0, nNum);
+	//pCore->glDrawArrays(GL_TRIANGLES, 0, nNum);
 
 	/*pCore->glDisable(GL_BLEND);
 	pCore->glDepthMask(GL_TRUE);*/
 
 
 	//delete
-	pCore->glDeleteBuffers(1, &VBO);
-	delete[] pSphereSurfaceData;
+	/*pCore->glDeleteBuffers(1, &VBO);
+	delete[] pSphereSurfaceData;*/
 }
 
 void WarheadOGLManager::DrawColumnRing(Ver3D center, float radius, float height, float radius2)
