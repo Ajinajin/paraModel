@@ -70,10 +70,16 @@
     <ClCompile Include="DimDataConvert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WarheadDataConvert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="WarheadParaModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WarheadDataConvert.cpp">
+    <ClCompile Include="BezierOpt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BezierWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WarheadOglManager.cpp">
@@ -108,6 +114,9 @@
     <ClInclude Include="WarheadDataConvert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BezierOpt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="WarheadOglManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -128,14 +137,11 @@
     <QtMoc Include="WarheadParaModel.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="BezierWidget.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\GLSL_YELLOW.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\shaders\GLSL_YELLOW.vert">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\shaders\coordinate.frag">
       <Filter>Resource Files</Filter>
     </None>
@@ -176,6 +182,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\shaders\window.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\WarheadSphere.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\shaders\WarheadSphere.vert">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\shaders\WarheadColumn.frag">

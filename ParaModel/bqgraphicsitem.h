@@ -14,13 +14,14 @@ class BGraphicsItem : public QObject, public QAbstractGraphicsShapeItem
 
 public:
 	enum ItemType {
-		Circle = 0,         // 圆
-		Ellipse,            // 椭圆
+		Square = 0,         // 正方形
 		Rectangle,          // 矩形
-		Square,             // 正方形
-		Polygon,            // 多边形
+		Circle,				// 圆
 		Line,				// 线
-		Point,            // 点
+		Curve,				// 曲线
+		Polygon,            // 多边形
+		Ellipse,            // 椭圆
+		Point,				// 点
 	};
 	QPointF m_oldleftup;       //中心点，拖动图形
 	QPointF m_center;          //中心点，拖动图形
@@ -167,9 +168,39 @@ protected:
 
 //------------------------------------------------------------------------------
 
+// 曲线
+class BCurveLine : public BGraphicsItem
+{
+	Q_OBJECT
+public:
+	BCurveLine(ItemType type);
+	QList<QPointF> lstCtrlPt;				// 控制点集
+	QList<QPointF> lstCurvePt;				// 曲线上的点集
+	float fLnWidth;							// 曲线宽度
+	QPen  oCtrlPen;							// 控制点连线画笔
+	QPen  oCurvePen;						// 曲线画笔
+	bool bCalCurveData;						// 曲线点数据计算标志
+public:
+	QPoint bezier(double t); 
+
+protected:
+
+	virtual QRectF boundingRect() const override;
+
+	virtual void paint(QPainter* painter,
+		const QStyleOptionGraphicsItem* option,
+		QWidget* widget) override;
+	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+
+};
+
+//------------------------------------------------------------------------------
 
 
 //------------------------------------------------------------------------------
+
 
 // 线
 class BLine : public BGraphicsItem
@@ -191,7 +222,6 @@ protected:
 };
 
 //------------------------------------------------------------------------------
-
 
 
 //------------------------------------------------------------------------------

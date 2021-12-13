@@ -67,7 +67,7 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 
 					resX = center.fXYZ[0] + (R1 - r - 0.005) * cos(angle);
 					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle);
-					resY = center.fXYZ[1] + f * floorheight;
+					resY = center.fXYZ[1] + r + f * floorheight;
 
 
 					res.push_back(resX);
@@ -80,7 +80,7 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 
 					resX = center.fXYZ[0] + (R2 + r + 0.005) * cos(angle);
 					resZ = center.fXYZ[2] + (R2 + r + 0.005) * sin(angle);
-					resY = center.fXYZ[1] + f * floorheight;
+					resY = center.fXYZ[1] + r + f * floorheight;
 
 					
 
@@ -101,7 +101,7 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 				{
 					resX = center.fXYZ[0] + (R1 - r - 0.005) * cos(angle);
 					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle);
-					resY = center.fXYZ[1] + f * floorheight;
+					resY = center.fXYZ[1] + r + f * floorheight;
 
 
 					res.push_back(resX);
@@ -114,7 +114,7 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 
 					resX = center.fXYZ[0] + (R2 + r + 0.005) * cos(angle);
 					resZ = center.fXYZ[2] + (R2 + r + 0.005) * sin(angle);
-					resY = center.fXYZ[1] + f * floorheight;
+					resY = center.fXYZ[1] + r + f * floorheight;
 
 
 					res.push_back(resX);
@@ -180,7 +180,7 @@ void WarheadOGLManager::initializeGL()
 	/************ 载入shader ***********/
 
 	ResourceManager::loadShader("warhead", ":/shaders/res/shaders/WarheadColumn.vert", ":/shaders/res/shaders/WarheadColumn.frag");
-	
+	ResourceManager::loadShader("WarheadSphere", ":/shaders/res/shaders/WarheadSphere.vert", ":/shaders/res/shaders/WarheadSphere.frag");
 
 	/************ 载入Texture ***********/
 	//ResourceManager::loadTexture("brickwall", ":/textures/res/textures/brickwall.jpg");
@@ -192,7 +192,7 @@ void WarheadOGLManager::initializeGL()
 	QMatrix4x4 projection, view;
 	//给着色器变量赋值
 	ResourceManager::getShader("warhead").use().setMatrix4f("model", model);
-	
+	ResourceManager::getShader("WarheadSphere").use().setMatrix4f("model", model);
 
 	/***********  处理Uniform Buffer相关参数 **************/
 	/*
@@ -244,6 +244,11 @@ void WarheadOGLManager::paintGL()
 	
 	ResourceManager::getShader("warhead").use();
 	ResourceManager::getShader("warhead").use().setFloat("tranS",0.25);
+
+	
+	
+
+
 	Ver3D center;
 	center.fXYZ[0] = 0.0f, center.fXYZ[1] = 0.0f, center.fXYZ[2] = 0.0f;
 	//InitAndDrawColumn(center,1,2);
@@ -264,7 +269,7 @@ void WarheadOGLManager::paintGL()
 
 		float sideR1=4.2, sideR2 =3.8, sideR3 =3.5,sideH = 10.0;			//弹壳侧面三层圆柱半径与高度
 
-		float fragR = 0.15;			//球状弹丸半径
+		float fragR = 0.125;			//球状弹丸半径
 
 		//弹柱体底面壳
 		{
@@ -335,19 +340,18 @@ void WarheadOGLManager::paintGL()
 
 		//绘制球状破片
 		{
-			for (int i = 0; i < res.size()/3; i++)
-			{
-				ResourceManager::getShader("warhead").use().setFloat("R", 255);
-				ResourceManager::getShader("warhead").use().setFloat("G", 0);
-				ResourceManager::getShader("warhead").use().setFloat("B", 0);
-				InitSphere(res[i * 3], res[i * 3 + 1], res[i * 3 + 2], fragR);
-			}
+			
+			ResourceManager::getShader("WarheadSphere").use();
+			ResourceManager::getShader("WarheadSphere").use().setFloat("R", 255);
+			ResourceManager::getShader("WarheadSphere").use().setFloat("G", 0);
+			ResourceManager::getShader("WarheadSphere").use().setFloat("B", 0);
+			DrawSphere(res, fragR);
+			
 			
 		}
 	
 	}
-	// 
-	//InitSphere(1, -2, 0, 2);
+
 }
 
 
@@ -363,12 +367,15 @@ void WarheadOGLManager::updateGL()
 	//projection.frustum(1000, 1000, 1000, 1000, 1, 1000);
 	view = camera->getViewMatrix();
 
-	
 	ResourceManager::getShader("warhead").use().setMatrix4f("model", targetModel);
 	ResourceManager::getShader("warhead").use().setMatrix4f("projection", projection);
 	ResourceManager::getShader("warhead").use().setMatrix4f("view", view);
 
-	
+
+	ResourceManager::getShader("WarheadSphere").use().setMatrix4f("model", targetModel);
+	ResourceManager::getShader("WarheadSphere").use().setMatrix4f("projection", projection);
+	ResourceManager::getShader("WarheadSphere").use().setMatrix4f("view", view);
+
 
 
 	/***********  处理Uniform Buffer相关参数 **************/
@@ -1230,10 +1237,11 @@ void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float hei
 }
 
 
-void WarheadOGLManager::InitSphere(float centerX, float centerY, float centerZ, float radius)
+void WarheadOGLManager::DrawSphere(VFLOAT centers,float radius)
 {
-	//球由很多层半径不同的圆圈组成,球面由三角面组成
+	
 
+	//球由很多层半径不同的圆圈组成,球面由三角面组成
 	int pointsNum = 10;		//每一层圆圈点的个数
 	int angleStep = 20;		//每次循环增加的角度
 
@@ -1241,25 +1249,26 @@ void WarheadOGLManager::InitSphere(float centerX, float centerY, float centerZ, 
 	float* pBallData = new float[ptNum * 3];
 
 	
+	//最初始的一个球
 	vector<vector<Ver3D>> BallPoints;			//存储每一层圆圈上的点
-
 	for (int angle = 0; angle < 180; angle += angleStep)
 	{
 		BallPoints.resize(180 / angleStep);
 
 		float cirLayR = radius * cos(2 * 3.14 * angle / 180.0);		//每一层圆圈的半径
-		float cirLayY = radius * sin(2 * 3.14 * angle / 180.0) + centerY;		//每一层圆圈的圆心的Y值
+		float cirLayY = radius * sin(2 * 3.14 * angle / 180.0) + centers[1];		//每一层圆圈的圆心的Y值
 		
 		for (int i = 0; i < pointsNum; i++)
 		{
 			Ver3D tmp;
-			tmp.fXYZ[0] = cirLayR * cos(2 * 3.14 * i / pointsNum) + centerX;
+			tmp.fXYZ[0] = cirLayR * cos(2 * 3.14 * i / pointsNum) + centers[0];
 			tmp.fXYZ[1] = cirLayY;
-			tmp.fXYZ[2] = cirLayR * sin(2 * 3.14 * i / pointsNum) + centerZ;
+			tmp.fXYZ[2] = cirLayR * sin(2 * 3.14 * i / pointsNum) + centers[2];
 
 			BallPoints[angle / angleStep].push_back(tmp);
 		}
 	}
+
 
 	//按画矩形的方式存储数据
 	for (int i = 0; i < BallPoints.size() - 1; i++)
@@ -1303,142 +1312,60 @@ void WarheadOGLManager::InitSphere(float centerX, float centerY, float centerZ, 
 	}
 	
 
+	//outfile << pBallData[0] << " " << pBallData[1] << " " << pBallData[2] << endl;
+
+
+
+	//InitStance
+	
+	//不同实例球的位置偏移量存储
+	float* translations = new float[centers.size()];
+	for (int i = 0; i < centers.size() / 3; i++)
+	{
+		//基于第一个球位置的偏移量
+		translations[i * 3] = centers[i * 3] - centers[0];
+		translations[i * 3 + 1] = centers[i * 3 + 1] - centers[1];
+		translations[i * 3 + 2] = centers[i * 3 + 2] - centers[2];
+
+	}
+
+
+	//球面相关数据
+
 	pCore->glGenBuffers(1, &VBO);
 	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	pCore->glBufferData(GL_ARRAY_BUFFER, ptNum * 3 * sizeof(float), pBallData, GL_STATIC_DRAW);
 
-	//draw
+	//数据读入gpu中
 	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	pCore->glEnableVertexAttribArray(0);
 	pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//pCore->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
+	////opengl 实例化相关参数
+	pCore->glGenBuffers(1, &instanceVBO);
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	pCore->glBufferData(GL_ARRAY_BUFFER, centers.size() * sizeof(float), translations, GL_STATIC_DRAW);
+	//pCore->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	pCore->glDrawArrays(GL_QUADS, 0, ptNum);
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	pCore->glEnableVertexAttribArray(1);
+	pCore->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//pCore->glBindBuffer(GL_ARRAY_BUFFER, 0);
+	pCore->glVertexAttribDivisor(1, 1);//属性为1的数据，每次实例化一次改变一次
+
+
+	//draw
+	//pCore->glBindVertexArray(0);
+	pCore->glDrawArraysInstanced(GL_QUADS, 0, ptNum, centers.size()/3);//实例化绘制球
+	//pCore->glDrawArrays(GL_QUADS, 0, ptNum);//实例化绘制球
 	
-
 	//delete
 	pCore->glDeleteBuffers(1, &VBO);
 	delete[] pBallData;
-
-
-	//********************************************************************************************
-
-
-	//float nStep = 30;
-	//int nLoopNum = 360 / nStep;
-	//double fPI = 3.14159265;
-	//int nPixelNum = 12;
-	//int nPtNum = nLoopNum * nLoopNum / 2 * nPixelNum;
-
-	//float* pSphereSurfaceData = new float[1000 * 3];//绘制球需要的数据集，用作根据三角面画球面
-
-
-	////直接将点集内存更新
-	//int i = 0, j = 0;
-	//int nLineNum = nLoopNum * nPixelNum;
-	//double fA1, fA2, fA3, fA4;
-	//double fSin1, fCos1, fSin2, fCos2, temp, temp1;
-	//int nRatio = 1;
-	//// 生成球数据
-	//for (i = 0; i < nLoopNum / 2; i++)
-	//{
-	//	fA1 = i * nStep * fPI / 180.0;
-	//	fA3 = (i + 1) * nStep * fPI / 180.0;
-
-	//	fSin1 = sin(fA1) / nRatio;
-	//	fCos1 = cos(fA1) / nRatio;
-
-	//	for (j = 0; j < nLoopNum; j++)
-	//	{
-	//		float angle = 60.0;
-	//		fA2 = j * nStep * fPI / angle;
-	//		fSin2 = fSin1 * sin(fA2);
-	//		fCos2 = fSin1 * cos(fA2);
-
-	//		// 			pSphereData[i*nLineNum + j + 0] = fCos1;
-	//		// 			pSphereData[i*nLineNum + j + 1] = fSin2;
-	//		// 			pSphereData[i*nLineNum + j + 2] = fCos2;
-	//					/*pSphereData[i*nLineNum + j * nPixelNum + 0] = centerX;
-	//					pSphereData[i*nLineNum + j * nPixelNum + 1] = centerY;
-	//					pSphereData[i*nLineNum + j * nPixelNum + 2] = centerZ;
-	//					pSphereData[i*nLineNum + j * nPixelNum + 3] = fCos1;
-	//					pSphereData[i*nLineNum + j * nPixelNum + 4] = fSin2;
-	//					pSphereData[i*nLineNum + j * nPixelNum + 5] = fCos2;*/
-
-
-	//					//pSphereData[i * nLineNum + j + 6] = j % 8 + 1;
-
-
-	//					//组织球面三角面的各个顶点
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 0] = radius * fCos1 + centerX;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 1] = radius * fSin2 + centerY;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 2] = radius * fCos2 + centerZ;
-
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 9] = radius * fCos1 + centerX;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 10] = radius * fSin2 + centerY;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 11] = radius * fCos2 + centerZ;
-
-	//		fA2 = (j + 1) * nStep * fPI / angle;
-	//		fSin2 = fSin1 * sin(fA2);
-	//		fCos2 = fSin1 * cos(fA2);
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 15] = radius * fCos1 + centerX;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 16] = radius * fSin2 + centerY;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 17] = radius * fCos2 + centerZ;
-
-	//		temp = sin(fA3) / nRatio;
-	//		temp1 = cos(fA3) / nRatio;
-	//		fA2 = (j)*nStep * fPI / angle;
-	//		fSin2 = temp * sin(fA2);
-	//		fCos2 = temp * cos(fA2);
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 3] = radius * temp1 + centerX;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 4] = radius * fSin2 + centerY;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 5] = radius * fCos2 + centerZ;
-
-	//		fA2 = (j + 1) * nStep * fPI / angle;
-	//		fSin2 = temp * sin(fA2);
-	//		fCos2 = temp * cos(fA2);
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 6] = radius * temp1 + centerX;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 7] = radius * fSin2 + centerY;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 8] = radius * fCos2 + centerZ;
-
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 12] = radius * temp1 + centerX;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 13] = radius * fSin2 + centerY;
-	//		pSphereSurfaceData[i * nLineNum + j * 18 + 14] = radius * fCos2 + centerZ;
-
-
-	//	}
-	//}
-
-
-	////绘制球面三角面
-	//pCore->glGenBuffers(1, &VBO);
-
-	//pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//pCore->glBufferData(GL_ARRAY_BUFFER, nPtNum * sizeof(float), pSphereSurfaceData, GL_STATIC_DRAW);
-
-
-
-	////根据三角面片画从圆心爆炸的球
-	//pCore->glEnableVertexAttribArray(0);
-	//pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0 * sizeof(float)));
-
-	//int nNum = 72 * 72;
-
-	//pCore->glDepthMask(GL_FALSE);//取消深度缓冲
-	//pCore->glEnable(GL_BLEND);//开启颜色混合
-	//pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
-
-	//pCore->glDrawArrays(GL_TRIANGLES, 0, nNum);
-
-	/*pCore->glDisable(GL_BLEND);
-	pCore->glDepthMask(GL_TRUE);*/
-
-
-	//delete
-	/*pCore->glDeleteBuffers(1, &VBO);
-	delete[] pSphereSurfaceData;*/
+	pCore->glDeleteBuffers(1, &instanceVBO);
+	delete[] translations;
 }
 
 void WarheadOGLManager::DrawColumnRing(Ver3D center, float radius, float height, float radius2)

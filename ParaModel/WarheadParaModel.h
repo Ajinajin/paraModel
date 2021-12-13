@@ -15,6 +15,7 @@
 #include <qlistwidget.h>
 #include <qmenu.h>
 #include <qlayout.h>
+#include <QStack>
 
 #include "bqgraphicsitem.h"
 #include "bqgraphicsscene.h"
@@ -25,6 +26,8 @@
 
 #include "WarheadDataConvert.h"
 #include <QFormLayout>
+
+#include "BezierWidget.h"
 
 class QMenu;
 class QListWidget;
@@ -60,7 +63,7 @@ private:
 	int pAuxiliaryLine;								//辅助线长度
 
 	QTextEdit* myLogOutLabel;						// 日志窗口输出的文本
- 
+	BezierWidget * pCurveWnd; 
 	// mainLabel显示的图像
 	QMenu* popMenu_In_ListWidget_;					/* 弹出菜单被使用无法删除*/
 	 
@@ -69,12 +72,22 @@ private:
 public:
 	VARMHEAD vWarhead;						// 系统战斗部库 
 	ArmHeadTopo vLoadWarhead;				// 载入的战斗部 
+	int iUpSelected;						// 当前选择的控制点
+	int iDnSelected;						// 当前选择的控制点
+	QList<QPointF> listUpCurveCtrlPt;		// 上方曲线控制点 按画布坐标保存
+	QList<QPointF> listDnCurveCtrlPt;		// 下方曲线控制点 按画布坐标保存
+	QStack<int> newUpPoints;				// 控制点索引
+	QStack<int> newDnPoints;				// 控制点索引
+	int nMoveXY[2];							// 屏幕相对画布偏移像素
 	int InitSysData();						// 初始化系统变量
 	int InitPath();							// 初始化路径
-	int InitWarheadLib();						// 初始化基本构件库  
+	int InitWarheadLib();					// 初始化基本构件库  
 	int InitParaTmpl();						// 初始化参数化生成模板
+
 private :
-	VSHAPE viewShape;
+	VSHAPE vDrawShape;
+	VSHAPE vDockDrawShape;
+	VSHAPE vOriginShape; 
 	WarheadDataConvert DataConvert;
 private:
 	//初始化窗口
@@ -93,6 +106,8 @@ private:
 	void InitLoadModelWidget(QDockWidget* from);
 	//初始化系统构件模型窗口
 	void InitSysUnitWidget(QDockWidget* from);
+
+	void InitCurveWidget(QDockWidget* from);
 
 	//初始化楼层选择
 	void InitWarheadWidget(QDockWidget* from);
@@ -118,7 +133,11 @@ private:
 	QColor ColorHelper(int unitIdx);
 	void ReLoadModelTree();			//重新加载模型树
 	void ReLoadModelProperty();		//重新加载模型属性
-
+protected:
+	void mousePressEvent(QMouseEvent *event);
+	void mouseReleaseEvent(QMouseEvent *event);
+	void mouseMoveEvent(QMouseEvent *event);
+	void keyPressEvent(QKeyEvent *event);
 public slots:
 	void MyLogOutput(QString myLogout);         //输出日志
 	
@@ -133,4 +152,5 @@ public slots:
 	void SaveasFileAction();		//另存当前数据
 	void ExportFileAction();		//导出成k文件
 	void ApplyDataAction();			//保存战斗部信息
+	void NewArmHeadTmpl(QTreeWidgetItem* item, int column); 
 };

@@ -18,7 +18,7 @@ void calColumnsIdxFromWallIdx(int wallIdx, int *columnArrayIdx, VTOPOTABLE oglTo
 			columnArrayIdx[index++] = oglTopTable.at(wallIdx).nAdjUnitIdx[j];
 		}
 		j++;
-	}
+	}		
 
 }
 

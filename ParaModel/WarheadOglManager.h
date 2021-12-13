@@ -58,8 +58,8 @@ public:
 	//第一个参数是下底中心点，第二、四个参数大圈、小圈半径，第三、五个参数是大柱高度与小柱高度
 	void DrawFuse(Ver3D center,float bigR,float height1,float smallR,float height2);
 
-	//绘制球
-	void InitSphere(float centerX, float centerY, float centerZ, float radius);
+	//绘制球(参数1是所有球的球心位置集合)
+	void DrawSphere(VFLOAT centers, float radius);
 
 
 	vPoint allNodes;			//存储三维模型的所有节点信息
@@ -110,7 +110,7 @@ private:
 
 
 	GLuint uboMatrices;
-	GLuint VBO, EBO;
+	GLuint VBO, EBO, instanceVBO;
 };
 
 

@@ -3,7 +3,8 @@
 // 参数化建模 模块 数据结构定义
 #include <vector>
 #include <QtCore/qstring.h>
-#include <Qpoint.h>
+#include <QPoint>
+#include <QList>
 using namespace std;
 
 typedef vector<int> VINT;
@@ -148,8 +149,8 @@ typedef struct SysPath
 // 战斗部设计用数据结构 
 typedef struct PARADES
 {
-	QString sUnitName;			// 构件名称
-	float 	nUnitPropty;		// 构件属性
+	float 	nUnitPropty;			// 构件属性
+	QString sUnitName;				// 构件名称
 }PARADES;
 
 typedef struct FragDes
@@ -162,11 +163,11 @@ typedef struct ArmHeadTopo
 {
 	int nArmHeadIdx;				// 战斗部类型索引
 	int nArrangeType;				// 破片排布类型 0 默认最优排布 1 对齐排布
-	vector<QPointF> vTurnPoint;		// 拐点
+	QList<QPointF> vTurnPoint;		// 拐点
 	FragDes oFragInfo;				// 破片信息 0 1 2 球形 方形 圆柱形
 	VFLOAT vFragPos;				// 每个破片中心点位置和姿态角度 方形有6个 球形1个 圆柱形3个
-	vector<PARADES> mapArmHead;		// 战斗部名称 R1
+	vector<PARADES> mapArmHead;		// 战斗部名称 R1 属性对
 	QString sArmHeadName;			// 名称 类型和对象不分 限制为单个战斗部编辑
-	QString sArmHeadVersion;			// 名称 类型和对象不分 限制为单个战斗部编辑
+	QString sArmHeadVersion;		// 名称 类型和对象不分 限制为单个战斗部编辑
 }ArmHeadTopo;
 typedef vector<ArmHeadTopo> VARMHEAD;
