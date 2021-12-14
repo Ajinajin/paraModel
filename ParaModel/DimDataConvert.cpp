@@ -648,7 +648,9 @@ int MovDoorWndInWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLaye
 
 		int doorW = table[vLayerTopo[nMoveUnitIdx].nCenUnitIdx].oShape.nShapeRange[0] / 2; //元素的中心点
 		int nWallWH = vPlaneDraw[vLayerTopo[nInsWallIdx].nTopoIdx].nWH[0];					//墻的寬度
-		int nRight = vPlaneDraw[vLayerTopo[nInsWallIdx].nTopoIdx].nWH[0] - doorW;
+		int PillarW = (vPlaneDraw[(vLayerTopo[(vLayerTopo[nMoveUnitIdx]).nAdjUnitIdx[0]]).nAdjUnitIdx[0]]).nWH[0]/2+(vPlaneDraw[(vLayerTopo[(vLayerTopo[nMoveUnitIdx]).nAdjUnitIdx[0]]).nAdjUnitIdx[0]]).nWH[1];
+		int nRight = nWallWH - doorW- PillarW;
+
 
 
 		// 按墙方向更改门窗位置
@@ -670,10 +672,10 @@ int MovDoorWndInWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLaye
 		//(vPlaneDraw[(vLayerTopo[(vLayerTopo[24]).nAdjUnitIdx[0]]).nAdjUnitIdx[0]]).nWH/2
 		int nBottom = 0;
 		int doorW = table[vLayerTopo[nMoveUnitIdx].nCenUnitIdx].oShape.nShapeRange[0] / 2; //元素的中心点
-		int PillarH = (vPlaneDraw[(vLayerTopo[(vLayerTopo[nMoveUnitIdx]).nAdjUnitIdx[0]]).nAdjUnitIdx[0]]).nWH[1] / 2; //柱子的高度 / 2;
+		int PillarH = (vPlaneDraw[(vLayerTopo[(vLayerTopo[nMoveUnitIdx]).nAdjUnitIdx[0]]).nAdjUnitIdx[0]]).nWH[0] /2+ (vPlaneDraw[(vLayerTopo[(vLayerTopo[nMoveUnitIdx]).nAdjUnitIdx[0]]).nAdjUnitIdx[0]]).nWH[0]/4; //柱子的高度 / 2;
 		int nUp = vPlaneDraw[nInsWallIdx].nWH[1] - doorW- PillarH;
 		// 按墙方向更改门窗位置
-		int nNewY = vLayerTopo[nMoveUnitIdx].nCenPos[1] + (nMoveY * -1) ;
+		int nNewY = vLayerTopo[nMoveUnitIdx].nCenPos[0] + (nMoveY * -1) ;
 		if (nNewY < nBottom)
 			nNewY = nBottom;
 		else if (nNewY > nUp)
