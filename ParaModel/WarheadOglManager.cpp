@@ -1138,95 +1138,7 @@ void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float hei
 	}
 
 
-	//画两个底面圆(按照gl_triangles_fan的方式)
-
-	////circle 1
-	//{
-	//	float* verticesBottom = new float[(pointsNum + 1) * 3 + 9];
-	//	//第一个点是圆心
-	//	verticesBottom[0] = center.fXYZ[0];
-	//	verticesBottom[1] = center.fXYZ[1];
-	//	verticesBottom[2] = center.fXYZ[2];
-	//	for (int i = 0; i < pointsNum; i++)
-	//	{
-	//		verticesBottom[3 + i * 3] = points[i].fXYZ[0];
-	//		verticesBottom[3 + i * 3 + 1] = points[i].fXYZ[1];
-	//		verticesBottom[3 + i * 3 + 2] = points[i].fXYZ[2];
-	//	}
-	//	//最后一个面
-	//	{
-	//		verticesBottom[(pointsNum + 1) * 3] = points[pointsNum - 1].fXYZ[0];
-	//		verticesBottom[(pointsNum + 1) * 3 + 1] = points[pointsNum - 1].fXYZ[1];
-	//		verticesBottom[(pointsNum + 1) * 3 + 2] = points[pointsNum - 1].fXYZ[2];
-
-	//		verticesBottom[(pointsNum + 1) * 3 + 3] = center.fXYZ[0];
-	//		verticesBottom[(pointsNum + 1) * 3 + 4] = center.fXYZ[1];
-	//		verticesBottom[(pointsNum + 1) * 3 + 5] = center.fXYZ[2];
-
-	//		verticesBottom[(pointsNum + 1) * 3 + 6] = points[0].fXYZ[0];
-	//		verticesBottom[(pointsNum + 1) * 3 + 7] = points[0].fXYZ[1];
-	//		verticesBottom[(pointsNum + 1) * 3 + 8] = points[0].fXYZ[2];
-	//	}
-
-	//	pCore->glGenBuffers(1, &VBO);
-	//	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//	pCore->glBufferData(GL_ARRAY_BUFFER, ((pointsNum + 1) * 3 + 9) * sizeof(float), verticesBottom, GL_STATIC_DRAW);
-
-	//	//draw
-	//	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//	pCore->glEnableVertexAttribArray(0);
-	//	pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-
-	//	pCore->glDrawArrays(GL_TRIANGLE_FAN, 0, (pointsNum + 1));
-	//	pCore->glDrawArrays(GL_TRIANGLES, (pointsNum + 1), 3);
-
-	//}
-
-	////circle 2
-	//{
-	//	float* verticesTop = new float[(pointsNum + 1) * 3 + 9];
-	//	//第一个点是圆心
-	//	verticesTop[0] = center.fXYZ[0];
-	//	verticesTop[1] = center.fXYZ[1] + height;
-	//	verticesTop[2] = center.fXYZ[2];
-	//	for (int i = 0; i < pointsNum; i++)
-	//	{
-	//		verticesTop[3 + i * 3] = uppoints[i].fXYZ[0];
-	//		verticesTop[3 + i * 3 + 1] = uppoints[i].fXYZ[1];
-	//		verticesTop[3 + i * 3 + 2] = uppoints[i].fXYZ[2];
-	//	}
-	//	//最后一个面
-	//	{
-	//		verticesTop[(pointsNum + 1) * 3] = uppoints[pointsNum - 1].fXYZ[0];
-	//		verticesTop[(pointsNum + 1) * 3 + 1] = uppoints[pointsNum - 1].fXYZ[1];
-	//		verticesTop[(pointsNum + 1) * 3 + 2] = uppoints[pointsNum - 1].fXYZ[2];
-
-	//		verticesTop[(pointsNum + 1) * 3 + 3] = center.fXYZ[0];
-	//		verticesTop[(pointsNum + 1) * 3 + 4] = center.fXYZ[1] + height;
-	//		verticesTop[(pointsNum + 1) * 3 + 5] = center.fXYZ[2];
-
-	//		verticesTop[(pointsNum + 1) * 3 + 6] = uppoints[0].fXYZ[0];
-	//		verticesTop[(pointsNum + 1) * 3 + 7] = uppoints[0].fXYZ[1];
-	//		verticesTop[(pointsNum + 1) * 3 + 8] = uppoints[0].fXYZ[2];
-	//	}
-
-	//	pCore->glGenBuffers(1, &VBO);
-	//	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//	pCore->glBufferData(GL_ARRAY_BUFFER, ((pointsNum + 1) * 3 + 9) * sizeof(float), verticesTop, GL_STATIC_DRAW);
-
-	//	//draw
-	//	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//	pCore->glEnableVertexAttribArray(0);
-	//	pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-
-
-	//	pCore->glDrawArrays(GL_TRIANGLE_FAN, 0, (pointsNum + 1));
-	//	pCore->glDrawArrays(GL_TRIANGLES, (pointsNum + 1), 3);
-
-
-	//}
+	
 
 
 	pCore->glDisable(GL_BLEND);
@@ -1310,9 +1222,6 @@ void WarheadOGLManager::DrawSphere(VFLOAT centers,float radius)
 			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 11] = BallPoints[i + 1][pointsNum - 1].fXYZ[2];
 		}
 	}
-	
-
-	//outfile << pBallData[0] << " " << pBallData[1] << " " << pBallData[2] << endl;
 
 
 
