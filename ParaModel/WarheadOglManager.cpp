@@ -11,11 +11,123 @@
 
 
 // 定义全局变量 后期修改
-const QVector3D CAMERA_POSITION(0.0f, 0.0f, 5.0f);
+const QVector3D CAMERA_POSITION(0.0f, 5.0f, 15.0f);
 const QVector3D LIGHT_POSITION(0.0f, 1.0f, 0.0f);
 
 const int OGLMANAGER_WIDTH = 1200;
 const int OGLMANAGER_HEIGHT = 800;
+
+const float Pi = 3.141592654;
+VFLOAT res;
+int initFlag = 0;
+fstream outfile("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/outtest.txt", fstream::out);
+
+//*********************工具性函数***********************************
+
+//参数 圆心	圆环大圆半径	圆环小圆半径	球半径	圆柱高度
+VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
+{
+
+
+
+	VFLOAT res;
+	//右手坐标系
+	//存放计算出的小球的圆心坐标
+	float resX;//X轴向右
+	float resY;//Y轴向上
+	float resZ;//Z轴屏幕向外
+
+	int floor = 0;//层数
+	float floorheight = 2 * r * sin(acos((R1 - R2 - 2 * r) / 2 * r));//层高
+	floor = (h - (2 * r - floorheight)) / floorheight;
+
+	//C是一个中间变量
+	float C = ((R2 + r) * (R2 + r) + (R1 - r) * (R1 - r) - 4 * r * r) / (2 * (R2 + r) * (R1 - r));
+
+	//计算可以每一层可以装下多少个小球
+	int num = 0;
+
+	//Beta是每个球所占用的弧度
+	float Beta = acos(C);
+
+	num = 2 * Pi / Beta;
+
+	for (int f = 0; f < floor; f++)
+	{
+		if (f % 2 == 0)
+		{
+			for (int i = 0; i < num; i++)
+			{
+				//该小球与圆心夹角（弧度）
+				float angle = i * Beta;
+
+				if (i % 2 == 0)
+				{
+					//PS:将计算内的大圆、小圆半径减少或者增加0.005，来缓和float型计算时产生的误差
+
+					resX = center.fXYZ[0] + (R1 - r - 0.005) * cos(angle);
+					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle);
+					resY = center.fXYZ[1] + r + f * floorheight;
+
+
+					res.push_back(resX);
+					res.push_back(resY);
+					res.push_back(resZ);
+				}
+				else
+				{
+
+
+					resX = center.fXYZ[0] + (R2 + r + 0.005) * cos(angle);
+					resZ = center.fXYZ[2] + (R2 + r + 0.005) * sin(angle);
+					resY = center.fXYZ[1] + r + f * floorheight;
+
+
+
+					res.push_back(resX);
+					res.push_back(resY);
+					res.push_back(resZ);
+				}
+			}
+		}
+		else
+		{
+			for (int i = 0; i < num; i++)
+			{
+				//该小球与圆心夹角（弧度）
+				float angle = i * Beta;
+
+				if (i % 2 == 1)
+				{
+					resX = center.fXYZ[0] + (R1 - r - 0.005) * cos(angle);
+					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle);
+					resY = center.fXYZ[1] + r + f * floorheight;
+
+
+					res.push_back(resX);
+					res.push_back(resY);
+					res.push_back(resZ);
+				}
+				else
+				{
+
+
+					resX = center.fXYZ[0] + (R2 + r + 0.005) * cos(angle);
+					resZ = center.fXYZ[2] + (R2 + r + 0.005) * sin(angle);
+					resY = center.fXYZ[1] + r + f * floorheight;
+
+
+					res.push_back(resX);
+					res.push_back(resY);
+					res.push_back(resZ);
+				}
+			}
+		}
+	}
+	return res;
+}
+
+//****************************************************************
 
 
 WarheadOGLManager::WarheadOGLManager(QWidget* parent) : QOpenGLWidget(parent)
@@ -67,8 +179,8 @@ void WarheadOGLManager::initializeGL()
 
 	/************ 载入shader ***********/
 
-	ResourceManager::loadShader("warheadColumn", ":/shaders/res/shaders/WarheadColumn.vert", ":/shaders/res/shaders/WarheadColumn.frag");
-	
+	ResourceManager::loadShader("warhead", ":/shaders/res/shaders/WarheadColumn.vert", ":/shaders/res/shaders/WarheadColumn.frag");
+	ResourceManager::loadShader("WarheadSphere", ":/shaders/res/shaders/WarheadSphere.vert", ":/shaders/res/shaders/WarheadSphere.frag");
 
 	/************ 载入Texture ***********/
 	//ResourceManager::loadTexture("brickwall", ":/textures/res/textures/brickwall.jpg");
@@ -79,8 +191,8 @@ void WarheadOGLManager::initializeGL()
 	model.setToIdentity();
 	QMatrix4x4 projection, view;
 	//给着色器变量赋值
-	ResourceManager::getShader("warheadColumn").use().setMatrix4f("model", model);
-	
+	ResourceManager::getShader("warhead").use().setMatrix4f("model", model);
+	ResourceManager::getShader("WarheadSphere").use().setMatrix4f("model", model);
 
 	/***********  处理Uniform Buffer相关参数 **************/
 	/*
@@ -129,19 +241,116 @@ void WarheadOGLManager::paintGL()
 
 	//update
 	this->updateGL();
-	
-	ResourceManager::getShader("warheadColumn").use();
-	ResourceManager::getShader("warheadColumn").use().setFloat("tranS",0.25);
+
+	ResourceManager::getShader("warhead").use();
+	ResourceManager::getShader("warhead").use().setFloat("tranS", 0.25);
+
+
+
+
+
 	Ver3D center;
 	center.fXYZ[0] = 0.0f, center.fXYZ[1] = 0.0f, center.fXYZ[2] = 0.0f;
 	//InitAndDrawColumn(center,1,2);
-
-
 	//DrawRing(center,4,2);
-	DrawFuse(center,2,2,1,2);
+	//DrawFuse(center,2,2,1,2);
+	//DrawRoundPConeSide(center,5,2,3);
+
+
 
 
 	//绘制一个弹
+	{
+		float CirBottomR = 5.0;		//弹壳最底面圆柱半径
+		float CirBottomH = 0.3;		//弹壳最底面圆柱高度
+
+		float CirTopR = 4.5;		//弹壳最上面圆柱半径
+		float CirTopH = 0.3;		//弹壳最上面圆柱高度
+
+		float sideR1 = 4.2, sideR2 = 3.8, sideR3 = 3.5, sideH = 10.0;			//弹壳侧面三层圆柱半径与高度
+
+		float fragR = 0.125;			//球状弹丸半径
+
+		//弹柱体底面壳
+		{
+			ResourceManager::getShader("warhead").use().setFloat("R", 227);
+			ResourceManager::getShader("warhead").use().setFloat("G", 168);
+			ResourceManager::getShader("warhead").use().setFloat("B", 105);
+
+
+			center.fXYZ[0] = 0.0f, center.fXYZ[1] = 0.0f, center.fXYZ[2] = 0.0f;
+			InitAndDrawColumn(center, CirBottomR, CirBottomH);
+		}
+		//弹柱体上壳
+		{
+			ResourceManager::getShader("warhead").use().setFloat("R", 255);
+			ResourceManager::getShader("warhead").use().setFloat("G", 128);
+			ResourceManager::getShader("warhead").use().setFloat("B", 0);
+
+			center.fXYZ[1] = 10.3f;
+			InitAndDrawColumn(center, CirTopR, CirTopH);
+		}
+
+		//引信
+		{
+			ResourceManager::getShader("warhead").use().setFloat("R", 255);
+			ResourceManager::getShader("warhead").use().setFloat("G", 0);
+			ResourceManager::getShader("warhead").use().setFloat("B", 255);
+
+			center.fXYZ[1] = 0.301f;
+			DrawFuse(center, 1.5, 2, 0.5, 1);
+		}
+
+
+		//三个圆柱侧面外壳
+		//第一层壳与第二层壳之间要装破片，所以先将第一层壳设置为透明
+		{
+
+
+			ResourceManager::getShader("warhead").use().setFloat("R", 255);
+			ResourceManager::getShader("warhead").use().setFloat("G", 255);
+			ResourceManager::getShader("warhead").use().setFloat("B", 0);
+			DrawColumnSide(center, sideR1, sideH, GL_TRUE);
+
+			ResourceManager::getShader("warhead").use().setFloat("R", 176);
+			ResourceManager::getShader("warhead").use().setFloat("G", 224);
+			ResourceManager::getShader("warhead").use().setFloat("B", 230);
+			DrawColumnSide(center, sideR2, sideH, GL_FALSE);
+
+			ResourceManager::getShader("warhead").use().setFloat("R", 255);
+			ResourceManager::getShader("warhead").use().setFloat("G", 192);
+			ResourceManager::getShader("warhead").use().setFloat("B", 203);
+			DrawColumnSide(center, sideR3, sideH, GL_FALSE);
+		}
+
+
+
+
+		//计算得到所有破片球的坐标
+
+		center.fXYZ[1] = CirBottomH;
+		if (initFlag == 0)
+		{
+			res = getFragSphere(center, sideR1, sideR2, fragR, sideH);
+			initFlag++;
+		}
+
+
+
+
+		//绘制球状破片
+		{
+
+			ResourceManager::getShader("WarheadSphere").use();
+			ResourceManager::getShader("WarheadSphere").use().setFloat("R", 255);
+			ResourceManager::getShader("WarheadSphere").use().setFloat("G", 0);
+			ResourceManager::getShader("WarheadSphere").use().setFloat("B", 0);
+			DrawSphere(res, fragR);
+
+
+		}
+
+	}
 
 }
 
@@ -153,17 +362,20 @@ void WarheadOGLManager::updateGL()
 	QMatrix4x4 projection;
 	GLfloat a = width();
 	GLfloat b = height();
-	projection.perspective(camera->zoom, (GLfloat)width() / (GLfloat)height(),0.1f, 2000.f);
+	projection.perspective(camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 2000.f);
 	//projection.ortho(1000,1000,1000,1000,0.1,1000);
 	//projection.frustum(1000, 1000, 1000, 1000, 1, 1000);
 	view = camera->getViewMatrix();
 
-	
-	ResourceManager::getShader("warheadColumn").use().setMatrix4f("model", targetModel);
-	ResourceManager::getShader("warheadColumn").use().setMatrix4f("projection", projection);
-	ResourceManager::getShader("warheadColumn").use().setMatrix4f("view", view);
+	ResourceManager::getShader("warhead").use().setMatrix4f("model", targetModel);
+	ResourceManager::getShader("warhead").use().setMatrix4f("projection", projection);
+	ResourceManager::getShader("warhead").use().setMatrix4f("view", view);
 
-	
+
+	ResourceManager::getShader("WarheadSphere").use().setMatrix4f("model", targetModel);
+	ResourceManager::getShader("WarheadSphere").use().setMatrix4f("projection", projection);
+	ResourceManager::getShader("WarheadSphere").use().setMatrix4f("view", view);
+
 
 
 	/***********  处理Uniform Buffer相关参数 **************/
@@ -202,9 +414,9 @@ void WarheadOGLManager::mouseMoveEvent(QMouseEvent* event)
 
 		//根据鼠标操作旋转模型矩阵
 		targetModel.setToIdentity();
-		targetModel.translate(0, 1, 0);
+		targetModel.translate(0, 5, 0);
 
-		
+
 		GLfloat angle_now = qSqrt(qPow(xoffset, 2) + qPow(yoffset, 2)) / 5;
 		targetModel.rotate(angle_now, -yoffset, xoffset, 0.0);
 		targetModel *= targetModeluse;
@@ -213,10 +425,10 @@ void WarheadOGLManager::mouseMoveEvent(QMouseEvent* event)
 		targetModelsave.rotate(angle_now, -yoffset, xoffset, 0.0);
 		targetModelsave *= targetModeluse;
 
-		targetModel.translate(-0, -1, -0);
+		targetModel.translate(-0, -5, -0);
 	}
 
-	
+
 }
 
 void WarheadOGLManager::mousePressEvent(QMouseEvent* event)
@@ -257,10 +469,10 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		points.push_back(tmp);
 	}
 
-	pCore->glEnable(GL_DEPTH_TEST);
-	pCore->glDepthMask(GL_FALSE);
-	pCore->glEnable(GL_BLEND);//开启颜色混合
-	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+	//pCore->glEnable(GL_DEPTH_TEST);
+	//pCore->glDepthMask(GL_FALSE);
+	//pCore->glEnable(GL_BLEND);//开启颜色混合
+	//pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 	//侧面
 	{
 		float* vertices = new float[pointsNum * 12];
@@ -310,11 +522,11 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 
-		
+
 		pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
-		
+
 	}
-	
+
 
 	//画两个底面圆(按照gl_triangles_fan的方式)
 
@@ -355,10 +567,10 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		pCore->glEnableVertexAttribArray(0);
 		pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-		
+
 		pCore->glDrawArrays(GL_TRIANGLE_FAN, 0, (pointsNum + 1));
 		pCore->glDrawArrays(GL_TRIANGLES, (pointsNum + 1), 3);
-		
+
 	}
 
 	//circle 2
@@ -399,27 +611,25 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 
-		
+
 		pCore->glDrawArrays(GL_TRIANGLE_FAN, 0, (pointsNum + 1));
 		pCore->glDrawArrays(GL_TRIANGLES, (pointsNum + 1), 3);
-		
+
 
 	}
 
 
-	pCore->glDisable(GL_BLEND);
-	pCore->glDepthMask(GL_TRUE);
-	pCore->glDisable(GL_DEPTH_TEST);
+	//pCore->glDisable(GL_BLEND);
+	//pCore->glDepthMask(GL_TRUE);
+	//pCore->glDisable(GL_DEPTH_TEST);
+	// 
 	//delete
 	pCore->glDeleteBuffers(1, &VBO);
 }
 
 void WarheadOGLManager::DrawRing(Ver3D center, float r1, float r2)
 {
-	pCore->glEnable(GL_DEPTH_TEST);
-	pCore->glDepthMask(GL_FALSE);
-	pCore->glEnable(GL_BLEND);//开启颜色混合
-	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+
 
 
 	int pointsNum = 50;//一个圈上面的点个数
@@ -485,7 +695,7 @@ void WarheadOGLManager::DrawRing(Ver3D center, float r1, float r2)
 		vertices[(pointsNum - 1) * 12 + 11] = Cir1Points[pointsNum - 1].fXYZ[2];
 	}
 
-	
+
 	pCore->glGenBuffers(1, &VBO);
 	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	pCore->glBufferData(GL_ARRAY_BUFFER, (pointsNum * 12) * sizeof(float), vertices, GL_STATIC_DRAW);
@@ -498,12 +708,8 @@ void WarheadOGLManager::DrawRing(Ver3D center, float r1, float r2)
 	pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
 
 
-
-	pCore->glDisable(GL_BLEND);
-	pCore->glDisable(GL_DEPTH_TEST);
-	pCore->glDepthMask(GL_TRUE);
 	//delete
-	pCore->glDeleteBuffers(1,&VBO);
+	pCore->glDeleteBuffers(1, &VBO);
 }
 
 void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float smallR, float height2)
@@ -511,12 +717,11 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 	int pointsNum = 50;//一个圈上面的点个数
 
 
-	pCore->glEnable(GL_DEPTH_TEST);
-	pCore->glDepthMask(GL_FALSE);
-	pCore->glEnable(GL_BLEND);//开启颜色混合
+	//pCore->glEnable(GL_DEPTH_TEST);
+	//pCore->glDepthMask(GL_FALSE);
+	//pCore->glEnable(GL_BLEND);//开启颜色混合
 	//pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
-	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 	//绘制下面较大柱
 	{
 		vector<Ver3D> points;
@@ -631,13 +836,13 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 	Ver3D ringCen;
 	ringCen.fXYZ[0] = center.fXYZ[0], ringCen.fXYZ[1] = center.fXYZ[1] + height1, ringCen.fXYZ[2] = center.fXYZ[2];
 	DrawRing(ringCen, bigR, smallR);
-	
+
 	//绘制上面较小柱
 	{
-		pCore->glEnable(GL_DEPTH_TEST);
-		pCore->glDepthMask(GL_FALSE);
-		pCore->glEnable(GL_BLEND);//开启颜色混合
-		pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+		//pCore->glEnable(GL_DEPTH_TEST);
+		//pCore->glDepthMask(GL_FALSE);
+		//pCore->glEnable(GL_BLEND);//开启颜色混合
+		//pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 
 
 		Ver3D sColCen;
@@ -757,7 +962,7 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 	//pCore->glDepthMask(GL_TRUE);
 	//pCore->glDisable(GL_DEPTH_TEST);
 	//delete
-	pCore->glDeleteBuffers(1,&VBO);
+	pCore->glDeleteBuffers(1, &VBO);
 }
 
 void WarheadOGLManager::DrawColumnSide(Ver3D center, float radius, float height, GLboolean ifTrans)
@@ -768,7 +973,7 @@ void WarheadOGLManager::DrawColumnSide(Ver3D center, float radius, float height,
 		pCore->glEnable(GL_BLEND);//开启颜色混合
 		pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 	}
-	
+
 
 	int pointsNum = 50;//一个圈上面的点个数
 	vector<Ver3D> points;
@@ -782,7 +987,7 @@ void WarheadOGLManager::DrawColumnSide(Ver3D center, float radius, float height,
 		points.push_back(tmp);
 	}
 
-	
+
 
 	//侧面
 	{
@@ -844,10 +1049,10 @@ void WarheadOGLManager::DrawColumnSide(Ver3D center, float radius, float height,
 		pCore->glDisable(GL_BLEND);
 		pCore->glDepthMask(GL_TRUE);
 	}
-	
-	
+
+
 	//delete
-	pCore->glDeleteBuffers(1,&VBO);
+	pCore->glDeleteBuffers(1, &VBO);
 }
 
 
@@ -933,7 +1138,7 @@ void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float hei
 	}
 
 
-	
+
 
 
 	pCore->glDisable(GL_BLEND);
@@ -944,9 +1149,9 @@ void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float hei
 }
 
 
-void WarheadOGLManager::DrawSphere(VFLOAT centers,float radius)
+void WarheadOGLManager::DrawSphere(VFLOAT centers, float radius)
 {
-	
+
 
 	//球由很多层半径不同的圆圈组成,球面由三角面组成
 	int pointsNum = 10;		//每一层圆圈点的个数
@@ -955,7 +1160,7 @@ void WarheadOGLManager::DrawSphere(VFLOAT centers,float radius)
 	int ptNum = pointsNum * (180 / angleStep - 1) * 4;
 	float* pBallData = new float[ptNum * 3];
 
-	
+
 	//最初始的一个球
 	vector<vector<Ver3D>> BallPoints;			//存储每一层圆圈上的点
 	for (int angle = 0; angle < 180; angle += angleStep)
@@ -964,7 +1169,7 @@ void WarheadOGLManager::DrawSphere(VFLOAT centers,float radius)
 
 		float cirLayR = radius * cos(2 * 3.14 * angle / 180.0);		//每一层圆圈的半径
 		float cirLayY = radius * sin(2 * 3.14 * angle / 180.0) + centers[1];		//每一层圆圈的圆心的Y值
-		
+
 		for (int i = 0; i < pointsNum; i++)
 		{
 			Ver3D tmp;
@@ -986,13 +1191,13 @@ void WarheadOGLManager::DrawSphere(VFLOAT centers,float radius)
 			pBallData[i * pointsNum * 12 + j * 12 + 1] = BallPoints[i][j].fXYZ[1];
 			pBallData[i * pointsNum * 12 + j * 12 + 2] = BallPoints[i][j].fXYZ[2];
 
-			pBallData[i * pointsNum * 12 + j * 12 + 3] = BallPoints[i][j+1].fXYZ[0];
-			pBallData[i * pointsNum * 12 + j * 12 + 4] = BallPoints[i][j+1].fXYZ[1];
-			pBallData[i * pointsNum * 12 + j * 12 + 5] = BallPoints[i][j+1].fXYZ[2];
+			pBallData[i * pointsNum * 12 + j * 12 + 3] = BallPoints[i][j + 1].fXYZ[0];
+			pBallData[i * pointsNum * 12 + j * 12 + 4] = BallPoints[i][j + 1].fXYZ[1];
+			pBallData[i * pointsNum * 12 + j * 12 + 5] = BallPoints[i][j + 1].fXYZ[2];
 
-			pBallData[i * pointsNum * 12 + j * 12 + 6] = BallPoints[i+1][j + 1].fXYZ[0];
-			pBallData[i * pointsNum * 12 + j * 12 + 7] = BallPoints[i+1][j + 1].fXYZ[1];
-			pBallData[i * pointsNum * 12 + j * 12 + 8] = BallPoints[i+1][j + 1].fXYZ[2];
+			pBallData[i * pointsNum * 12 + j * 12 + 6] = BallPoints[i + 1][j + 1].fXYZ[0];
+			pBallData[i * pointsNum * 12 + j * 12 + 7] = BallPoints[i + 1][j + 1].fXYZ[1];
+			pBallData[i * pointsNum * 12 + j * 12 + 8] = BallPoints[i + 1][j + 1].fXYZ[2];
 
 			pBallData[i * pointsNum * 12 + j * 12 + 9] = BallPoints[i + 1][j].fXYZ[0];
 			pBallData[i * pointsNum * 12 + j * 12 + 10] = BallPoints[i + 1][j].fXYZ[1];
@@ -1021,7 +1226,7 @@ void WarheadOGLManager::DrawSphere(VFLOAT centers,float radius)
 
 
 	//InitStance
-	
+
 	//不同实例球的位置偏移量存储
 	float* translations = new float[centers.size()];
 	for (int i = 0; i < centers.size() / 3; i++)
@@ -1034,9 +1239,56 @@ void WarheadOGLManager::DrawSphere(VFLOAT centers,float radius)
 	}
 
 
+	//球面相关数据
+
+	pCore->glGenBuffers(1, &VBO);
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	pCore->glBufferData(GL_ARRAY_BUFFER, ptNum * 3 * sizeof(float), pBallData, GL_STATIC_DRAW);
+
+	//数据读入gpu中
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	pCore->glEnableVertexAttribArray(0);
+	pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//pCore->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
+	////opengl 实例化相关参数
+	pCore->glGenBuffers(1, &instanceVBO);
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	pCore->glBufferData(GL_ARRAY_BUFFER, centers.size() * sizeof(float), translations, GL_STATIC_DRAW);
+	//pCore->glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	pCore->glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	pCore->glEnableVertexAttribArray(1);
+	pCore->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	//pCore->glBindBuffer(GL_ARRAY_BUFFER, 0);
+	pCore->glVertexAttribDivisor(1, 1);//属性为1的数据，每次实例化一次改变一次
+
+
+	//draw
+	//pCore->glBindVertexArray(0);
+	pCore->glDrawArraysInstanced(GL_QUADS, 0, ptNum, centers.size() / 3);//实例化绘制球
+	//pCore->glDrawArrays(GL_QUADS, 0, ptNum);//实例化绘制球
+
+	//delete
+	pCore->glDeleteBuffers(1, &VBO);
+	delete[] pBallData;
+	pCore->glDeleteBuffers(1, &instanceVBO);
+	delete[] translations;
+}
+
+void WarheadOGLManager::DrawColumnRing(Ver3D center, float radius, float height, float radius2)
+{
+	//两个圆环
+	DrawRing(center, radius, radius2);
+	center.fXYZ[1] += height;
+	DrawRing(center, radius, radius2);
+
+	//两个圆柱侧面
+	center.fXYZ[1] -= height;
+	DrawColumnSide(center, radius, height, GL_FALSE);
+	DrawColumnSide(center, radius2, height, GL_FALSE);
+}
 
 
 

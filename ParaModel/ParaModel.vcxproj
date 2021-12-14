@@ -149,6 +149,8 @@
     <None Include="res\shaders\wall.vert" />
     <None Include="res\shaders\WarheadColumn.frag" />
     <None Include="res\shaders\WarheadColumn.vert" />
+    <None Include="res\shaders\WarheadSphere.frag" />
+    <None Include="res\shaders\WarheadSphere.vert" />
     <None Include="res\shaders\window.frag" />
     <None Include="res\shaders\window.vert" />
   </ItemGroup>
