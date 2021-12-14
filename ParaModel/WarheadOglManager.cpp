@@ -753,12 +753,285 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 
 
 
-	pCore->glDisable(GL_BLEND);//开启颜色混合
-	pCore->glDepthMask(GL_TRUE);
-	pCore->glDisable(GL_DEPTH_TEST);
+	//pCore->glDisable(GL_BLEND);//开启颜色混合
+	//pCore->glDepthMask(GL_TRUE);
+	//pCore->glDisable(GL_DEPTH_TEST);
 	//delete
 	pCore->glDeleteBuffers(1,&VBO);
 }
+
+void WarheadOGLManager::DrawColumnSide(Ver3D center, float radius, float height, GLboolean ifTrans)
+{
+	if (ifTrans == GL_TRUE)
+	{
+		pCore->glDepthMask(GL_FALSE);
+		pCore->glEnable(GL_BLEND);//开启颜色混合
+		pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+	}
+	
+
+	int pointsNum = 50;//一个圈上面的点个数
+	vector<Ver3D> points;
+	for (int i = 0; i < pointsNum; i++)
+	{
+		Ver3D tmp;
+		tmp.fXYZ[0] = radius * cos(2 * 3.14 * i / pointsNum) + center.fXYZ[0];
+		tmp.fXYZ[1] = center.fXYZ[1];
+		tmp.fXYZ[2] = radius * sin(2 * 3.14 * i / pointsNum) + center.fXYZ[2];
+
+		points.push_back(tmp);
+	}
+
+	
+
+	//侧面
+	{
+		float* vertices = new float[pointsNum * 12];
+		for (int i = 0; i < pointsNum - 1; i++)
+		{
+			vertices[i * 12] = points[i].fXYZ[0];
+			vertices[i * 12 + 1] = points[i].fXYZ[1];
+			vertices[i * 12 + 2] = points[i].fXYZ[2];
+
+			vertices[i * 12 + 3] = points[i + 1].fXYZ[0];
+			vertices[i * 12 + 4] = points[i + 1].fXYZ[1];
+			vertices[i * 12 + 5] = points[i + 1].fXYZ[2];
+
+			vertices[i * 12 + 6] = points[i + 1].fXYZ[0];
+			vertices[i * 12 + 7] = points[i + 1].fXYZ[1] + height;
+			vertices[i * 12 + 8] = points[i + 1].fXYZ[2];
+
+			vertices[i * 12 + 9] = points[i].fXYZ[0];
+			vertices[i * 12 + 10] = points[i].fXYZ[1] + height;
+			vertices[i * 12 + 11] = points[i].fXYZ[2];
+		}
+		{
+			vertices[(pointsNum - 1) * 12] = points[pointsNum - 1].fXYZ[0];
+			vertices[(pointsNum - 1) * 12 + 1] = points[pointsNum - 1].fXYZ[1];
+			vertices[(pointsNum - 1) * 12 + 2] = points[pointsNum - 1].fXYZ[2];
+
+			vertices[(pointsNum - 1) * 12 + 3] = points[0].fXYZ[0];
+			vertices[(pointsNum - 1) * 12 + 4] = points[0].fXYZ[1];
+			vertices[(pointsNum - 1) * 12 + 5] = points[0].fXYZ[2];
+
+			vertices[(pointsNum - 1) * 12 + 6] = points[0].fXYZ[0];
+			vertices[(pointsNum - 1) * 12 + 7] = points[0].fXYZ[1] + height;
+			vertices[(pointsNum - 1) * 12 + 8] = points[0].fXYZ[2];
+
+			vertices[(pointsNum - 1) * 12 + 9] = points[pointsNum - 1].fXYZ[0];
+			vertices[(pointsNum - 1) * 12 + 10] = points[pointsNum - 1].fXYZ[1] + height;
+			vertices[(pointsNum - 1) * 12 + 11] = points[pointsNum - 1].fXYZ[2];
+		}
+
+		pCore->glGenBuffers(1, &VBO);
+		pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		pCore->glBufferData(GL_ARRAY_BUFFER, (pointsNum * 12) * sizeof(float), vertices, GL_STATIC_DRAW);
+
+		//draw
+		pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		pCore->glEnableVertexAttribArray(0);
+		pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+
+
+		pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
+
+	}
+
+
+	if (ifTrans == GL_TRUE)
+	{
+		pCore->glDisable(GL_BLEND);
+		pCore->glDepthMask(GL_TRUE);
+	}
+	
+	
+	//delete
+	pCore->glDeleteBuffers(1,&VBO);
+}
+
+
+void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float height, float radius2)
+{
+	int pointsNum = 50;//一个圈上面的点个数
+
+	vector<Ver3D> points;//底面圆
+	vector<Ver3D> uppoints;//顶面圆
+
+	for (int i = 0; i < pointsNum; i++)
+	{
+		Ver3D tmp;
+		tmp.fXYZ[0] = radius * cos(2 * 3.14 * i / pointsNum) + center.fXYZ[0];
+		tmp.fXYZ[1] = center.fXYZ[1];
+		tmp.fXYZ[2] = radius * sin(2 * 3.14 * i / pointsNum) + center.fXYZ[2];
+
+		points.push_back(tmp);
+
+
+		tmp.fXYZ[0] = radius2 * cos(2 * 3.14 * i / pointsNum) + center.fXYZ[0];
+		tmp.fXYZ[1] = center.fXYZ[1] + height;
+		tmp.fXYZ[2] = radius2 * sin(2 * 3.14 * i / pointsNum) + center.fXYZ[2];
+		uppoints.push_back(tmp);
+	}
+
+	pCore->glEnable(GL_DEPTH_TEST);
+	pCore->glDepthMask(GL_FALSE);
+	pCore->glEnable(GL_BLEND);//开启颜色混合
+	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+	//侧面
+	{
+		float* vertices = new float[pointsNum * 12];
+		for (int i = 0; i < pointsNum - 1; i++)
+		{
+			vertices[i * 12] = points[i].fXYZ[0];
+			vertices[i * 12 + 1] = points[i].fXYZ[1];
+			vertices[i * 12 + 2] = points[i].fXYZ[2];
+
+			vertices[i * 12 + 3] = points[i + 1].fXYZ[0];
+			vertices[i * 12 + 4] = points[i + 1].fXYZ[1];
+			vertices[i * 12 + 5] = points[i + 1].fXYZ[2];
+
+			vertices[i * 12 + 6] = uppoints[i + 1].fXYZ[0];
+			vertices[i * 12 + 7] = uppoints[i + 1].fXYZ[1];
+			vertices[i * 12 + 8] = uppoints[i + 1].fXYZ[2];
+
+			vertices[i * 12 + 9] = uppoints[i].fXYZ[0];
+			vertices[i * 12 + 10] = uppoints[i].fXYZ[1];
+			vertices[i * 12 + 11] = uppoints[i].fXYZ[2];
+		}
+		{
+			vertices[(pointsNum - 1) * 12] = points[pointsNum - 1].fXYZ[0];
+			vertices[(pointsNum - 1) * 12 + 1] = points[pointsNum - 1].fXYZ[1];
+			vertices[(pointsNum - 1) * 12 + 2] = points[pointsNum - 1].fXYZ[2];
+
+			vertices[(pointsNum - 1) * 12 + 3] = points[0].fXYZ[0];
+			vertices[(pointsNum - 1) * 12 + 4] = points[0].fXYZ[1];
+			vertices[(pointsNum - 1) * 12 + 5] = points[0].fXYZ[2];
+
+			vertices[(pointsNum - 1) * 12 + 6] = uppoints[0].fXYZ[0];
+			vertices[(pointsNum - 1) * 12 + 7] = uppoints[0].fXYZ[1];
+			vertices[(pointsNum - 1) * 12 + 8] = uppoints[0].fXYZ[2];
+
+			vertices[(pointsNum - 1) * 12 + 9] = uppoints[pointsNum - 1].fXYZ[0];
+			vertices[(pointsNum - 1) * 12 + 10] = uppoints[pointsNum - 1].fXYZ[1];
+			vertices[(pointsNum - 1) * 12 + 11] = uppoints[pointsNum - 1].fXYZ[2];
+		}
+
+		pCore->glGenBuffers(1, &VBO);
+		pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		pCore->glBufferData(GL_ARRAY_BUFFER, (pointsNum * 12) * sizeof(float), vertices, GL_STATIC_DRAW);
+
+		//draw
+		pCore->glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		pCore->glEnableVertexAttribArray(0);
+		pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+
+
+		pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
+
+	}
+
+
+	
+
+
+	pCore->glDisable(GL_BLEND);
+	pCore->glDepthMask(GL_TRUE);
+	pCore->glDisable(GL_DEPTH_TEST);
+	//delete
+	pCore->glDeleteBuffers(1, &VBO);
+}
+
+
+void WarheadOGLManager::DrawSphere(VFLOAT centers,float radius)
+{
+	
+
+	//球由很多层半径不同的圆圈组成,球面由三角面组成
+	int pointsNum = 10;		//每一层圆圈点的个数
+	int angleStep = 20;		//每次循环增加的角度
+
+	int ptNum = pointsNum * (180 / angleStep - 1) * 4;
+	float* pBallData = new float[ptNum * 3];
+
+	
+	//最初始的一个球
+	vector<vector<Ver3D>> BallPoints;			//存储每一层圆圈上的点
+	for (int angle = 0; angle < 180; angle += angleStep)
+	{
+		BallPoints.resize(180 / angleStep);
+
+		float cirLayR = radius * cos(2 * 3.14 * angle / 180.0);		//每一层圆圈的半径
+		float cirLayY = radius * sin(2 * 3.14 * angle / 180.0) + centers[1];		//每一层圆圈的圆心的Y值
+		
+		for (int i = 0; i < pointsNum; i++)
+		{
+			Ver3D tmp;
+			tmp.fXYZ[0] = cirLayR * cos(2 * 3.14 * i / pointsNum) + centers[0];
+			tmp.fXYZ[1] = cirLayY;
+			tmp.fXYZ[2] = cirLayR * sin(2 * 3.14 * i / pointsNum) + centers[2];
+
+			BallPoints[angle / angleStep].push_back(tmp);
+		}
+	}
+
+
+	//按画矩形的方式存储数据
+	for (int i = 0; i < BallPoints.size() - 1; i++)
+	{
+		for (int j = 0; j < pointsNum - 1; j++)
+		{
+			pBallData[i * pointsNum * 12 + j * 12] = BallPoints[i][j].fXYZ[0];
+			pBallData[i * pointsNum * 12 + j * 12 + 1] = BallPoints[i][j].fXYZ[1];
+			pBallData[i * pointsNum * 12 + j * 12 + 2] = BallPoints[i][j].fXYZ[2];
+
+			pBallData[i * pointsNum * 12 + j * 12 + 3] = BallPoints[i][j+1].fXYZ[0];
+			pBallData[i * pointsNum * 12 + j * 12 + 4] = BallPoints[i][j+1].fXYZ[1];
+			pBallData[i * pointsNum * 12 + j * 12 + 5] = BallPoints[i][j+1].fXYZ[2];
+
+			pBallData[i * pointsNum * 12 + j * 12 + 6] = BallPoints[i+1][j + 1].fXYZ[0];
+			pBallData[i * pointsNum * 12 + j * 12 + 7] = BallPoints[i+1][j + 1].fXYZ[1];
+			pBallData[i * pointsNum * 12 + j * 12 + 8] = BallPoints[i+1][j + 1].fXYZ[2];
+
+			pBallData[i * pointsNum * 12 + j * 12 + 9] = BallPoints[i + 1][j].fXYZ[0];
+			pBallData[i * pointsNum * 12 + j * 12 + 10] = BallPoints[i + 1][j].fXYZ[1];
+			pBallData[i * pointsNum * 12 + j * 12 + 11] = BallPoints[i + 1][j].fXYZ[2];
+		}
+		//每一层的最后一个面
+		{
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12] = BallPoints[i][pointsNum - 1].fXYZ[0];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 1] = BallPoints[i][pointsNum - 1].fXYZ[1];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 2] = BallPoints[i][pointsNum - 1].fXYZ[2];
+
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 3] = BallPoints[i][0].fXYZ[0];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 4] = BallPoints[i][0].fXYZ[1];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 5] = BallPoints[i][0].fXYZ[2];
+
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 6] = BallPoints[i + 1][0].fXYZ[0];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 7] = BallPoints[i + 1][0].fXYZ[1];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 8] = BallPoints[i + 1][0].fXYZ[2];
+
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 9] = BallPoints[i + 1][pointsNum - 1].fXYZ[0];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 10] = BallPoints[i + 1][pointsNum - 1].fXYZ[1];
+			pBallData[i * pointsNum * 12 + (pointsNum - 1) * 12 + 11] = BallPoints[i + 1][pointsNum - 1].fXYZ[2];
+		}
+	}
+
+
+
+	//InitStance
+	
+	//不同实例球的位置偏移量存储
+	float* translations = new float[centers.size()];
+	for (int i = 0; i < centers.size() / 3; i++)
+	{
+		//基于第一个球位置的偏移量
+		translations[i * 3] = centers[i * 3] - centers[0];
+		translations[i * 3 + 1] = centers[i * 3 + 1] - centers[1];
+		translations[i * 3 + 2] = centers[i * 3 + 2] - centers[2];
+
+	}
 
 
 
