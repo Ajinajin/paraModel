@@ -219,7 +219,8 @@ int DimDataConvert::CalDoorWndShape(int nUnitIdx, VTOPOTABLE& vLayerTopo, VSHAPE
 	return 0;
 }
 
-// 拓扑结构数据转为现实数据 只考虑矩形截面
+// 拓扑结构数据转为现实数据 只考虑矩形截面0.
+
 int DimDataConvert::CalPlaneData(VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
 	int nRe = 0;

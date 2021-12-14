@@ -39,17 +39,6 @@ public:
 	//柱
 	void InitAndDrawColumn(Ver3D center, float radius, float height);		//参数：中心先下点，半径，高度
 
-	//圆环柱
-	//第二个参数是大圈半径，第四个参数是小圈半径
-	void DrawColumnRing(Ver3D center, float radius, float height,float radius2);		
-
-	//圆柱侧面(第四个参数为设置是否透明)
-	void DrawColumnSide(Ver3D center, float radius, float height,GLboolean ifTrans);
-
-	//绘制圆台侧面
-	//第二个参数是底面圆半径，第四个参数是顶面圆半径
-	void DrawRoundPConeSide(Ver3D center, float radius, float height,float radius2);
-
 	//绘制圆环
 	//第一个参数大圈半径，第二、三个参数大圈、小圈半径
 	void DrawRing(Ver3D center,float r1,float r2);
@@ -57,10 +46,6 @@ public:
 	//引信绘制
 	//第一个参数是下底中心点，第二、四个参数大圈、小圈半径，第三、五个参数是大柱高度与小柱高度
 	void DrawFuse(Ver3D center,float bigR,float height1,float smallR,float height2);
-
-	//绘制球(参数1是所有球的球心位置集合)
-	void DrawSphere(VFLOAT centers, float radius);
-
 
 	vPoint allNodes;			//存储三维模型的所有节点信息
 
@@ -89,7 +74,7 @@ public:
 	GLfloat rotateRaw;											//每次对模型的raw旋转
 	GLfloat rotatePitch;										//每次对模型的pitch旋转
 
-	
+
 protected:
 	void mouseMoveEvent(QMouseEvent* event);
 	void wheelEvent(QWheelEvent* event) override;			//滚轮事件
@@ -110,7 +95,7 @@ private:
 
 
 	GLuint uboMatrices;
-	GLuint VBO, EBO, instanceVBO;
+	GLuint VBO, EBO;
 };
 
 

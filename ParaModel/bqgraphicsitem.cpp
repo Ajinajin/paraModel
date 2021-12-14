@@ -7,7 +7,6 @@
 #include <QGraphicsObject>
 #include <QtMath>
 #include <QPushButton>
-#include "BezierOpt.h"
 
 BGraphicsItem::BGraphicsItem(QPointF center, QPointF edge, ItemType type)
 	: m_center(center), m_edge(edge), m_type(type)
@@ -59,8 +58,10 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	{
 		setSelected(true);
 		return;
+	}
 	QList<QGraphicsItem*> itemList = this->scene()->items();
 	for (size_t i = 0; i < itemList.size(); i++)
+	{
 		if (itemList[i]->type() == BGraphicsItem::type())
 		{
 			BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
@@ -75,6 +76,7 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 				itemList[i]->setSelected(true);
 				continue;
 			}
+			if (this->graphAngle == 0 && proxyWidget->getCenter().y() == this->getCenter().y())
 			{
 				itemList[i]->setSelected(true);
 				continue;
@@ -301,8 +303,8 @@ void BCircle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 BRectangle::BRectangle(qreal x, qreal y, qreal width, qreal height, ItemType type)
 	: BGraphicsItem(QPointF(x, y), QPointF(x + width / 2, y + height / 2), type)
 {
-	m_leftup.setX(int(m_center.x() - (m_edge.x()- m_center.x())  ));
-	m_leftup.setY(int(m_center.y() - (m_edge.y() - m_center.y()) ));
+	m_leftup.setX(int(m_center.x() - (m_edge.x() - m_center.x())));
+	m_leftup.setY(int(m_center.y() - (m_edge.y() - m_center.y())));
 
 }
 
@@ -365,6 +367,19 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	menu->addAction(height_widgetAction);
 
 
+	//QPushButton* pApplyBtn = new QPushButton(QString::fromStdString(u8"确认"));
+	//pApplyBtn->setFixedWidth(100);
+
+	//connect(pApplyBtn, &QPushButton::clicked, this, [=]() {
+	//	//发送信号 确认修改后的值 
+	//	emit SceneMenuClick(nUnitType, nUnitIdx, 1);
+	//	});
+
+
+	//QWidgetAction* applyBtn_widgetAction = new QWidgetAction(menu);
+	//applyBtn_widgetAction->setDefaultWidget(pApplyBtn);
+	//menu->addAction(applyBtn_widgetAction);
+
 	QAction* act = new QAction(this);
 
 	if (nUnitType >= 4)
@@ -423,7 +438,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 		connect(act, &QAction::triggered, this, [=]() {
 			//发送信号 提示点击了更换
 			emit SceneMenuClick(nUnitType, nUnitIdx);
-		});
+			});
 		menu->addAction(act);
 	}
 	menu->exec(QCursor::pos());
@@ -561,8 +576,7 @@ void BPolygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 	painter->setPen(this->pen());
 	painter->setBrush(this->brush());
 
-	if (is_create_finished) 
-	{
+	if (is_create_finished) {
 		for (int i = 1; i < m_pointList.size() - 1; i++)
 		{
 			painter->drawLine(m_pointList.at(i - 1)->getPoint(), m_pointList.at(i)->getPoint());
@@ -577,97 +591,6 @@ void BPolygon::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 		}
 	}
 }
-
-//------------------------------------------------------------------------------
- 
-BCurveLine::BCurveLine(ItemType type)
-	: BGraphicsItem(QPointF(0, 0), QPointF(0, 0), type)
-{
-
-}
-
-QRectF BCurveLine::boundingRect() const
-{
-	return QRectF(m_center.x(), m_center.y(), 1, 1);
-}
-
-QPoint BCurveLine::bezier(double t)
-{
-	const int n = lstCtrlPt.size() - 1;
-	QPointF sum;
-
-	for (int i = 0; i <= n; i++)
-		sum += QPointF(lstCtrlPt[i]) * bernstein(i, n, t);
-
-	return sum.toPoint();
-}
-
-void BCurveLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-	Q_UNUSED(option);
-	Q_UNUSED(widget);
-
-// 	lstCtrlPt = ((BQGraphicsScene*)(this->scene()))->listUpCurveCtrlPt;
-
-	int nCtrlPtNum = lstCtrlPt.size();
-	if (nCtrlPtNum < 2)
-		return; 
-	// 画控制点
-	int i = 0; 
-	painter->setPen(DRAWPOINTS_PEN);
-	for ( i = 0 ; i < nCtrlPtNum ; i++ )
-		painter->drawPoint(lstCtrlPt[i]);
-
-	//画控制点连线
-	painter->setPen(this->pen());
-	painter->setBrush(this->brush());
-
-	QPainterPath pathCtrl(lstCtrlPt[0]);
-	for ( i = 1 ; i < nCtrlPtNum ; i++ )
-	{
-		pathCtrl.lineTo(lstCtrlPt[i]);
-	}
-	painter->drawPath(pathCtrl);
-	// 计算完成 画曲线
-		// Bezier曲线
-	double DIFT_BEZIER = 1.0 / NPOINTS_BEZIER;
-	double DIFT_WEIGHTS = 1.0 / NPOINTS_WEIGHTS;
-	painter->setPen(QPen(DRAWBEZIER_COLOR, DRAWBEZIER_TICK));
-
-	QPoint oStart = bezier(0.0);
-	QPoint oEnd;
-	QPainterPath pathCurve(oStart);
-	for (double t = 0.0; t <= 1.0; t += DIFT_BEZIER)
-	{
-		// 		painter.drawPoint(bezier(t));
-		oEnd = bezier(t);
-// 		painter->drawLine(oStart, oEnd);
-		pathCurve.lineTo(oEnd);
-		oStart = oEnd;
-	}
-	painter->drawPath(pathCurve);
-
-	return; 
-}
-
-void BCurveLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
-{
-	QPointF oPos = event->pos();
-	return; 
-}
-
-void BCurveLine::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
-{
-	QPointF oPos = event->pos(); 
-	return; 
-}
-
-void BCurveLine::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
-{
-	QPointF oPos = event->pos();
-	return; 
-}
-//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 
@@ -689,28 +612,41 @@ void BLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWi
 	painter->setPen(this->pen());
 	painter->setBrush(this->brush());
 	//给出的关键点绘制线
-
-	if (point.size() <= 0)
-		return;
+	/*static QList<QPointF> points = QList<QPointF>() << QPointF(10, 40) << QPointF(100, 100) << QPointF(200, 100)
+		<< QPointF(300, 100) << QPointF(330, 80) << QPointF(350, 70);*/
 	QPainterPath path(this->point[0]);
 	int twidth = 1;
+	if (lineWidth.size() != 0)
+	{
+		twidth = lineWidth[0];
+	}
 	for (int i = 1; i < point.size(); ++i)
 	{
 		if (lineWidth.size() != 0)
 		{
 			if (twidth != lineWidth[i])
 			{
-				twidth = lineWidth[i];
-				this->pen().setWidth(lineWidth[i]);
-				painter->setPen(this->pen());
+				QPen pen = QPen(this->pen().color(), twidth);
+				pen.setStyle(Qt::SolidLine);
+				painter->setPen(pen);
+
 				painter->drawPath(path);
-				QPainterPath tpath(point[i]);
+				QPainterPath tpath(point[i-1]);
 				path = tpath;
+				twidth = lineWidth[i];
+				QPen pen1 = QPen(this->pen().color(), twidth);
+				pen1.setStyle(Qt::SolidLine);
+				painter->setPen(pen1);
+
 			}
 		}
+		path.lineTo(point[i]);
 	}
 	painter->drawPath(path);
 }
+
+//------------------------------------------------------------------------------
+
 
 BPoint::BPoint(ItemType type)
 	: BGraphicsItem(QPointF(0, 0), QPointF(0, 0), type)
