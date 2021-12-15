@@ -25,13 +25,17 @@ fstream outfile("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/outtest.txt",fstr
 //*********************工具性函数***********************************
 
 //参数 圆心	圆环大圆半径	圆环小圆半径	球半径	圆柱高度
-//参数 圆心	圆环大圆半径	圆环小圆半径	球半径	圆柱高度
+
 vector<VFLOAT> getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 {
 	vector<VFLOAT> finalRes;
 
-	VFLOAT InternalRes;//内部的
-	VFLOAT ExternalRes;//外部的
+
+	//从内向外计数
+	VFLOAT Res1;//第1层
+	VFLOAT Res2;//第2层
+	VFLOAT Res3;//第3层
+
 
 
 	//右手坐标系
@@ -41,96 +45,254 @@ vector<VFLOAT> getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 	float resZ;//Z轴屏幕向外
 
 	int floor = 0;//层数
-	float floorheight = 2 * r * sin(acos((R1 - R2 - 2 * r) / 2 * r));//层高
-	floor = (h - (2 * r - floorheight)) / floorheight;
+
+	float floorheight = pow(3, 0.5) * r;//层高
+	floor = (h - r + pow(3, 0.5) * r / 2) / floorheight;
+
 
 	//C是一个中间变量
-	float C = ((R2 + r) * (R2 + r) + (R1 - r) * (R1 - r) - 4 * r * r) / (2 * (R2 + r) * (R1 - r));
+	float C = r / (R2 + r);
 
 	//计算可以每一层可以装下多少个小球
 	int num = 0;
 
-	//Beta是每个球所占用的弧度
-	float Beta = acos(C);
+	//half_a是紧贴内圆球一半圆所占的弧度
+	float halfBeta = asin(C);
+	//an是紧贴内圆球整个圆所占的弧度
+	float Beta = halfBeta * 2;
 
 	num = 2 * Pi / Beta;
 
-	for (int f = 0; f < floor; f++)
+	if ((2 * ((R2 + r) * cos(halfBeta) + pow(3, 0.5) * r) + r) > R1)
 	{
-		if (f % 2 == 0)
+		for (int f = 0; f < floor; f++)
 		{
-			for (int i = 0; i < num; i++)
+			if (f % 2 == 0)
 			{
-				//该小球与圆心夹角（弧度）
-				float angle = i * Beta;
-
-				if (i % 2 == 0)
+				for (int i = 0; i < num; i++)
 				{
-					//PS:将计算内的大圆、小圆半径减少或者增加0.005，来缓和float型计算时产生的误差
+					//该小球与圆心夹角（弧度）
+					float angle1 = i * Beta;
+					float angle2 = i * Beta + halfBeta;
 
-					resX = center.fXYZ[0] + (R1 - r - 0.005) * cos(angle);
-					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle);
+					//第1层
+
+					resX = center.fXYZ[0] + (R2 + r) * cos(angle1);
+					resZ = center.fXYZ[2] + (R2 + r) * sin(angle1);
 					resY = r + center.fXYZ[1] + f * floorheight;
 
 
-					ExternalRes.push_back(resX);
-					ExternalRes.push_back(resY);
-					ExternalRes.push_back(resZ);
+					Res1.push_back(resX);
+					Res1.push_back(resY);
+					Res1.push_back(resZ);
+
+
+					//第2层
+					resX = center.fXYZ[0] + ((R2 + r) * cos(halfBeta) + pow(3, 0.5) * r) * cos(angle2);
+					resZ = center.fXYZ[2] + ((R2 + r) * cos(halfBeta) + pow(3, 0.5) * r) * sin(angle2);
+					resY = r + center.fXYZ[1] + f * floorheight;
+
+
+
+					Res2.push_back(resX);
+					Res2.push_back(resY);
+					Res2.push_back(resZ);
+
+
+					//第3层
+
+					resX = center.fXYZ[0] + (2 * ((R2 + r) * cos(halfBeta) + pow(3, 0.5) * r) * cos(halfBeta) - (R2 + r)) * cos(angle1);
+					resZ = center.fXYZ[2] + (2 * ((R2 + r) * cos(halfBeta) + pow(3, 0.5) * r) * cos(halfBeta) - (R2 + r)) * sin(angle1);
+					resY = r + center.fXYZ[1] + f * floorheight;
+
+
+					Res3.push_back(resX);
+					Res3.push_back(resY);
+					Res3.push_back(resZ);
+
+
+
 				}
-				else
+			}
+			else
+			{
+				for (int i = 0; i < num; i++)
 				{
+					//该小球与圆心夹角（弧度）
+					float angle1 = i * Beta;
+					float angle2 = i * Beta + halfBeta;
 
+					//第1层
 
-					resX = center.fXYZ[0] + (R2 + r + 0.005) * cos(angle);
-					resZ = center.fXYZ[2] + (R2 + r + 0.005) * sin(angle);
+					resX = center.fXYZ[0] + (R2 + r) * cos(angle2);
+					resZ = center.fXYZ[2] + (R2 + r) * sin(angle2);
 					resY = r + center.fXYZ[1] + f * floorheight;
 
 
 
-					InternalRes.push_back(resX);
-					InternalRes.push_back(resY);
-					InternalRes.push_back(resZ);
+					Res1.push_back(resX);
+					Res1.push_back(resY);
+					Res1.push_back(resZ);
+
+
+					//第2层
+					resX = center.fXYZ[0] + ((R2 + r) * cos(halfBeta) + pow(3, 0.5) * r) * cos(angle1);
+					resZ = center.fXYZ[2] + ((R2 + r) * cos(halfBeta) + pow(3, 0.5) * r) * sin(angle1);
+					resY = r + center.fXYZ[1] + f * floorheight;
+
+
+					Res2.push_back(resX);
+					Res2.push_back(resY);
+					Res2.push_back(resZ);
+
+
+					//第3层
+
+					resX = center.fXYZ[0] + (2 * ((R2 + r) * cos(halfBeta) + pow(3, 0.5) * r) * cos(halfBeta) - (R2 + r)) * cos(angle2);
+					resZ = center.fXYZ[2] + (2 * ((R2 + r) * cos(halfBeta) + pow(3, 0.5) * r) * cos(halfBeta) - (R2 + r)) * sin(angle2);
+					resY = r + center.fXYZ[1] + f * floorheight;
+
+
+					Res3.push_back(resX);
+					Res3.push_back(resY);
+					Res3.push_back(resZ);
+
 				}
 			}
 		}
-		else
-		{
-			for (int i = 0; i < num; i++)
-			{
-				//该小球与圆心夹角（弧度）
-				float angle = i * Beta;
+		finalRes.push_back(Res1);
+		finalRes.push_back(Res2);
+		finalRes.push_back(Res3);
 
-				if (i % 2 == 1)
-				{
-					resX = center.fXYZ[0] + (R1 - r - 0.005) * cos(angle);
-					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle);
-					resY = r + center.fXYZ[1] + f * floorheight;
-
-
-					ExternalRes.push_back(resX);
-					ExternalRes.push_back(resY);
-					ExternalRes.push_back(resZ);
-				}
-				else
-				{
-
-
-					resX = center.fXYZ[0] + (R2 + r + 0.005) * cos(angle);
-					resZ = center.fXYZ[2] + (R2 + r + 0.005) * sin(angle);
-					resY = r + center.fXYZ[1] + f * floorheight;
-
-
-					InternalRes.push_back(resX);
-					InternalRes.push_back(resY);
-					InternalRes.push_back(resZ);
-				}
-			}
-		}
+		return finalRes;
 	}
-	finalRes.push_back(InternalRes);
-	finalRes.push_back(ExternalRes);
+	else
+	{
 
-	return finalRes;
+		//C是一个中间变量
+		float C1 = (R1 - R2) / 2 - r;
+		float C2 = pow((4 * r * r - C1 * C1), 0.5);
+
+		floor = 0;//层数
+		floorheight = C1;//层高
+		floor = h - C1 + r / floorheight;
+
+
+		//计算可以每一层可以装下多少个小球
+		int num = 0;
+
+		//half_a是紧贴内圆球一半圆所占的弧度
+		float halfBeta = atan(C2 / (R2 + r + C1));
+		//an是紧贴内圆球整个圆所占的弧度
+		float Beta = halfBeta * 2;
+
+		num = 2 * Pi / Beta;
+		for (int f = 0; f < floor; f++)
+		{
+			if (f % 2 == 0)
+			{
+				for (int i = 0; i < num; i++)
+				{
+
+					//该小球与圆心夹角（弧度）
+					float angle1 = i * Beta;
+					float angle2 = i * Beta + halfBeta;
+
+					//第1层
+
+					resX = center.fXYZ[0] + (R2 + r) * cos(angle1);
+					resZ = center.fXYZ[2] + (R2 + r) * sin(angle1);
+					resY = r + center.fXYZ[1] + f * floorheight;
+
+
+					Res1.push_back(resX);
+					Res1.push_back(resY);
+					Res1.push_back(resZ);
+
+
+					//第2层
+					resX = center.fXYZ[0] + (R2 + r + C1) * cos(angle2);
+					resZ = center.fXYZ[2] + (R2 + r + C1) * sin(angle2);
+					resY = r + center.fXYZ[1] + f * floorheight;
+
+
+					Res2.push_back(resX);
+					Res2.push_back(resY);
+					Res2.push_back(resZ);
+
+
+					//第3层
+
+					resX = center.fXYZ[0] + (R1 - r) * cos(angle1);
+					resZ = center.fXYZ[2] + (R1 - r) * sin(angle1);
+					resY = r + center.fXYZ[1] + f * floorheight;
+
+
+					Res3.push_back(resX);
+					Res3.push_back(resY);
+					Res3.push_back(resZ);
+
+
+				}
+			}
+			else
+			{
+				for (int i = 0; i < num; i++)
+				{
+					//该小球与圆心夹角（弧度）
+					float angle1 = i * Beta;
+					float angle2 = i * Beta + halfBeta;
+
+					//第1层
+
+					resX = center.fXYZ[0] + (R2 + r) * cos(angle2);
+					resZ = center.fXYZ[2] + (R2 + r) * sin(angle2);
+					resY = r + center.fXYZ[1] + f * floorheight;
+
+
+					Res1.push_back(resX);
+					Res1.push_back(resY);
+					Res1.push_back(resZ);
+
+
+
+					//第2层
+					resX = center.fXYZ[0] + (R2 + r + C1) * cos(angle1);
+					resZ = center.fXYZ[2] + (R2 + r + C1) * sin(angle1);
+					resY = r + center.fXYZ[1] + f * floorheight;
+
+
+					Res2.push_back(resX);
+					Res2.push_back(resY);
+					Res2.push_back(resZ);
+
+
+					//第3层
+
+					resX = center.fXYZ[0] + (R1 - r) * cos(angle2);
+					resZ = center.fXYZ[2] + (R1 - r) * sin(angle2);
+					resY = r + center.fXYZ[1] + f * floorheight;
+
+
+					Res3.push_back(resX);
+					Res3.push_back(resY);
+					Res3.push_back(resZ);
+
+
+
+				}
+			}
+		}
+		finalRes.push_back(Res1);
+		finalRes.push_back(Res2);
+		finalRes.push_back(Res3);
+
+		return finalRes;
+
+
+	}
+
+
 }
 
 
@@ -276,7 +438,7 @@ void WarheadOGLManager::paintGL()
 
 		float sideR1=4.2, sideR2 =3.8, sideR3 =3.5,sideH = 10.0;			//弹壳侧面三层圆柱半径与高度
 
-		float fragR = 0.125;			//球状弹丸半径
+		float fragR = 0.08;			//球状弹丸半径
 
 		//弹柱体底面壳
 		{
