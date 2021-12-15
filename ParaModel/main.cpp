@@ -1,6 +1,6 @@
 
-//#include "WarheadParaModel.h"
-#include "ParaModel.h"
+#include "WarheadParaModel.h"
+//#include "ParaModel.h"
 #include <QtWidgets/QApplication>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -12,8 +12,8 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-	//WarheadParaModel w;
-	ParaModel w;
+	WarheadParaModel w;
+	//ParaModel w;
 	w.show();
 	//计时开始
 	LARGE_INTEGER litmp;
