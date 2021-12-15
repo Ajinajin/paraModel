@@ -18,19 +18,22 @@ const int OGLMANAGER_WIDTH = 1200;
 const int OGLMANAGER_HEIGHT = 800;
 
 const float Pi = 3.141592654;
-VFLOAT res;
+vector<VFLOAT> res;
 int initFlag = 0;
 fstream outfile("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/outtest.txt",fstream::out);
 
 //*********************工具性函数***********************************
 
 //参数 圆心	圆环大圆半径	圆环小圆半径	球半径	圆柱高度
-VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
+//参数 圆心	圆环大圆半径	圆环小圆半径	球半径	圆柱高度
+vector<VFLOAT> getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 {
+	vector<VFLOAT> finalRes;
 
-	
+	VFLOAT InternalRes;//内部的
+	VFLOAT ExternalRes;//外部的
 
-	VFLOAT res;
+
 	//右手坐标系
 	//存放计算出的小球的圆心坐标
 	float resX;//X轴向右
@@ -38,8 +41,8 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 	float resZ;//Z轴屏幕向外
 
 	int floor = 0;//层数
-	float floorheight = 2*r*sin(acos((R1-R2-2*r)/2*r));//层高
-	floor = (h -(2*r- floorheight))/ floorheight;
+	float floorheight = 2 * r * sin(acos((R1 - R2 - 2 * r) / 2 * r));//层高
+	floor = (h - (2 * r - floorheight)) / floorheight;
 
 	//C是一个中间变量
 	float C = ((R2 + r) * (R2 + r) + (R1 - r) * (R1 - r) - 4 * r * r) / (2 * (R2 + r) * (R1 - r));
@@ -67,12 +70,12 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 
 					resX = center.fXYZ[0] + (R1 - r - 0.005) * cos(angle);
 					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle);
-					resY = center.fXYZ[1] + r + f * floorheight;
+					resY = r + center.fXYZ[1] + f * floorheight;
 
 
-					res.push_back(resX);
-					res.push_back(resY);
-					res.push_back(resZ);
+					ExternalRes.push_back(resX);
+					ExternalRes.push_back(resY);
+					ExternalRes.push_back(resZ);
 				}
 				else
 				{
@@ -80,13 +83,13 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 
 					resX = center.fXYZ[0] + (R2 + r + 0.005) * cos(angle);
 					resZ = center.fXYZ[2] + (R2 + r + 0.005) * sin(angle);
-					resY = center.fXYZ[1] + r + f * floorheight;
+					resY = r + center.fXYZ[1] + f * floorheight;
 
-					
 
-					res.push_back(resX);
-					res.push_back(resY);
-					res.push_back(resZ);
+
+					InternalRes.push_back(resX);
+					InternalRes.push_back(resY);
+					InternalRes.push_back(resZ);
 				}
 			}
 		}
@@ -101,12 +104,12 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 				{
 					resX = center.fXYZ[0] + (R1 - r - 0.005) * cos(angle);
 					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle);
-					resY = center.fXYZ[1] + r + f * floorheight;
+					resY = r + center.fXYZ[1] + f * floorheight;
 
 
-					res.push_back(resX);
-					res.push_back(resY);
-					res.push_back(resZ);
+					ExternalRes.push_back(resX);
+					ExternalRes.push_back(resY);
+					ExternalRes.push_back(resZ);
 				}
 				else
 				{
@@ -114,18 +117,22 @@ VFLOAT getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 
 					resX = center.fXYZ[0] + (R2 + r + 0.005) * cos(angle);
 					resZ = center.fXYZ[2] + (R2 + r + 0.005) * sin(angle);
-					resY = center.fXYZ[1] + r + f * floorheight;
+					resY = r + center.fXYZ[1] + f * floorheight;
 
 
-					res.push_back(resX);
-					res.push_back(resY);
-					res.push_back(resZ);
+					InternalRes.push_back(resX);
+					InternalRes.push_back(resY);
+					InternalRes.push_back(resZ);
 				}
 			}
 		}
 	}
-	return res;
+	finalRes.push_back(InternalRes);
+	finalRes.push_back(ExternalRes);
+
+	return finalRes;
 }
+
 
 //****************************************************************
 
@@ -342,10 +349,17 @@ void WarheadOGLManager::paintGL()
 		{
 			
 			ResourceManager::getShader("WarheadSphere").use();
-			ResourceManager::getShader("WarheadSphere").use().setFloat("R", 255);
-			ResourceManager::getShader("WarheadSphere").use().setFloat("G", 0);
-			ResourceManager::getShader("WarheadSphere").use().setFloat("B", 0);
-			DrawSphere(res, fragR);
+			
+			
+			
+			//每层破片要不同颜色
+			{
+				for (int i = 0; i < res.size(); i++)
+				{
+					ResourceManager::getShader("WarheadSphere").use().setInteger("layer",i);
+					DrawSphere(res[i], fragR);
+				}
+			}
 			
 			
 		}

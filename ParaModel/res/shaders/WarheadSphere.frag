@@ -1,12 +1,17 @@
 #version 330 core
 out vec4 FragColor;
 
-uniform float R;
-uniform float G;
-uniform float B;
 
+uniform int layer;
 
 void main(){
 
-	FragColor = vec4( R/255.0, G/255.0, B/255.0, 1.0f);
+	if(layer==0)
+	{
+		FragColor = vec4( 1.0, 0.0, 0.0, 1.0f);
+	}
+	if(layer==1)
+	{
+		FragColor = vec4( 0.0, 0.0, 1.0, 1.0f);
+	}
 }
