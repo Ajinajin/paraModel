@@ -62,10 +62,13 @@ public:
 	void DrawSphere(VFLOAT centers, float radius);
 
 
-	vPoint allNodes;			//存储三维模型的所有节点信息
+	//vPoint allNodes;			//存储三维模型的所有节点信息
 
 
 public:
+
+	ArmHeadTopo oglWarhead;		//需要绘制的战斗部
+
 	//相机、鼠标键入相关参数
 	Camera* camera;
 	GLboolean isFirstMouse;

@@ -342,7 +342,7 @@ void WarheadOGLManager::initializeGL()
 
 
 	//
-	allNodes.resize(0);
+	//allNodes.resize(0);
 
 
 	/************ 载入shader ***********/
@@ -424,10 +424,7 @@ void WarheadOGLManager::paintGL()
 	//DrawFuse(center,2,2,1,2);
 	//DrawRoundPConeSide(center,5,2,3);
 
-
-
-
-	//绘制一个弹
+	if (oglWarhead.mapArmHead.size() != 0)			//绘制战斗部
 	{
 		float CirBottomR = 5.0;		//弹壳最底面圆柱半径
 		float CirBottomH = 0.3;		//弹壳最底面圆柱高度
@@ -437,7 +434,8 @@ void WarheadOGLManager::paintGL()
 
 		float sideR1=4.2, sideR2 =3.8, sideR3 =3.5,sideH = 10.0;			//弹壳侧面三层圆柱半径与高度
 
-		float fragR = 0.09;			//球状弹丸半径
+		float fragR = (sideR1- sideR2)/(4.5);			//球状弹丸半径
+
 
 		//弹柱体底面壳
 		{
