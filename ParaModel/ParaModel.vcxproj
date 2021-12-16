@@ -62,7 +62,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link />
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Qt\5.12.11\msvc2017_64\lib;C:\Qt\5.12.11\msvc2017_64\include\ActiveQt;C:\Qt\5.12.11\msvc2017_64\include\QtXml;GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\5.12.11\msvc2017_64\lib;C:\Qt\5.12.11\msvc2017_64\include\ActiveQt;C:\Qt\5.12.11\msvc2017_64\include\QtXml;GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\openssl\lib;C:\Utils\my_sql\mysql-5.6.11-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
