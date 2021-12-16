@@ -63,7 +63,7 @@ vector<VFLOAT> getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 
 	num = 2 * Pi / Beta;
 
-	if ((2 * ((R2 + r) * cos(halfBeta) + pow(3, 0.5) * r) + r) > R1)
+	if (((2 * ((R2 + r) * cos(halfBeta) + pow(3, 0.5) * r) * cos(halfBeta) - (R2 + r)) + r) < R1)
 	{
 		for (int f = 0; f < floor; f++)
 		{
@@ -175,7 +175,7 @@ vector<VFLOAT> getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 
 		floor = 0;//层数
 		floorheight = C1;//层高
-		floor = h - C1 + r / floorheight;
+		floor = (h - C1 + r) / floorheight;
 
 
 		//计算可以每一层可以装下多少个小球
@@ -223,8 +223,8 @@ vector<VFLOAT> getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 
 					//第3层
 
-					resX = center.fXYZ[0] + (R1 - r) * cos(angle1);
-					resZ = center.fXYZ[2] + (R1 - r) * sin(angle1);
+					resX = center.fXYZ[0] + (R1 - r - 0.005) * cos(angle1);
+					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle1);
 					resY = r + center.fXYZ[1] + f * floorheight;
 
 
@@ -269,8 +269,8 @@ vector<VFLOAT> getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 
 					//第3层
 
-					resX = center.fXYZ[0] + (R1 - r) * cos(angle2);
-					resZ = center.fXYZ[2] + (R1 - r) * sin(angle2);
+					resX = center.fXYZ[0] + (R1 - r - 0.005) * cos(angle2);
+					resZ = center.fXYZ[2] + (R1 - r - 0.005) * sin(angle2);
 					resY = r + center.fXYZ[1] + f * floorheight;
 
 
@@ -294,7 +294,6 @@ vector<VFLOAT> getFragSphere(Ver3D center, float R1, float R2, float r, float h)
 
 
 }
-
 
 //****************************************************************
 
@@ -438,7 +437,7 @@ void WarheadOGLManager::paintGL()
 
 		float sideR1=4.2, sideR2 =3.8, sideR3 =3.5,sideH = 10.0;			//弹壳侧面三层圆柱半径与高度
 
-		float fragR = 0.08;			//球状弹丸半径
+		float fragR = 0.09;			//球状弹丸半径
 
 		//弹柱体底面壳
 		{
