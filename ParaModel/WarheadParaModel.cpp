@@ -140,8 +140,12 @@ void WarheadParaModel::InitOpenGlWidget(QDockWidget* from)
 void WarheadParaModel::updateOGL()
 {
 	warheadParaOglmanager->update();
-
+	if (! vLoadWarhead.mapArmHead.empty())
+	{
+		warheadParaOglmanager->oglWarhead = vLoadWarhead;
+	}
 }
+	
 
 //初始化内容区域
 void WarheadParaModel::InitCentralWidget()
