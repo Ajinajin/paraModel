@@ -2,7 +2,7 @@
 #include <ParaType.h>
 #include <DimDataConvert.h>
 #include <math.h>
-
+#include <vector>
 //通过墙的构建序号来得到与其连接的两个柱子索引
 void calColumnsIdxFromWallIdx(int wallIdx, int *columnArrayIdx, VTOPOTABLE oglTopTable)
 {
@@ -956,23 +956,525 @@ int CalWallMoveRange(int nWallIdx, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, i
 	return 0;
 }
 // 移动墙
-int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw)
+int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw, VUNITTABLE table)
 {
-	int nRe = 0;
-	// 墙只能沿垂直墙方向移动
-	// 墙两端必须有柱子
-	// 得到柱子关联的其他墙
+	//int nRe = 0;
+	//// 墙只能沿垂直墙方向移动
+	//// 墙两端必须有柱子
+	//// 得到柱子关联的其他墙
+	//int nAdjCol[2];
+	//int nXYMoveRange[2][2];
+	//// 	// 计算墙的合规范围
+	//nRe = CalWallMoveRange(nMoveUnitIdx, vLayerTopo, vPlaneDraw, nAdjCol, nXYMoveRange);
+
+	//// 按墙垂直方向计算移动距离
+	//if (nMoveX <= nXYMoveRange[0][0] || nMoveX >= nXYMoveRange[0][1])
+	//	nMoveX = 0;
+	//if (nMoveY <= nXYMoveRange[1][0] || nMoveY >= nXYMoveRange[1][1])
+	//	nMoveY = 0;
+	
+
+
 	int nAdjCol[2];
 	int nXYMoveRange[2][2];
-	// 	// 计算墙的合规范围
+	int nRe = 0;
+	// 计算墙的合规范围
 	nRe = CalWallMoveRange(nMoveUnitIdx, vLayerTopo, vPlaneDraw, nAdjCol, nXYMoveRange);
+	int nAdjNum = 10;
+	int j = 0;
+	int nCurAdj;
+	int nAdjColIdx[2];
+	int nColIdx = 0;
+	TopoUnit oUnit = vLayerTopo[nMoveUnitIdx];
+	for (j = 0; j < nAdjNum; j++)
+	{
+		nCurAdj = oUnit.nAdjUnitIdx[j];
+		if (nCurAdj >= 0 && vLayerTopo[nCurAdj].nUnitType == 1)
+		{
+			nAdjColIdx[nColIdx] = nCurAdj;
+			nColIdx += 1;
+			if (nColIdx == 2)
+				break;
+		}
+	}
+	if (nColIdx < 2)
+		return 1;
+	int thickness;
+	// 得到两个柱子的范围
+	for (int j = 0; j < 12; j++)
+	{
+		if (vLayerTopo[nColIdx].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nUnitType == 4 && vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nUnitAngle == 0)
+		{
+			int walUnitId = vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nCenUnitIdx;
+			int thickness = table[walUnitId].oShape.nThickNess;
 
-	// 按墙垂直方向计算移动距离
-	if (nMoveX <= nXYMoveRange[0][0] || nMoveX >= nXYMoveRange[0][1])
-		nMoveX = 0;
-	if (nMoveY <= nXYMoveRange[1][0] || nMoveY >= nXYMoveRange[1][1])
-		nMoveY = 0;
+		}
+
+	}
+	SimpleShape oColShape0 = vPlaneDraw[nAdjColIdx[0]];
+	SimpleShape oColShape1 = vPlaneDraw[nAdjColIdx[1]];
+	int nXDis = abs(oColShape0.nCen[0] - oColShape1.nCen[0] - (oColShape0.nWH[0] + oColShape1.nWH[0]) / 2);
+	int nYDis = abs(oColShape0.nCen[1] - oColShape1.nCen[1] - (oColShape0.nWH[1] + oColShape1.nWH[1]) / 2);
+
+
+
+
+
+
+	// 根据墙的两个柱子得到另外两个需要判定的墙
+	int finalXminDis, finalYminDis;
 	
+	if (vLayerTopo[nMoveUnitIdx].nUnitAngle == 0)
+	{
+		VINT allWalls;				//找到所有与此墙同一水平的柱子	
+
+		for (int i = 0; i < vLayerTopo.size(); i++)//找寻与此墙同一水平的其他墙
+		{
+			
+			if (vLayerTopo[i].nUnitType == 4 && vLayerTopo[i].nUnitAngle == 0)
+			{
+				int moveWallY = vLayerTopo[vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0]].nCenPos[2];					//移动的墙的中心Y值
+				int newWallY = vLayerTopo[vLayerTopo[i].nAdjUnitIdx[0]].nCenPos[2];								//判定墙的中心Y值
+
+				if (moveWallY== newWallY)
+				{
+					allWalls.push_back(i);
+				}
+				
+			}
+		}
+
+		VINT allCols;				//找到这些墙的所有柱子	
+		for (int j = 0; j < allWalls.size(); j++)
+		{
+			if (find(allCols.begin(), allCols.end(), vLayerTopo[allWalls[j]].nAdjUnitIdx[0])== allCols.end())
+			{
+				allCols.push_back(vLayerTopo[allWalls[j]].nAdjUnitIdx[0]);
+			}
+			if (find(allCols.begin(), allCols.end(), vLayerTopo[allWalls[j]].nAdjUnitIdx[1]) == allCols.end())
+			{
+				allCols.push_back(vLayerTopo[allWalls[j]].nAdjUnitIdx[1]);
+			}
+		}
+
+		VINT nUpWalls;				//找到这些柱子所连接的竖直墙(分上面与下面，基于最初移动的墙)
+		VINT nDownWalls;
+		for (int k = 0; k < allCols.size(); k++)
+		{
+			for (int i = 0; i < 12; i++)
+			{
+				if (vLayerTopo[allCols[k]].nAdjUnitIdx[i] != -1)
+				{
+					if (vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nUnitType == 4 && vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nUnitAngle == 90)
+					{
+						int moveWallY = vLayerTopo[vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0]].nCenPos[2];					//移动的墙的中心Y值
+						int newWallY;								//判定墙的中心Y值
+						{
+							int col1 = vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nAdjUnitIdx[0];
+							int col2 = vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nAdjUnitIdx[1];
+							newWallY = (vLayerTopo[col1].nCenPos[2] + vLayerTopo[col2].nCenPos[2])/2;
+
+						}
+
+						if (newWallY < moveWallY)
+						{
+							nUpWalls.push_back(vLayerTopo[allCols[k]].nAdjUnitIdx[i]);
+						}
+						else { 
+							nDownWalls.push_back(vLayerTopo[allCols[k]].nAdjUnitIdx[i]); }
+					}
+				}
+			}
+		}
+
+
+		//找到能移动的最大距离
+		{
+			if (nMoveY < 0)	//如果墙是往上挪的
+			{
+				VINT nDoorAndWinIds;		//找到这些竖直的墙的对应门窗ID
+				for (int i = 0; i < nUpWalls.size(); i++)		//原墙以上的墙
+				{
+					for (int j = 0; j < 12; j++)
+					{
+						if (vLayerTopo[nUpWalls[i]].nAdjUnitIdx[j] != -1)
+						{
+							if (vLayerTopo[vLayerTopo[nUpWalls[i]].nAdjUnitIdx[j]].nUnitType > 4)
+							{
+								nDoorAndWinIds.push_back(vLayerTopo[nUpWalls[i]].nAdjUnitIdx[j]);
+							}
+						}
+					}
+				}
+				if (nDoorAndWinIds.size() != 0)
+				{
+					int maxDisY = 0;
+					for (int tmp = 0; tmp < nDoorAndWinIds.size(); tmp++)
+					{
+
+						int dis = vLayerTopo[nDoorAndWinIds[tmp]].nCenPos[0] + vPlaneDraw[nDoorAndWinIds[tmp]].nWH[0];
+						if (dis > maxDisY) { maxDisY = dis; }
+					}
+					//nYDis += maxDisY;
+					// 
+					// 
+					//再减去另一个墙的厚度
+
+					{
+						int wallId = vLayerTopo[nDoorAndWinIds[0]].nAdjUnitIdx[0];
+						int colId;
+						for (int i = 0; i < 2; i++)
+						{
+							if (vLayerTopo[vLayerTopo[wallId].nAdjUnitIdx[i]].nCenPos[2] < vLayerTopo[vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0]].nCenPos[2])
+							{
+								colId = vLayerTopo[wallId].nAdjUnitIdx[i];
+							}
+						}
+						//通过此柱子找到移动墙对面的墙
+						for (int j = 0; j < 12; j++)
+						{
+							if (vLayerTopo[colId].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nUnitType == 4 && vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nUnitAngle == 0)
+							{
+								int walUnitId = vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nCenUnitIdx;
+								int thickness = table[walUnitId].oShape.nThickNess;
+								maxDisY += thickness;
+
+								//柱子与墙厚度有一点差异
+								int colH = vPlaneDraw[colId].nWH[1];
+								maxDisY += (colH - thickness) / 2;
+
+								break;
+							}
+						}
+
+
+					}
+
+
+
+
+					nXYMoveRange[1][0] += maxDisY;
+				}
+				
+			}
+			else
+			{
+				VINT nDoorAndWinIds;		//找到这些竖直的墙的对应门窗ID
+				for (int i = 0; i < nDownWalls.size(); i++)		//原墙以下的墙
+				{
+					for (int j = 0; j < 12; j++)
+					{
+						if (vLayerTopo[nDownWalls[i]].nAdjUnitIdx[j] != -1)
+						{
+							if (vLayerTopo[vLayerTopo[nDownWalls[i]].nAdjUnitIdx[j]].nUnitType > 4)
+							{
+								nDoorAndWinIds.push_back(vLayerTopo[nDownWalls[i]].nAdjUnitIdx[j]);
+							}
+						}
+					}
+				}
+				if (nDoorAndWinIds.size() != 0)
+				{
+					int maxDisY = 0;
+					for (int tmp = 0; tmp < nDoorAndWinIds.size(); tmp++)
+					{
+
+						int dis = vLayerTopo[nDoorAndWinIds[tmp]].nCenPos[0] + vPlaneDraw[nDoorAndWinIds[tmp]].nWH[0];
+						if (dis > maxDisY) { maxDisY = dis; }
+					}
+					//nYDis -= maxDisY;
+
+					//再减去另一个墙的厚度
+					{
+						int wallId = vLayerTopo[nDoorAndWinIds[0]].nAdjUnitIdx[0];
+						int colId;
+						for (int i = 0; i < 2; i++)
+						{
+							if (vLayerTopo[vLayerTopo[wallId].nAdjUnitIdx[i]].nCenPos[2] > vLayerTopo[vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0]].nCenPos[2])
+							{
+								colId = vLayerTopo[wallId].nAdjUnitIdx[i];
+							}
+						}
+						//通过此柱子找到移动墙对面的墙
+						for (int j = 0; j < 12; j++)
+						{
+							if (vLayerTopo[colId].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nUnitType == 4 && vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nUnitAngle == 0)
+							{
+								int walUnitId = vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nCenUnitIdx;
+								int thickness = table[walUnitId].oShape.nThickNess;
+								maxDisY += thickness;
+
+								//柱子与墙厚度有一点差异
+								int colH = vPlaneDraw[colId].nWH[1];
+								maxDisY += (colH - thickness) / 2;
+
+								break;
+							}
+						}
+
+
+					}
+
+					nXYMoveRange[1][1] -= maxDisY;
+				}
+				
+			}
+
+
+			
+
+		}
+		
+	}
+
+
+
+
+
+
+
+
+
+	// 根据墙的两个柱子得到另外两个需要判定的墙
+
+	if (vLayerTopo[nMoveUnitIdx].nUnitAngle == 90)
+	{
+		VINT allWalls;				//找到所有与此墙同垂直的柱子	
+
+		for (int i = 0; i < vLayerTopo.size(); i++)//找寻与此墙垂直的其他墙
+		{
+
+			if (vLayerTopo[i].nUnitType == 4 && vLayerTopo[i].nUnitAngle == 90)
+			{
+				int moveWallX = vLayerTopo[vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0]].nCenPos[0];					//移动的墙的中心X值
+				int newWallX = vLayerTopo[vLayerTopo[i].nAdjUnitIdx[0]].nCenPos[0];								//判定墙的中心X值
+
+				if (moveWallX == newWallX)
+				{
+					allWalls.push_back(i);
+				}
+
+			}
+		}
+
+		VINT allCols;				//找到这些墙的所有柱子	
+		for (int j = 0; j < allWalls.size(); j++)
+		{
+			if (find(allCols.begin(), allCols.end(), vLayerTopo[allWalls[j]].nAdjUnitIdx[0]) == allCols.end())
+			{
+				allCols.push_back(vLayerTopo[allWalls[j]].nAdjUnitIdx[0]);
+			}
+			if (find(allCols.begin(), allCols.end(), vLayerTopo[allWalls[j]].nAdjUnitIdx[1]) == allCols.end())
+			{
+				allCols.push_back(vLayerTopo[allWalls[j]].nAdjUnitIdx[1]);
+			}
+		}
+
+		VINT nLeftWalls;				//找到这些柱子所连接的竖直墙(左边与右边，基于最初移动的墙)
+		VINT nRightWalls;
+		for (int k = 0; k < allCols.size(); k++)
+		{
+			for (int i = 0; i < 12; i++)
+			{
+				if (vLayerTopo[allCols[k]].nAdjUnitIdx[i] != -1)
+				{
+					if (vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nUnitType == 4 && vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nUnitAngle == 0)
+					{
+						int moveWallX = vLayerTopo[vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0]].nCenPos[0];					//移动的墙的中心X值
+						int newWallX;								//判定墙的中心X值
+						{
+							int col1 = vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nAdjUnitIdx[0];
+							int col2 = vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nAdjUnitIdx[1];
+							newWallX = (vLayerTopo[col1].nCenPos[0] + vLayerTopo[col2].nCenPos[0]) / 2;
+
+						}
+
+						if (newWallX < moveWallX)
+						{
+							nLeftWalls.push_back(vLayerTopo[allCols[k]].nAdjUnitIdx[i]);
+						}
+						else {
+							nRightWalls.push_back(vLayerTopo[allCols[k]].nAdjUnitIdx[i]);
+						}
+					}
+				}
+			}
+		}
+
+
+		//找到能移动的最大距离
+		{
+			if (nMoveX < 0)	//如果墙是往左挪的
+			{
+				VINT nDoorAndWinIds;		//找到这些竖直的墙的对应门窗ID
+				for (int i = 0; i < nLeftWalls.size(); i++)		//原墙左边的墙
+				{
+					for (int j = 0; j < 12; j++)
+					{
+						if (vLayerTopo[nLeftWalls[i]].nAdjUnitIdx[j] != -1)
+						{
+							if (vLayerTopo[vLayerTopo[nLeftWalls[i]].nAdjUnitIdx[j]].nUnitType > 4)
+							{
+								nDoorAndWinIds.push_back(vLayerTopo[nLeftWalls[i]].nAdjUnitIdx[j]);
+							}
+						}
+					}
+				}
+				if (nDoorAndWinIds.size() != 0)
+				{
+					int maxDisX = 0;
+					for (int tmp = 0; tmp < nDoorAndWinIds.size(); tmp++)
+					{
+
+						int dis = vLayerTopo[nDoorAndWinIds[tmp]].nCenPos[2] + vPlaneDraw[nDoorAndWinIds[tmp]].nWH[0];
+						if (dis > maxDisX) { maxDisX = dis; }
+					}
+					//nYDis += maxDisY;
+					// 
+					// 
+					//再减去另一个墙的厚度
+
+					{
+						int wallId = vLayerTopo[nDoorAndWinIds[0]].nAdjUnitIdx[0];
+						int colId;
+						for (int i = 0; i < 2; i++)
+						{
+							if (vLayerTopo[vLayerTopo[wallId].nAdjUnitIdx[i]].nCenPos[2] < vLayerTopo[vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0]].nCenPos[2])
+							{
+								colId = vLayerTopo[wallId].nAdjUnitIdx[i];
+							}
+						}
+						//通过此柱子找到移动墙对面的墙
+						for (int j = 0; j < 12; j++)
+						{
+							if (vLayerTopo[colId].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nUnitType == 4 && vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nUnitAngle == 90)
+							{
+								int walUnitId = vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nCenUnitIdx;
+								int thickness = table[walUnitId].oShape.nThickNess;
+								maxDisX += thickness;
+
+								//柱子与墙厚度有一点差异
+								int colH = vPlaneDraw[colId].nWH[0];
+								maxDisX += (colH - thickness) / 2;
+
+								break;
+							}
+						}
+
+
+					}
+
+
+
+
+					nXYMoveRange[0][0] += maxDisX;
+				}
+
+			}
+			else
+			{
+				VINT nDoorAndWinIds;		//找到这些竖直的墙的对应门窗ID
+				for (int i = 0; i < nRightWalls.size(); i++)		//原墙右边的墙
+				{
+					for (int j = 0; j < 12; j++)
+					{
+						if (vLayerTopo[nRightWalls[i]].nAdjUnitIdx[j] != -1)
+						{
+							if (vLayerTopo[vLayerTopo[nRightWalls[i]].nAdjUnitIdx[j]].nUnitType > 4)
+							{
+								nDoorAndWinIds.push_back(vLayerTopo[nRightWalls[i]].nAdjUnitIdx[j]);
+							}
+						}
+					}
+				}
+				if (nDoorAndWinIds.size() != 0)
+				{
+					int maxDisX = 0;
+					for (int tmp = 0; tmp < nDoorAndWinIds.size(); tmp++)
+					{
+
+						int dis = vLayerTopo[nDoorAndWinIds[tmp]].nCenPos[2] + vPlaneDraw[nDoorAndWinIds[tmp]].nWH[0];
+						if (dis > maxDisX) { maxDisX = dis; }
+					}
+					//nYDis -= maxDisY;
+
+					//再减去另一个墙的厚度
+					{
+						int wallId = vLayerTopo[nDoorAndWinIds[0]].nAdjUnitIdx[0];
+						int colId;
+						for (int i = 0; i < 2; i++)
+						{
+							if (vLayerTopo[vLayerTopo[wallId].nAdjUnitIdx[i]].nCenPos[0] > vLayerTopo[vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0]].nCenPos[0])
+							{
+								colId = vLayerTopo[wallId].nAdjUnitIdx[i];
+							}
+						}
+						//通过此柱子找到移动墙对面的墙
+						for (int j = 0; j < 12; j++)
+						{
+							if (vLayerTopo[colId].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nUnitType == 4 && vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nUnitAngle == 90)
+							{
+								int walUnitId = vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nCenUnitIdx;
+								int thickness = table[walUnitId].oShape.nThickNess;
+								maxDisX += thickness;
+
+								//柱子与墙厚度有一点差异
+								int colH = vPlaneDraw[colId].nWH[0];
+								maxDisX += (colH - thickness) / 2;
+
+								break;
+							}
+						}
+
+
+					}
+
+					nXYMoveRange[0][1] -= maxDisX;
+				}
+
+			}
+
+
+
+
+		}
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		// 按墙垂直方向计算移动距离
+
+		if (nMoveX <= nXYMoveRange[0][0] || nMoveX >= nXYMoveRange[0][1])
+		{
+			
+			if (nMoveX < nXDis)
+			{
+				nMoveX = 0;
+			}
+		}
+
+		if (nMoveY <= nXYMoveRange[1][0] || nMoveY >= nXYMoveRange[1][1])
+		{
+			if (nMoveY < nYDis)
+			{
+				nMoveY = 0;
+			}
+		}
+
+
+
 
 	// 移动两端柱子
 	int nColNum = 2;
@@ -1000,7 +1502,7 @@ int DimDataConvert::MoveBaseUnit(int nSelUnitIdx, int nMoveX, int nMoveY, VTOPOT
 
 	// 移动墙
 	else if (nUnitType == 4)
-		nRe = MovWall(nSelUnitIdx,  nMoveX,  nMoveY, vLayerTopo, vPlaneDraw);
+		nRe = MovWall(nSelUnitIdx,  nMoveX,  nMoveY, vLayerTopo, vPlaneDraw, table);
 
 	return 0;
 }
