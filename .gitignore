@@ -33,6 +33,7 @@
 Debug
 debug
 Release
+SARibbon
 obj/
 .vs/
 /ParaModel/ParaModel.vcxproj
