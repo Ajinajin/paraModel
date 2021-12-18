@@ -1001,20 +1001,27 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 		return 1;
 	int thickness;
 	// 得到两个柱子的范围
-	for (int j = 0; j < 12; j++)
-	{
-		if (vLayerTopo[nColIdx].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nUnitType == 4 && vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nUnitAngle == 0)
-		{
-			int walUnitId = vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nCenUnitIdx;
-			int thickness = table[walUnitId].oShape.nThickNess;
+	//for (int j = 0; j < 12; j++)
+	//{
+	//	if (vLayerTopo[nColIdx].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nUnitType /*== 4 && vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nUnitAngle == 0*/)
+	//	{
+	//		int walUnitId = vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nCenUnitIdx;
+	//		int thickness = table[walUnitId].oShape.nThickNess;
 
-		}
+	//	}
 
-	}
+	//}
 	SimpleShape oColShape0 = vPlaneDraw[nAdjColIdx[0]];
 	SimpleShape oColShape1 = vPlaneDraw[nAdjColIdx[1]];
 	int nXDis = abs(oColShape0.nCen[0] - oColShape1.nCen[0] - (oColShape0.nWH[0] + oColShape1.nWH[0]) / 2);
 	int nYDis = abs(oColShape0.nCen[1] - oColShape1.nCen[1] - (oColShape0.nWH[1] + oColShape1.nWH[1]) / 2);
+
+
+
+
+
+
+
 
 
 
@@ -1152,7 +1159,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 
 
 
-
+					//nYDis += maxDisY;
 					nXYMoveRange[1][0] += maxDisY;
 				}
 				
@@ -1214,7 +1221,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 
 
 					}
-
+					//nYDis += maxDisY;
 					nXYMoveRange[1][1] -= maxDisY;
 				}
 				
@@ -1459,7 +1466,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 		if (nMoveX <= nXYMoveRange[0][0] || nMoveX >= nXYMoveRange[0][1])
 		{
 			
-			if (nMoveX < nXDis)
+			if (abs(nMoveX) > nYDis)
 			{
 				nMoveX = 0;
 			}
@@ -1467,7 +1474,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 
 		if (nMoveY <= nXYMoveRange[1][0] || nMoveY >= nXYMoveRange[1][1])
 		{
-			if (nMoveY < nYDis)
+			if (abs(nMoveY) > nXDis)
 			{
 				nMoveY = 0;
 			}
