@@ -1018,7 +1018,7 @@ void ParaOGLManager::InitAndDrawCuboid(int x, int y, int z, int length, int thic
 
 	//柱、门窗是不透明的，所以对其类型不加深度缓冲
 	
-	pCore->glEnable(GL_DEPTH_TEST);
+
 	if (type != 1 && type != 2/* && type != 3*/ && type != 5 /*&& type != 6*/) { pCore->glDepthMask(GL_FALSE); }//取消深度缓冲
 	
 	pCore->glDisable(GL_CULL_FACE);
@@ -1030,7 +1030,7 @@ void ParaOGLManager::InitAndDrawCuboid(int x, int y, int z, int length, int thic
 	pCore->glDisable(GL_BLEND);
 
 	if (type != 1 && type != 2 /*&& type != 3*/  && type != 5 /*&& type != 6*/ ) { pCore->glDepthMask(GL_TRUE); }
-	pCore->glDisable(GL_DEPTH_TEST);
+
 
 
 	

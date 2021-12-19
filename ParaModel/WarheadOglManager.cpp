@@ -572,7 +572,7 @@ void WarheadOGLManager::paintGL()
 				ResourceManager::getShader("warhead").use().setFloat("R", 124);
 				ResourceManager::getShader("warhead").use().setFloat("G", 252);
 				ResourceManager::getShader("warhead").use().setFloat("B", 0);
-				
+
 				
 				for (int i = 0; i < oglCurveData.size() / 2; i++)
 				{
@@ -830,10 +830,11 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 
-
+		
 		pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
-
-
+		
+	}
+	
 		//delete
 		pCore->glDeleteBuffers(1, &VBO);
 		delete[] vertices;
@@ -879,10 +880,11 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		pCore->glEnableVertexAttribArray(0);
 		pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-
+		
 		pCore->glDrawArrays(GL_TRIANGLE_FAN, 0, (pointsNum + 1));
 		pCore->glDrawArrays(GL_TRIANGLES, (pointsNum + 1), 3);
-
+		
+	}
 
 		//delete 
 		pCore->glDeleteBuffers(1, &VBO);
@@ -927,10 +929,10 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 
-
+		
 		pCore->glDrawArrays(GL_TRIANGLE_FAN, 0, (pointsNum + 1));
 		pCore->glDrawArrays(GL_TRIANGLES, (pointsNum + 1), 3);
-
+		
 
 		//delete
 		pCore->glDeleteBuffers(1, &VBO);
@@ -1389,6 +1391,7 @@ void WarheadOGLManager::DrawColumnSide(Ver3D center, float radius, float height,
 		pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
 
 
+		pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
 
 		//delete
 		pCore->glDeleteBuffers(1, &VBO);
@@ -1402,14 +1405,16 @@ void WarheadOGLManager::DrawColumnSide(Ver3D center, float radius, float height,
 		pCore->glDepthMask(GL_TRUE);
 	}
 	
-
+	
+	//delete
+	pCore->glDeleteBuffers(1,&VBO);
 }
 
 
 void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float height, float radius2, GLboolean ifTrans)
 {
 	if (ifTrans == GL_TRUE)//透明度
-	{
+{
 		pCore->glDepthMask(GL_FALSE);
 		pCore->glEnable(GL_BLEND);//开启颜色混合
 		pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
@@ -1503,8 +1508,8 @@ void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float hei
 
 	if (ifTrans == GL_TRUE)
 	{
-		pCore->glDisable(GL_BLEND);
-		pCore->glDepthMask(GL_TRUE);
+	pCore->glDisable(GL_BLEND);
+	pCore->glDepthMask(GL_TRUE);
 	}
 	
 	

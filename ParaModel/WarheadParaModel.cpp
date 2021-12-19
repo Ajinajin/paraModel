@@ -82,19 +82,23 @@ void WarheadParaModel::InitSysUnitWidget(QDockWidget* from)
 }
 
 void WarheadParaModel::NewArmHeadTmpl(QTreeWidgetItem* item, int column)
-{
+		{
 	DataConvert.bFirst = true; 
-	QVariant variant = item->data(0, Qt::UserRole);
-	int nArmHeadIdx = variant.value<int>();
-	vLoadWarhead = vWarhead[nArmHeadIdx];
-	ReLoadModelTree();
-	ReLoadModelProperty();
-	AddSceneData();
-	if (if_data == 0)
-	{
-		MyLogOutput("当前无画布信息，请新建或者打开后在操作");
-		return;
-	}
+			QVariant variant = item->data(0, Qt::UserRole);
+			int nArmHeadIdx = variant.value<int>();
+			vLoadWarhead = vWarhead[nArmHeadIdx];
+			ReLoadModelTree();
+			ReLoadModelProperty();
+			AddSceneData();
+			if (if_data == 0)
+			{
+				MyLogOutput("当前无画布信息，请新建或者打开后在操作");
+				return;
+			}
+		});
+	from->setWidget(pWarheadModelTreeWidget);
+	pWarheadModelTreeWidget->expandAll();
+}
 
 	return; 
 }
@@ -152,7 +156,7 @@ void WarheadParaModel::InitEditManagerWidget(QDockWidget* from)
 
 	graphicsViewMain = new BQGraphicsView();
 	graphicsViewMain->setScene(&pSceneMain);
-	pSceneMain.setBackgroundBrush(Qt::darkGray);
+	pSceneMain.setBackgroundBrush(Qt::darkGray); 
 	MainDockWidget->setMinimumWidth(1310);
 	MainDockWidget->setWindowTitle("编辑视图 （二维X）");
 	MainDockWidget->setWidget(graphicsViewMain);
@@ -185,6 +189,7 @@ void WarheadParaModel::updateOGL()
 	}
 
 }
+	
 
 //初始化内容区域
 void WarheadParaModel::InitCentralWidget()
@@ -354,7 +359,7 @@ void WarheadParaModel::InitWindow()
 	//QElapsedTimer cost;
 	//int lastTimes = 0;
 	//cost.start();
-	 
+
 }
 //初始化弹出窗口
 void WarheadParaModel::InitTipWindow()
@@ -476,7 +481,7 @@ void WarheadParaModel::ApplyDataAction()
 	for (size_t i = 0; i < pArmHeadEdit.size()-1; i++)
 	{
 		vLoadWarhead.mapArmHead[i].nUnitPropty= pArmHeadEdit[i]->text().toFloat();
-	} 
+	}
 	AddSceneData();
 	return;
 }
@@ -751,11 +756,11 @@ void WarheadParaModel::AddSceneData()
 			pen.setStyle(Qt::SolidLine);
 			m_line->setPen(pen);
 			if (vDrawShape[i].unitIdx == 7 || vDrawShape[i].unitIdx == 4)
-			{
+			{ 
 				m_line->setBrush(ColorHelper(vDrawShape[i].unitIdx));
 			}
 			for (size_t j = 0; j < vDrawShape[i].vCorner.size(); j++)
-			{
+				{
 				m_line->point.push_back(QPointF(vDrawShape[i].vCorner[j].nXY[0], vDrawShape[i].vCorner[j].nXY[1]));
 			}
 			pSceneMain.addItem(m_line);
@@ -863,7 +868,7 @@ void WarheadParaModel::ReLoadModelProperty()
 	pArmHeadEdit.clear();
 	QFormLayout* pLayout = new QFormLayout();
 	for (vector<PARADES>::const_iterator iter = vLoadWarhead.mapArmHead.begin(); iter != vLoadWarhead.mapArmHead.end(); iter++)
-	{ 
+	{
 		QLabel* unitName = new QLabel(iter->sUnitName);
 		unitName->setFixedWidth(100);
 		QLineEdit* txt = new QLineEdit(QString("%1").arg(iter->nUnitPropty));

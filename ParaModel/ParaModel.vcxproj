@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{286E0A3B-599A-4E85-AE21-50F7E1B98B9C}</ProjectGuid>
+    <Keyword>QtVS_v304</Keyword>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.19041.0</WindowsTargetPlatformVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
+    <QtInstall>msvc2017_64</QtInstall>
+    <QtModules>axcontainer;axserver;core;gui;widgets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
+    <QtInstall>msvc2017_64</QtInstall>
+    <QtModules>core;gui;widgets</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(QtMsBuild)\Qt.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <IncludePath>D:\gongzuo\paraModel\paraModel\ParaModel\SARibbon\src\SARibbonBar;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link />
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\QT\5.12.11\msvc2017_64\lib;C:\QT\5.12.11\msvc2017_64\include\ActiveQt;C:\QT\5.12.11\msvc2017_64\include\QtXml;GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\openssl\lib;C:\Utils\my_sql\mysql-5.6.11-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>shell32.lib;C:\QT\5.12.11\msvc2017_64\lib\qtmaind.lib;C:\QT\5.12.11\msvc2017_64\lib\Qt5AxContainerd.lib;C:\QT\5.12.11\msvc2017_64\lib\Qt5AxBased.lib;C:\QT\5.12.11\msvc2017_64\lib\Qt5Xmld.lib;D:\gongzuo\paraModel\paraModel\ParaModel\SARibbon\bin_qt5.12.11_debug_64\SARibbonBard.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="bpointitem.cpp" />
+    <ClCompile Include="bqgraphicsitem.cpp" />
+    <ClCompile Include="bqgraphicsscene.cpp" />
+    <ClCompile Include="bqgraphicsview.cpp" />
+    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="DimDataConvert.cpp" />
+    <ClCompile Include="paraoglmanager.cpp" />
+    <ClCompile Include="ParaModel.cpp" />
+    <ClCompile Include="resourcemanager.cpp" />
+    <ClCompile Include="ShaderProc.cpp" />
+    <ClCompile Include="WarheadDataConvert.cpp" />
+    <ClCompile Include="WarheadOglManager.cpp" />
+    <ClCompile Include="WarheadParaModel.cpp" />
+    <QtRcc Include="ParaModel.qrc" />
+    <QtUic Include="ParaModel.ui" />
+    <QtMoc Include="ParaModel.h" />
+    <ClCompile Include="GLWidget.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DimDataConvert.h" />
+    <ClInclude Include="ParaType.h" />
+    <ClInclude Include="resourcemanager.h" />
+    <ClInclude Include="ShaderProc.h" />
+    <ClInclude Include="WarheadDataConvert.h" />
+    <ClInclude Include="WarheadOglManager.h" />
+    <QtMoc Include="WarheadParaModel.h" />
+    <QtMoc Include="bqgraphicsscene.h" />
+    <QtMoc Include="bqgraphicsitem.h" />
+    <QtMoc Include="bpointitem.h" />
+    <QtMoc Include="bqgraphicsview.h" />
+    <ClInclude Include="camera.h" />
+    <ClInclude Include="GLWidget.h" />
+    <ClInclude Include="paraoglmanager.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\shaders\beam.frag" />
+    <None Include="res\shaders\beam.vert" />
+    <None Include="res\shaders\board.frag" />
+    <None Include="res\shaders\board.vert" />
+    <None Include="res\shaders\column.frag" />
+    <None Include="res\shaders\column.vert" />
+    <None Include="res\shaders\coordinate.frag" />
+    <None Include="res\shaders\coordinate.vert" />
+    <None Include="res\shaders\door.frag" />
+    <None Include="res\shaders\door.vert" />
+    <None Include="res\shaders\GLSL_YELLOW.frag" />
+    <None Include="res\shaders\GLSL_YELLOW.vert" />
+    <None Include="res\shaders\wall.frag" />
+    <None Include="res\shaders\wall.vert" />
+    <None Include="res\shaders\WarheadColumn.frag" />
+    <None Include="res\shaders\WarheadColumn.vert" />
+    <None Include="res\shaders\WarheadSphere.frag" />
+    <None Include="res\shaders\WarheadSphere.vert" />
+    <None Include="res\shaders\window.frag" />
+    <None Include="res\shaders\window.vert" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

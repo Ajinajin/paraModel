@@ -59,10 +59,10 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	{
 		setSelected(true);
 		return;
-	} 
+	}
 	QList<QGraphicsItem*> itemList = this->scene()->items();
 	for (size_t i = 0; i < itemList.size(); i++)
-	{ 
+	{
 		if (itemList[i]->type() == BGraphicsItem::type())
 		{
 			BGraphicsItem* proxyWidget = qgraphicsitem_cast<BGraphicsItem*>(itemList[i]);
@@ -320,7 +320,7 @@ void BRectangle::paint(QPainter* painter, const QStyleOptionGraphicsItem* option
 	Q_UNUSED(widget);
 	painter->setPen(this->pen());
 	painter->setBrush(this->brush());
-	 
+
 	QRectF ret(m_leftup.x(), m_leftup.y(), m_edge.x() - m_leftup.x(), m_edge.y()- m_leftup.y());
 	painter->drawRect(ret);
 }
@@ -368,10 +368,23 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 	menu->addAction(height_widgetAction);
 
 
+	//QPushButton* pApplyBtn = new QPushButton(QString::fromStdString(u8"确认"));
+	//pApplyBtn->setFixedWidth(100);
+
+	//connect(pApplyBtn, &QPushButton::clicked, this, [=]() {
+	//	//发送信号 确认修改后的值 
+	//	emit SceneMenuClick(nUnitType, nUnitIdx, 1);
+	//	});
+
+
+	//QWidgetAction* applyBtn_widgetAction = new QWidgetAction(menu);
+	//applyBtn_widgetAction->setDefaultWidget(pApplyBtn);
+	//menu->addAction(applyBtn_widgetAction);
+
 	QAction* act = new QAction(this);
 
 	if (nUnitType >= 4)
-	{ 
+	{
 		act->setObjectName((u8"增加构件"));
 		act->setIcon(QIcon(":/qss/res/qss/White/506463.png"));
 		act->setText((u8"增加构件"));
@@ -428,7 +441,7 @@ void BRectangle::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 			emit SceneMenuClick(nUnitType, nUnitIdx);
 			});
 		menu->addAction(act);
-	} 
+	}
 	menu->exec(QCursor::pos());
 	delete menu;
 
@@ -657,7 +670,7 @@ void BCurveLine::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	QPointF oPos = event->pos();
 	return; 
-}
+	}
 
 void BCurveLine::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
@@ -697,6 +710,10 @@ void BLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWi
 		return;
 	QPainterPath path(this->point[0]);
 	int twidth = 1;
+	if (lineWidth.size() != 0)
+	{
+		twidth = lineWidth[0];
+	}
 	for (int i = 1; i < point.size(); ++i)
 	{
 		path.lineTo(point[i]);
@@ -710,11 +727,20 @@ void BLine::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWi
 				painter->drawPath(path);
 				QPainterPath tpath(point[i]);
 				path = tpath;
+				twidth = lineWidth[i];
+				QPen pen1 = QPen(this->pen().color(), twidth);
+				pen1.setStyle(Qt::SolidLine);
+				painter->setPen(pen1);
+
 			}
 		}
+		path.lineTo(point[i]);
 	}
 	painter->drawPath(path);
 }
+
+//------------------------------------------------------------------------------
+
 
 BPoint::BPoint(ItemType type)
 	: BGraphicsItem(QPointF(0, 0), QPointF(0, 0), type)

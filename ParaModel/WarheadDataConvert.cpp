@@ -77,6 +77,7 @@ int WarheadDataConvert::CaArmHeadData(VSHAPE& vOriginShape)
 	oBack.nCen[1] = 0;
 	vOriginShape.push_back(oBack);
 
+
 #pragma region 外壳
 	//外壳记录了拐点，根据拐点绘制线 视觉下方壳线 数据为大
 	SimpleShape ShellShapeB;
@@ -87,7 +88,14 @@ int WarheadDataConvert::CaArmHeadData(VSHAPE& vOriginShape)
 	// 先设为1 调试用
 // 	ShellShapeB.nWH[0] = 1;
 	//根据外壳拐点绘制底部
-	PixelPos PointB;//底部外壳
+	for (size_t i = 0; i < vArmHeadTopo.vTurnPoint.size(); i++)
+	{
+		PixelPos PointB;//底部外壳
+		PointB.nXY[0] = f.x() - vArmHeadTopo.vTurnPoint[i].x();
+		PointB.nXY[1] = f.y() + vArmHeadTopo.vTurnPoint[i].y();
+		ShellShapeB.vCorner.push_back(PointB);
+	}
+	vPlaneDraw.push_back(ShellShapeB);
 
 	// 第一次需要插入前后端点
 	if ( bFirst )
@@ -95,9 +103,9 @@ int WarheadDataConvert::CaArmHeadData(VSHAPE& vOriginShape)
 		// 原先的值变为负值
 		int nPtNum = vCtrlPts.size(); 
 		for (int i = 0; i < nPtNum; i++)
-		{
+	{
 			vCtrlPts[i].setX(-vCtrlPts[i].x()); 
-		}
+	}
 		QPoint ptB1(-fT[8],fR[1]-fT[1]/2); 
 		// 添加前盖连接点
 		vCtrlPts.insert(0, ptB1); 
@@ -114,7 +122,9 @@ int WarheadDataConvert::CaArmHeadData(VSHAPE& vOriginShape)
 		int nPtNum = vCtrlPts.size(); 
 		vCtrlPts[nPtNum - 1] = ptB2; 
 	}
-	
+	vPlaneDraw.push_back(FragmentShapeT);
+#pragma endregion
+
 	for (size_t i = 0; i < vCtrlPts.size(); i++)
 	{
 		PointB.nXY[0] = vCtrlPts[i].x();
@@ -133,6 +143,18 @@ int WarheadDataConvert::CaArmHeadData(VSHAPE& vOriginShape)
 	ShellShapeB.unitIdx = 3;
 	vOriginShape.push_back(ShellShapeB);
 
+	SimpleShape LiningShapeT;
+	LiningShapeT.nWH[0] = LiningWidth;
+	LiningShapeT.unitType = 4;
+	LiningShapeT.unitIdx = 13;
+	for (size_t i = 0; i < vArmHeadTopo.vTurnPoint.size(); i++)
+	{
+		PixelPos PointT;//顶部
+		PointT.nXY[0] = f.x() - vArmHeadTopo.vTurnPoint[i].x();
+		PointT.nXY[1] = f.y() - vArmHeadTopo.vTurnPoint[i].y() + ShellWidth + FragmentWidth;
+		LiningShapeT.vCorner.push_back(PointT);
+	}
+	vPlaneDraw.push_back(LiningShapeT);
 #pragma endregion
 
 
@@ -147,6 +169,13 @@ int WarheadDataConvert::CaArmHeadData(VSHAPE& vOriginShape)
 
 	//弹芯
 	SimpleShape BulletCore;
+	float BulletCoreWidth = FindMapArmHead(vArmHeadTopo, "T5").nUnitPropty; //弹芯厚度T5
+	float BulletCoreRadius = FindMapArmHead(vArmHeadTopo, "R5").nUnitPropty;//弹芯半径R5
+	float BulletCoreLength = FindMapArmHead(vArmHeadTopo, "H5").nUnitPropty;//弹芯长H5 
+
+	float BulletFuseRadius = FindMapArmHead(vArmHeadTopo, "R4").nUnitPropty;//引信半径R4 
+	float BulletFuseLength = FindMapArmHead(vArmHeadTopo, "H4").nUnitPropty;//中心管长H4
+	float BulletFuseWidth = FindMapArmHead(vArmHeadTopo, "T4").nUnitPropty;//中心管厚度T4
 
 	BulletCore.unitType = 4;
 	BulletCore.unitIdx = 7; 

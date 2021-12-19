@@ -35,7 +35,7 @@ void BQGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 	int nPtNum = listUpCurveCtrlPt.size();
 	// 判断是否在控制点上点击
 	for (int i = nPtNum - 1; i >= 0; i--)
-	{
+        {
 		if (qAbs(listUpCurveCtrlPt[i].x() - oCurPos.x()) < POINT_TOLLERANCE && qAbs(listUpCurveCtrlPt[i].y() - oCurPos.y()) < POINT_TOLLERANCE)
 		{
 			if (event->button() == Qt::LeftButton)
@@ -97,25 +97,25 @@ void BQGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 		{
 		case Qt::LeftButton:
 		{
-			m_list.push_back(p);
-			emit updatePoint(p, m_list, false);
+            m_list.push_back(p);
+            emit updatePoint(p, m_list, false);
 		}
 		break;
 		case Qt::RightButton:
 		{
 			if (m_list.size() >= 3)
 			{
-				emit updatePoint(p, m_list, true);
-				emit createFinished();
-				is_creating_BPolygon = false;
-				m_list.clear();
-			}
+                emit updatePoint(p, m_list, true);
+                emit createFinished();
+                is_creating_BPolygon = false;
+                m_list.clear();
+            }
 		}
 		break;
 		default: 
 			break;
 		}
-    } 
+        }
 	else 
 	{
         QGraphicsScene::mousePressEvent(event);
