@@ -42,13 +42,14 @@ public:
 	void setCenter(QPointF p) { m_center = p; }
 
 	QPointF getEdge() { return m_edge; }
-	void setEdge(QPointF p) {  
-		m_edge = p; }
+	void setEdge(QPointF p) {
+		m_edge = p;
+	}
 
 	ItemType getType() { return m_type; }
 
 protected:
-	BGraphicsItem(QPointF center, QPointF edge, ItemType type); 
+	BGraphicsItem(QPointF center, QPointF edge, ItemType type);
 	virtual void focusInEvent(QFocusEvent* event) override;
 	virtual void focusOutEvent(QFocusEvent* event) override;
 	virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
@@ -91,7 +92,7 @@ class BCircle : public BEllipse
 {
 public:
 	BCircle(qreal x, qreal y, qreal radius, ItemType type);
-	void updateRadius(); 
+	void updateRadius();
 protected:
 	virtual QRectF boundingRect() const override;
 
@@ -122,7 +123,7 @@ protected:
 		const QStyleOptionGraphicsItem* option,
 		QWidget* widget) override;
 
-	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override; 
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
 };
 
 //------------------------------------------------------------------------------
@@ -181,7 +182,7 @@ public:
 	QPen  oCurvePen;						// 曲线画笔
 	bool bCalCurveData;						// 曲线点数据计算标志
 public:
-	QPoint bezier(double t); 
+	QPoint bezier(double t);
 
 protected:
 
@@ -218,11 +219,10 @@ protected:
 	virtual void paint(QPainter* painter,
 		const QStyleOptionGraphicsItem* option,
 		QWidget* widget) override;
-	 
+
 };
 
 //------------------------------------------------------------------------------
-
 
 
 //------------------------------------------------------------------------------
@@ -241,7 +241,7 @@ protected:
 	virtual void paint(QPainter* painter,
 		const QStyleOptionGraphicsItem* option,
 		QWidget* widget) override;
-	 
+
 };
 
 //------------------------------------------------------------------------------

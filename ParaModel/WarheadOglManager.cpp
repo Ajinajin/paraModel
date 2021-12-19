@@ -833,14 +833,17 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		
 		pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
 		
-	}
-	
+
 		//delete
 		pCore->glDeleteBuffers(1, &VBO);
 		delete[] vertices;
-
-
+		
 	}
+	
+		
+
+
+	
 	//画两个底面圆(按照gl_triangles_fan的方式)
 
 	//circle 1
@@ -883,14 +886,17 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		
 		pCore->glDrawArrays(GL_TRIANGLE_FAN, 0, (pointsNum + 1));
 		pCore->glDrawArrays(GL_TRIANGLES, (pointsNum + 1), 3);
-		
-	}
+
 
 		//delete 
 		pCore->glDeleteBuffers(1, &VBO);
 		delete[] verticesBottom;
-
+		
 	}
+
+		
+
+	
 	//circle 2
 	{
 		float* verticesTop = new float[(pointsNum + 1) * 3 + 9];

@@ -82,25 +82,21 @@ void WarheadParaModel::InitSysUnitWidget(QDockWidget* from)
 }
 
 void WarheadParaModel::NewArmHeadTmpl(QTreeWidgetItem* item, int column)
-		{
-	DataConvert.bFirst = true; 
-			QVariant variant = item->data(0, Qt::UserRole);
-			int nArmHeadIdx = variant.value<int>();
-			vLoadWarhead = vWarhead[nArmHeadIdx];
-			ReLoadModelTree();
-			ReLoadModelProperty();
-			AddSceneData();
-			if (if_data == 0)
-			{
-				MyLogOutput("当前无画布信息，请新建或者打开后在操作");
-				return;
-			}
-		});
-	from->setWidget(pWarheadModelTreeWidget);
-	pWarheadModelTreeWidget->expandAll();
-}
+{
+	DataConvert.bFirst = true;
+	QVariant variant = item->data(0, Qt::UserRole);
+	int nArmHeadIdx = variant.value<int>();
+	vLoadWarhead = vWarhead[nArmHeadIdx];
+	ReLoadModelTree();
+	ReLoadModelProperty();
+	AddSceneData();
+	if (if_data == 0)
+	{
+		MyLogOutput("当前无画布信息，请新建或者打开后在操作");
+		return;
+	}
 
-	return; 
+	return;
 }
 //初始化已加载的模型窗口
 void WarheadParaModel::InitLoadModelWidget(QDockWidget* from)
