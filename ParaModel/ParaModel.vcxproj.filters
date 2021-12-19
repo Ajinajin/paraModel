@@ -70,25 +70,25 @@
     <ClCompile Include="DimDataConvert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WarheadParaModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WarheadDataConvert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="WarheadOglManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ArmDesignWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ArmHeadDesign.cpp">
+    <ClCompile Include="WarheadParaModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BezierOpt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BezierWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ArmHeadDesign.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ArmDesignWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WarheadOglManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -120,13 +120,13 @@
     <ClInclude Include="WarheadDataConvert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WarheadOglManager.h">
+    <ClInclude Include="BezierOpt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ArmHeadDesign.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BezierOpt.h">
+    <ClInclude Include="WarheadOglManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -146,20 +146,14 @@
     <QtMoc Include="WarheadParaModel.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="ArmDesignWidget.h">
+    <QtMoc Include="BezierWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="BezierWidget.h">
+    <QtMoc Include="ArmDesignWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\GLSL_YELLOW.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\shaders\GLSL_YELLOW.vert">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\shaders\coordinate.frag">
       <Filter>Resource Files</Filter>
     </None>

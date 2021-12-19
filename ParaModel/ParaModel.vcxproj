@@ -16,6 +16,7 @@
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.19041.0</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -62,7 +63,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link />
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Qt\5.12.11\5.12.11\msvc2017_64\lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\include\ActiveQt;D:\Qt\5.12.11\5.12.11\msvc2017_64\include\QtXml;GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Qt\5.12.11\5.12.11\msvc2017_64\lib;D:\Qt\5.12.11\5.12.11\msvc2017_64\include\ActiveQt;D:\Qt\5.12.11\5.12.11\msvc2017_64\include\QtXml;GeneratedFiles\$(ConfigurationName);GeneratedFiles;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\openssl\lib;C:\Utils\my_sql\mysql-5.6.11-winx64\lib;C:\Utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -96,10 +97,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ArmDesignWidget.cpp" />
     <ClCompile Include="ArmHeadDesign.cpp" />
     <ClCompile Include="BezierOpt.cpp" />
     <ClCompile Include="BezierWidget.cpp" />
+    <ClCompile Include="ArmDesignWidget.cpp" />
     <ClCompile Include="bpointitem.cpp" />
     <ClCompile Include="bqgraphicsitem.cpp" />
     <ClCompile Include="bqgraphicsscene.cpp" />
@@ -120,16 +121,16 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="ArmDesignWidget.h" />
     <ClInclude Include="ArmHeadDesign.h" />
     <ClInclude Include="BezierOpt.h" />
+    <ClInclude Include="WarheadOglManager.h" />
     <QtMoc Include="BezierWidget.h" />
+    <QtMoc Include="ArmDesignWidget.h" />
     <ClInclude Include="DimDataConvert.h" />
     <ClInclude Include="ParaType.h" />
     <ClInclude Include="resourcemanager.h" />
     <ClInclude Include="ShaderProc.h" />
     <ClInclude Include="WarheadDataConvert.h" />
-    <ClInclude Include="WarheadOglManager.h" />
     <QtMoc Include="WarheadParaModel.h" />
     <QtMoc Include="bqgraphicsscene.h" />
     <QtMoc Include="bqgraphicsitem.h" />
@@ -151,8 +152,6 @@
     <None Include="res\shaders\coordinate.vert" />
     <None Include="res\shaders\door.frag" />
     <None Include="res\shaders\door.vert" />
-    <None Include="res\shaders\GLSL_YELLOW.frag" />
-    <None Include="res\shaders\GLSL_YELLOW.vert" />
     <None Include="res\shaders\wall.frag" />
     <None Include="res\shaders\wall.vert" />
     <None Include="res\shaders\WarheadColumn.frag" />
