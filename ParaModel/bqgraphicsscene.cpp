@@ -139,6 +139,7 @@ void BQGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
     if (is_creating_BPolygon) 
 	{
+
     } 
 	else 
 	{
@@ -146,16 +147,16 @@ void BQGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
-void BQGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-	if (event->button() == Qt::LeftButton)
-	{
-		iUpSelected = -1;
-		update();
-	}
-
-	return; 
-}
+//void BQGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+//{
+//	if (event->button() == Qt::LeftButton)
+//	{
+//		iUpSelected = -1;
+//		update();
+//	}
+//
+//	return; 
+//}
 bool BQGraphicsScene::belongs(const QPoint &point, int iPoint1, int iPoint2, QList<QPointF> const& lstPt)
 {
 	const QPointF &a = lstPt.at(iPoint1);
