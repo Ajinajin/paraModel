@@ -4,6 +4,9 @@
 #include <math.h>
 #include <vector>
 //通过墙的构建序号来得到与其连接的两个柱子索引
+
+int addX = 0;
+int addY = 0;
 void calColumnsIdxFromWallIdx(int wallIdx, int* columnArrayIdx, VTOPOTABLE oglTopTable)
 {
 	//查找墙连接的两个柱构件序号
@@ -786,12 +789,15 @@ int GetColAdjWall(int nSelWallIdx, VTOPOTABLE const& vLayerTopo, VVINT& vvAdjWal
 	return 0;
 }
 // 移动柱子 由PreMoveWall带动的移动(以及移动相连同角度的墙的柱子)
-int MovCol(int nMoveUnitIdx, int moveWallId, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo)
+int MovCol(int nMoveUnitIdx, int moveWallId, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw)
 {
 	//水平墙
 	// 只移动柱子
 	vLayerTopo[nMoveUnitIdx].nCenPos[0] += nMoveX;
 	vLayerTopo[nMoveUnitIdx].nCenPos[2] += nMoveY;
+
+	vPlaneDraw[nMoveUnitIdx].nCen[0] += nMoveX;
+	vPlaneDraw[nMoveUnitIdx].nCen[1] += nMoveY;
 
 	if (vLayerTopo[moveWallId].nUnitAngle == 0)
 	{
@@ -827,7 +833,7 @@ int MovCol(int nMoveUnitIdx, int moveWallId, int nMoveX, int nMoveY, VTOPOTABLE&
 			return 0;
 		}
 		//
-		MovCol(otherColId, wallId, 0, nMoveY, vLayerTopo);
+		MovCol(otherColId, wallId, 0, nMoveY, vLayerTopo, vPlaneDraw);
 	}
 	//垂直墙
 	// 只移动柱子
@@ -865,7 +871,7 @@ int MovCol(int nMoveUnitIdx, int moveWallId, int nMoveX, int nMoveY, VTOPOTABLE&
 			return 0;
 		}
 		//
-		MovCol(otherColId, wallId, nMoveX, 0, vLayerTopo);
+		MovCol(otherColId, wallId, nMoveX, 0, vLayerTopo, vPlaneDraw);
 	}
 	return 0;
 }
@@ -985,6 +991,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 	int nCurAdj;
 	int nAdjColIdx[2];
 	int nColIdx = 0;
+	int nWall = 0;
 	TopoUnit oUnit = vLayerTopo[nMoveUnitIdx];
 	for (j = 0; j < nAdjNum; j++)
 	{
@@ -1003,26 +1010,30 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 	// 得到两个柱子的范围
 	//for (int j = 0; j < 12; j++)
 	//{
-	//	if (vLayerTopo[nColIdx].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nUnitType /*== 4 && vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nUnitAngle == 0*/)
+	//	if (vLayerTopo[nWall].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[nWall].nAdjUnitIdx[j]].nUnitType == 1 && vLayerTopo[vLayerTopo[nWall].nAdjUnitIdx[j]].nUnitAngle == 0)
 	//	{
-	//		int walUnitId = vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nCenUnitIdx;
-	//		int thickness = table[walUnitId].oShape.nThickNess;
+	//		int nColIdx = vLayerTopo[vLayerTopo[nWall].nAdjUnitIdx[j]].nCenUnitIdx;
+	//		int thickness = table[nColIdx].oShape.nThickNess;
+
 
 	//	}
 
 	//}
-	SimpleShape oColShape0 = vPlaneDraw[nAdjColIdx[0]];
-	SimpleShape oColShape1 = vPlaneDraw[nAdjColIdx[1]];
-	int nXDis = abs(oColShape0.nCen[0] - oColShape1.nCen[0] - (oColShape0.nWH[0] + oColShape1.nWH[0]) / 2);
-	int nYDis = abs(oColShape0.nCen[1] - oColShape1.nCen[1] - (oColShape0.nWH[1] + oColShape1.nWH[1]) / 2);
 
 
 
 
 
 
+	//SimpleShape oColShape0 = vPlaneDraw[nAdjColIdx[0]];
+	//SimpleShape oColShape1 = vPlaneDraw[nAdjColIdx[1]];
+	//int nXDis = oColShape0.nCen[0] - oColShape1.nCen[0] - (oColShape0.nWH[0] + oColShape1.nWH[0]) / 2;
+	//int nYDis = oColShape0.nCen[1] - oColShape1.nCen[1] - (oColShape0.nWH[1] + oColShape1.nWH[1]) / 2;
 
 
+
+	int nXDis;
+	int nYDis;
 
 
 
@@ -1081,6 +1092,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 							int col2 = vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nAdjUnitIdx[1];
 							newWallY = (vLayerTopo[col1].nCenPos[2] + vLayerTopo[col2].nCenPos[2]) / 2;
 
+							//nYDis= abs(vLayerTopo[col1].nCenPos[2] - vLayerTopo[col2].nCenPos[2]);//新增
 						}
 
 						if (newWallY < moveWallY)
@@ -1278,6 +1290,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 			}
 		}
 
+
 		VINT nLeftWalls;				//找到这些柱子所连接的竖直墙(左边与右边，基于最初移动的墙)
 		VINT nRightWalls;
 		for (int k = 0; k < allCols.size(); k++)
@@ -1294,7 +1307,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 							int col1 = vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nAdjUnitIdx[0];
 							int col2 = vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nAdjUnitIdx[1];
 							newWallX = (vLayerTopo[col1].nCenPos[0] + vLayerTopo[col2].nCenPos[0]) / 2;
-
+							//nXDis = vLayerTopo[col1].nCenPos[0] - vLayerTopo[col2].nCenPos[0];//新增
 						}
 
 						if (newWallX < moveWallX)
@@ -1308,6 +1321,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 				}
 			}
 		}
+
 
 
 		//找到能移动的最大距离
@@ -1362,8 +1376,8 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 								maxDisX += thickness;
 
 								//柱子与墙厚度有一点差异
-								int colH = vPlaneDraw[colId].nWH[0];
-								maxDisX += (colH - thickness) / 2;
+								int colH = vPlaneDraw[colId].nWH[1];
+								maxDisX += (colH - thickness)/* / 2*/;
 
 								break;
 							}
@@ -1427,8 +1441,8 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 								maxDisX += thickness;
 
 								//柱子与墙厚度有一点差异
-								int colH = vPlaneDraw[colId].nWH[0];
-								maxDisX += (colH - thickness) / 2;
+								int colH = vPlaneDraw[colId].nWH[1];
+								maxDisX += (colH - thickness)/* / 2*/;
 
 								break;
 							}
@@ -1462,24 +1476,53 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 
 
 
-	// 按墙垂直方向计算移动距离
+	//// 按墙垂直方向计算移动距离
+
+	//if (nMoveX <= nXYMoveRange[0][0] || nMoveX >= nXYMoveRange[0][1])
+	//{
+
+	//	if (abs(nMoveX) < nYDis)
+	//	{
+	//		nMoveX = 0;
+	//	}
+	//}
+
+	//if (nMoveY <= nXYMoveRange[1][0] || nMoveY >= nXYMoveRange[1][1])
+	//{
+	//	if (abs(nMoveY) < nXDis)
+	//	{
+	//		nMoveY = 0;
+	//	}
+	//}
+
+
+
+
+		// 按墙垂直方向计算移动距离
 
 	if (nMoveX <= nXYMoveRange[0][0] || nMoveX >= nXYMoveRange[0][1])
 	{
+		nMoveX = 0;
 
-		if (abs(nMoveX) > nYDis)
-		{
-			nMoveX = 0;
-		}
+	}
+	//addX += nMoveX;
+	if (nMoveX > nXDis)
+	{
+		nMoveX = 0;
 	}
 
 	if (nMoveY <= nXYMoveRange[1][0] || nMoveY >= nXYMoveRange[1][1])
 	{
-		if (abs(nMoveY) > nXDis)
-		{
-			nMoveY = 0;
-		}
+		nMoveY = 0;
 	}
+
+	//addY += nMoveY;
+	if (nMoveY > nYDis)
+	{
+		nMoveY = 0;
+	}
+
+
 
 
 
@@ -1492,7 +1535,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 
 	for (i = 0; i < nColNum; i++)
 	{
-		MovCol(nAdjCol[i], nMoveUnitIdx, nMoveX, nMoveY, vLayerTopo);
+		MovCol(nAdjCol[i], nMoveUnitIdx, nMoveX, nMoveY, vLayerTopo, vPlaneDraw);
 	}
 	// 重新计算几何数值
 

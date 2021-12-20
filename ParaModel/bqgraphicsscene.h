@@ -18,7 +18,7 @@ public:
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-	virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+	//virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 signals:
     void updatePoint(QPointF p, QList<QPointF> list, bool isCenter);
