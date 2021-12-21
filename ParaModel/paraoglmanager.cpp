@@ -14,6 +14,8 @@
 const QVector3D CAMERA_POSITION(300, 130, 1000.0f);
 const QVector3D LIGHT_POSITION(0.0f, 1.0f, 0.0f);
 
+QVector3D CAMERA_LAST_POSITION(-999,-999,-999);
+
 const int OGLMANAGER_WIDTH = 1200;
 const int OGLMANAGER_HEIGHT = 800;
 
@@ -721,11 +723,38 @@ void ParaOGLManager::paintGL()
 
 	//此时0 1 2是暂时的，1说明所有的点信息已存储，等于2说明所有的solid信息已存储(此时可输出到K文件了)
 
-	//将此三维模型的数据输出到K文件里
+	//数据已存储完毕
 	if (outFlag == 2)
 	{
 		outFlag = -1;
+
+
+		int Xmin = INT_MAX, Xmax = INT_MIN, Ymin = INT_MAX, Ymax = INT_MIN, Zmin = INT_MAX, Zmax = INT_MIN;
+
+		for (int i = 0; i < allNodes.size(); i++)
+		{
+			if (allNodes[i].x < Xmin) { Xmin = allNodes[i].x; }
+			if (allNodes[i].x > Xmax) { Xmax = allNodes[i].x; }
+			if (allNodes[i].y < Ymin) { Ymin = allNodes[i].y; }
+			if (allNodes[i].y > Ymax) { Ymax = allNodes[i].y; }
+			if (allNodes[i].z < Zmin) { Zmin = allNodes[i].z; }
+			if (allNodes[i].z > Zmax) { Zmax = allNodes[i].z; }
+		}
+
+		//建筑中心点
+		pCen.fXYZ[0] = (Xmax + Xmin) / 2;
+		pCen.fXYZ[1] = (Ymin + Ymax) / 2;
+		pCen.fXYZ[2] = (Zmin + Zmax) / 2;
+
+		//将相机的位置调整
+		//if (CAMERA_LAST_POSITION != QVector3D(pCen.fXYZ[0], pCen.fXYZ[1], pCen.fXYZ[2] * 2.5))
+		//{
+			//CAMERA_LAST_POSITION = QVector3D(pCen.fXYZ[0], pCen.fXYZ[1], pCen.fXYZ[2] * 2.5);
+			camera = new Camera(QVector3D(pCen.fXYZ[0], pCen.fXYZ[1], pCen.fXYZ[2] * 2.5));
+		//}
 	}
+	
+	
 }
 
 void ParaOGLManager::processInput(GLfloat dt)
@@ -753,7 +782,7 @@ void ParaOGLManager::updateGL()
 	QMatrix4x4 projection;
 	GLfloat a = width();
 	GLfloat b = height();
-	projection.perspective(camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 2000.f);
+	projection.perspective(camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.01f, 200000.f);
 	
 
 	//switch (switchView)
@@ -844,7 +873,8 @@ void ParaOGLManager::mouseMoveEvent(QMouseEvent* event)
 		rotatePitch += yoffset * 0.1;
 
 		//根据鼠标操作旋转模型矩阵
-		targetModel.translate(200, 0, 300);
+		//targetModel.translate(200, 0, 300);
+		targetModel.translate(pCen.fXYZ[0], 0, pCen.fXYZ[2]);
 
 		targetModel.setToIdentity();
 		GLfloat angle_now = qSqrt(qPow(xoffset, 2) + qPow(yoffset, 2)) / 5;
@@ -855,7 +885,8 @@ void ParaOGLManager::mouseMoveEvent(QMouseEvent* event)
 		targetModelsave.rotate(angle_now, -yoffset, xoffset, 0.0);
 		targetModelsave *= targetModeluse;
 
-		targetModel.translate(-200, 0, -300);
+		targetModel.translate(-pCen.fXYZ[0],0, -pCen.fXYZ[2]);
+		//targetModel.translate(-200, 0, -300);
 	}
 
 	//if (isRightMousePress)//右键则旋转相机

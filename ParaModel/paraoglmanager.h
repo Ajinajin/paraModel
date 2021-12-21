@@ -112,6 +112,7 @@ public:
 	GLfloat rotateRaw;											//每次对模型的raw旋转
 	GLfloat rotatePitch;										//每次对模型的pitch旋转
 
+	Ver3D pCen;													//记录建筑的中心点
 
 protected:
 	void mouseMoveEvent(QMouseEvent* event);
