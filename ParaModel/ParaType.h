@@ -171,7 +171,7 @@ typedef struct PARADES
 // 破片描述
 typedef struct FragDes
 {
-	int nFragType;					// 破片类型 0 1 2 球形 方形 圆柱形
+	int nFragType;					// 破片类型 0 1 2 球形圆柱形 方形 
 	float fFragPara[3];				// 球形为半径 方形为长宽高 圆柱形为半径和长度
 }FragDes;
 
@@ -190,7 +190,7 @@ typedef struct ArmHeadTopo
 	int nArmHeadIdx;				// 战斗部类型索引
 	int nArrangeType;				// 破片排布类型 0 默认最优排布 1 对齐排布
 	int nFragNum;					// 破片数量
-	FragDes oFragInfo;				// 破片信息 0 1 2 球形 方形 圆柱形
+	FragDes oFragInfo;				// 破片信息 0 1 2 球形 圆柱形 方形
 	QList<QPointF> vCtrlPts;		// 外壳控制拐点
 	LSTEDGEDES lstEdgeDes;			// 外壳各段信息
 	VINT vFragGesture;				// 破片姿态 数量为1时表示所有破片一种姿态

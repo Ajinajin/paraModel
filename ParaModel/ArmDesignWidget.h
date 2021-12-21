@@ -42,6 +42,7 @@ public:
 	bool bCalCen;					// 居中计算标志
 	bool bCalDesign;				// 
 	bool bCalPartShape;				// 轮廓曲线计算标志
+	bool bFirstCalFrag;				// 计算破片位置标志 默认姿态只计算一次
 	int nScreenWH[2]; 
 	int nMoveXY[2];					// 原始数据和显示数据偏移
 	float fR[20], fT[10], fH[10]; 
@@ -70,6 +71,12 @@ public:
 	LISTPT   lstLinkFrontPt;		// 和前盖连接点
 	LISTPT   lstLinkBackPt;			// 和后盖连接点
 
+	LISTPT   lstDesignFragCen;		// 剖面图中破片中心坐标		图纸
+	LISTPT   lstDrawFragCen;		// 剖面图中破片中心位置		屏幕
+
+	// 当所有破片为一个姿态时 只保存一个 否则保存全部姿态
+	// 破片姿态  球形时没有姿态 圆柱形3个姿态 方形6个姿态
+	VINT     vFragGesture;			
 // 计算函数
 public:
     // 计算给定t值的曲线点坐标
@@ -111,8 +118,12 @@ public:
 	void ReflectPos(VPIXELPOS & vPt, int nXY[2]);
 	QColor ColorHelper(int unitIdx);
 	void DrawSubPart(QPainter * pPaint, SimpleShape const& oCurShape);
+	// 画破片
+	void DrawFrag(QPainter * pPaint);
 // 	void DrawArmHead(QPainter * pPaint, VSHAPE const& vShape); 
 	void DrawArmHead(QPainter * pPaint, VECLSTPT const& vAllDraw, VSHAPE const& vShape);
+	// 计算破片中心位置  参数分别为 区域上边界 下边界 破片信息 破片中心位置 破片姿态
+	int CalFragCenPts(LISTPT const& lstUpEdge, LISTPT const& lstDownEdge, FragDes oFrag, LISTPT& lstCenPts, VINT& vFragGes); 
 };
 
 #endif // ARMDESIGNWIDGET_H

@@ -188,7 +188,7 @@ int CArmHeadDesign::ReadArmHeadInfo(QString sFile)
 		if (bFragType)
 		{
 			oFragDes.nFragType = list[1].toInt();
-			//oFragDes.fFragPara[0] = list[2].toFloat();
+			oFragDes.fFragPara[0] = list[2].toFloat();
 			if (oFragDes.nFragType >= 1)
 				oFragDes.fFragPara[1] = list[3].toFloat(); 
 			if( oFragDes.nFragType >= 2 )
