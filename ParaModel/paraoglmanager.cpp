@@ -14,6 +14,8 @@
 const QVector3D CAMERA_POSITION(300, 130, 1000.0f);
 const QVector3D LIGHT_POSITION(0.0f, 1.0f, 0.0f);
 
+QVector3D CAMERA_LAST_POSITION(-999,-999,-999);
+
 const int OGLMANAGER_WIDTH = 1200;
 const int OGLMANAGER_HEIGHT = 800;
 
@@ -726,7 +728,8 @@ void ParaOGLManager::paintGL()
 	{
 		outFlag = -1;
 
-		int Xmin=INT_MAX, Xmax= INT_MIN, Ymin= INT_MAX, Ymax= INT_MIN, Zmin= INT_MAX, Zmax= INT_MIN;
+
+		int Xmin = INT_MAX, Xmax = INT_MIN, Ymin = INT_MAX, Ymax = INT_MIN, Zmin = INT_MAX, Zmax = INT_MIN;
 
 		for (int i = 0; i < allNodes.size(); i++)
 		{
@@ -744,8 +747,14 @@ void ParaOGLManager::paintGL()
 		pCen.fXYZ[2] = (Zmin + Zmax) / 2;
 
 		//将相机的位置调整
-		camera = new Camera(QVector3D(pCen.fXYZ[0], pCen.fXYZ[1], pCen.fXYZ[2]*2.5));
+		//if (CAMERA_LAST_POSITION != QVector3D(pCen.fXYZ[0], pCen.fXYZ[1], pCen.fXYZ[2] * 2.5))
+		//{
+			//CAMERA_LAST_POSITION = QVector3D(pCen.fXYZ[0], pCen.fXYZ[1], pCen.fXYZ[2] * 2.5);
+			camera = new Camera(QVector3D(pCen.fXYZ[0], pCen.fXYZ[1], pCen.fXYZ[2] * 2.5));
+		//}
 	}
+	
+	
 }
 
 void ParaOGLManager::processInput(GLfloat dt)
@@ -865,7 +874,7 @@ void ParaOGLManager::mouseMoveEvent(QMouseEvent* event)
 
 		//根据鼠标操作旋转模型矩阵
 		//targetModel.translate(200, 0, 300);
-		targetModel.translate(pCen.fXYZ[0],0, pCen.fXYZ[2]);
+		targetModel.translate(pCen.fXYZ[0], 0, pCen.fXYZ[2]);
 
 		targetModel.setToIdentity();
 		GLfloat angle_now = qSqrt(qPow(xoffset, 2) + qPow(yoffset, 2)) / 5;
@@ -876,7 +885,7 @@ void ParaOGLManager::mouseMoveEvent(QMouseEvent* event)
 		targetModelsave.rotate(angle_now, -yoffset, xoffset, 0.0);
 		targetModelsave *= targetModeluse;
 
-		targetModel.translate(-pCen.fXYZ[0], 0, -pCen.fXYZ[2]);
+		targetModel.translate(-pCen.fXYZ[0],0, -pCen.fXYZ[2]);
 		//targetModel.translate(-200, 0, -300);
 	}
 

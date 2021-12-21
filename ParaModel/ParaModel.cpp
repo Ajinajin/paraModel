@@ -1230,6 +1230,13 @@ void ParaModel::CloseFileAction()
 	vLoadModelData.clear();
 	SceneMainClear();
 	MyLogOutput("清除数据成功");
+	
+
+	//三维窗口成员
+	paraOglmanagerMain->outFlag = 0;
+	paraOglmanagerMain->allNodes.resize(0);
+	paraOglmanagerMain->allSolids.resize(0);
+
 	ParaModel::RefreshLayerWidget();
 }
 /// <summary>
