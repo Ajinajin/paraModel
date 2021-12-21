@@ -92,7 +92,7 @@ void BGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	setSelected(true);
 }
 void BGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
-{
+{	
 	if (operMourse == Qt::LeftButton)
 	{
 		if (nUnitType == 1)

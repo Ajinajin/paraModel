@@ -139,6 +139,7 @@ void BQGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
     if (is_creating_BPolygon) 
 	{
+
     } 
 	else 
 	{

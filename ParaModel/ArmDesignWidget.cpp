@@ -24,6 +24,8 @@ ArmDesignWidget::ArmDesignWidget(QWidget *parent) : QWidget(parent)
 	bCalCen = true; 
 	bCalPartShape = true; 
 	bCalDesign = true; 
+	bFirstCalFrag = true;
+
     curveColor = DRAWBEZIER_COLOR;
 
     setMinimumSize(MINIMUM_SIZE);
@@ -441,7 +443,72 @@ void ArmDesignWidget::DrawSubPart(QPainter * pPaint, SimpleShape const& oCurShap
 	}
 	return; 
 }
+// 画破片
+void ArmDesignWidget::DrawFrag(QPainter * pPaint)
+{
+	QPen oLinePen(Qt::red, 1.0, Qt::DashLine);
+	pPaint->setPen(oLinePen); 
+	QBrush oBrush(Qt::black);
+	pPaint->setBrush(oBrush);
 
+	FragDes oFrag = oArmHeadDesign.oDesignData.oFragInfo; 
+	int nFragNum = lstDrawFragCen.size(); 
+	int i = 0; 
+	float fabc[3]; 
+	
+	int nGesIdx; 
+	if (!vFragGesture.empty())
+	{
+		nGesIdx = vFragGesture[0];
+	}
+	else
+	{
+		nGesIdx = 0;
+	}
+
+	//int nGesIdx = 0;
+	for ( i = 0 ; i < nFragNum ; i++ )
+	{
+		switch (oFrag.nFragType)
+		{
+		// 球形
+		case 0:
+			for ( i = 0 ; i < nFragNum ; i++ )
+			{
+				pPaint->drawEllipse(lstDrawFragCen[i], oFrag.fFragPara[0], oFrag.fFragPara[0]);
+			}
+			break;
+		// 圆柱形 有三个姿态
+		case 1:
+			for ( i = 0 ; i < nFragNum ; i++ )
+			{
+				if ( nGesIdx == 0 )
+				{
+					pPaint->drawEllipse(lstDrawFragCen[i], oFrag.fFragPara[0], oFrag.fFragPara[0]);
+				}
+				else if( nGesIdx == 1 )
+				{
+					int nSx = lstDrawFragCen[i].x() - oFrag.fFragPara[1] / 2; 
+					int nSy = lstDrawFragCen[i].y() - oFrag.fFragPara[0]; 
+					pPaint->drawRect(nSx,nSy,oFrag.fFragPara[1],oFrag.fFragPara[0]*2);
+				}
+				else if( nGesIdx == 2 )
+				{
+					int nSx = lstDrawFragCen[i].x() - oFrag.fFragPara[0]; 
+					int nSy = lstDrawFragCen[i].y() - oFrag.fFragPara[1] / 2; 
+					pPaint->drawRect(nSx,nSy,oFrag.fFragPara[0]*2,oFrag.fFragPara[1]);
+				}
+			}
+			break; 
+		// 方形 有六种姿态 自行完善
+		case 2:
+			break; 
+		default:
+			break;
+		}
+	}
+	return; 
+}
 void ArmDesignWidget::DrawArmHead(QPainter * pPaint,VECLSTPT const& vAllDraw, VSHAPE const& vShape)
 {
 	if (vShape.empty() && vAllDraw.empty() )
@@ -481,7 +548,8 @@ void ArmDesignWidget::DrawArmHead(QPainter * pPaint,VECLSTPT const& vAllDraw, VS
 	}
 	// 画弹芯
 	DrawSubPart(pPaint, vShape[7]);
-
+	// 画破片
+	DrawFrag(pPaint); 
 
 	return; 
 }
@@ -573,6 +641,8 @@ int ArmDesignWidget::CalDesignShape()
 	nRe = CalAllPartPt(lstLinkFrontPt, lstLinkBackPt, vlstCurvePt, vlstPartPt); 
 	nRe = CalAllPartPt(lstLinkFrontPt, lstLinkBackPt, vlst3DCurvePt, vlst3DPartPt);
 
+	// 计算破片位置
+	nRe = CalFragCenPts(vlstCurvePt[1], vlstCurvePt[2], oArmHeadDesign.oDesignData.oFragInfo, lstDesignFragCen, vFragGesture); 
 	
 	oglCurveData = vlst3DCurvePt;
 
@@ -784,6 +854,13 @@ void ArmDesignWidget::paintEvent(QPaintEvent *)
 				{
 					vlstDrawPartPt[i][j] += oMove; 
 				}
+			}
+			// 移动破片坐标 居中
+			int nFragNum = lstDesignFragCen.size(); 
+			lstDrawFragCen = lstDesignFragCen; 
+			for (int i = 0; i < nFragNum; i++)
+			{
+				lstDrawFragCen[i] += oMove; 
 			}
 		}
 	}
@@ -1286,4 +1363,37 @@ void ArmDesignWidget::exportCurve()
 
     painter.end();
     image.save(fileName);
+}
+
+// 计算破片中心位置  参数分别为 区域上边界 下边界 破片信息 破片中心位置 破片姿态
+int ArmDesignWidget::CalFragCenPts(LISTPT const& lstUpEdge, LISTPT const& lstDownEdge, FragDes oFrag, LISTPT& lstCenPts, VINT& vFragGes)
+{
+	if (lstUpEdge.empty())
+		return 0;
+
+	// 按上下边界计算破片中心位置集
+	float fHei = lstUpEdge[0].y() - lstDownEdge[0].y(); 
+	float fLen = 0; 
+	// 目前只给出粗糙的示例算法  将球形破片沿圆筒中心线排布 后续自行完善
+
+	// 球形破片 只有一种姿态
+	if( bFirstCalFrag )
+	{
+		vFragGes.clear();
+		vFragGes.push_back(0); 
+		bFirstCalFrag = false; 
+	}
+	QPointF oCen; 
+	int nEdgePtNum = lstUpEdge.size(); 
+	float fRadius = oFrag.fFragPara[0]; 
+	float fEndX = lstUpEdge[nEdgePtNum - 1].x() + fRadius; 
+	float fStartX = lstUpEdge[0].x() - fRadius; 
+	float fCenY = (lstUpEdge[0].y() + lstDownEdge[0].y()) / 2; 
+	for ( ; fStartX > fEndX ; fStartX -= 2*fRadius )
+	{
+		QPointF oCen(fStartX, fCenY); 
+		lstCenPts.push_back(oCen); 
+	}
+
+	return 0; 
 }
