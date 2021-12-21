@@ -4,6 +4,7 @@
 #include <math.h>
 #include <vector>
 //通过墙的构建序号来得到与其连接的两个柱子索引
+
 void calColumnsIdxFromWallIdx(int wallIdx, int* columnArrayIdx, VTOPOTABLE oglTopTable)
 {
 	//查找墙连接的两个柱构件序号
@@ -533,7 +534,7 @@ int AddWallInCols(BasicUnit oAddUnit, int nAdjCol[2], VUNITTABLE vTable, VTOPOTA
 	oInsUnit.nCenUnitIdx = vTable.size() - 1;
 	oInsUnit.nCenUnitIdx = oAddUnit.nUnitIdx;
 
-	if (vLayerTopo[nAdjCol[0]].nCenPos[2] == vLayerTopo[nAdjCol[1]].nCenPos[2])
+	if (abs(vLayerTopo[nAdjCol[0]].nCenPos[2] - vLayerTopo[nAdjCol[1]].nCenPos[2])<10)
 	{
 		oInsUnit.nUnitAngle = 0;
 	}
@@ -568,11 +569,14 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE
 		calColumnsIdxFromWallIdx(nInsWallIdx, nAdjCol, vLayerTopo);
 	}
 
+	if (oAddUnit.nUnitType != 4)
+	{
+		if (nInsWallIdx < 0 && nAdjCol[0] < 0)
+			return 1;
+		// 判断待插入构件是否是门窗
+	}
 
-
-	if (nInsWallIdx < 0 && nAdjCol[0] < 0)
-		return 1;
-	// 判断待插入构件是否是门窗
+	
 	if (oAddUnit.nUnitType > 4)
 	{
 		nRe = AddDoorWndInWall(oAddUnit, nInsWallIdx, oInsPos, vTable, vLayerTopo, vPlaneDraw);
@@ -590,13 +594,13 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE
 		nRe = AddBeamOnWall(oAddUnit, nInsWallIdx, vTable, vLayerTopo, vPlaneDraw);
 	}
 	// 插入板
-	else if (oAddUnit.nUnitType == 2)
+	else if (oAddUnit.nUnitType == 3)
 	{
 		//nRe = AddBoard(oAddUnit, nInsWallIdx, vTable, vLayerTopo, vPlaneDraw);;
 	}
 
 	// 插入墙
-	else if (oAddUnit.nUnitType == 4 && nAdjCol[0] >= 0)
+	else if (oAddUnit.nUnitType == 4 /*&& nAdjCol[0] >= 0*/)
 	{
 		//获取两柱子ID
 		for (int i = 0; i < vLayerTopo.size(); i++)
@@ -606,25 +610,34 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE
 				//两个为柱子，则判断插入点是否在两个柱子之间
 				if (j != i && vLayerTopo[i].nUnitType == 1 && vLayerTopo[j].nUnitType == 1)
 				{
+
+					//<10为允许鼠标点击误差
 					//0度
-					if (vLayerTopo[i].nCenPos[2] == vLayerTopo[j].nCenPos[2])
+					if (abs(vLayerTopo[i].nCenPos[2] - vLayerTopo[j].nCenPos[2])<10)
 					{
 						if ((oInsPos.nXY[0]< vLayerTopo[i].nCenPos[0] && oInsPos.nXY[0] > vLayerTopo[j].nCenPos[0])
 							|| (oInsPos.nXY[0]< vLayerTopo[j].nCenPos[0] && oInsPos.nXY[0] > vLayerTopo[i].nCenPos[0]))
 						{
-							nAdjCol[0] = vLayerTopo[i].nTopoIdx, nAdjCol[1] = vLayerTopo[j].nTopoIdx;
-							break;
+							if (abs(oInsPos.nXY[1] - vLayerTopo[i].nCenPos[2]) < (vTable[vLayerTopo[i].nCenUnitIdx].oShape.nShapeRange[3] - vTable[vLayerTopo[i].nCenUnitIdx].oShape.nShapeRange[1]))
+							{
+								nAdjCol[0] = vLayerTopo[i].nTopoIdx, nAdjCol[1] = vLayerTopo[j].nTopoIdx;
+								break;
+							}
 						}
 
 					}
 					//90度
-					if (vLayerTopo[i].nCenPos[0] == vLayerTopo[j].nCenPos[0])
+					if (abs(vLayerTopo[i].nCenPos[0] - vLayerTopo[j].nCenPos[0])<10)
 					{
 						if ((oInsPos.nXY[1]< vLayerTopo[i].nCenPos[2] && oInsPos.nXY[1] > vLayerTopo[j].nCenPos[2])
 							|| (oInsPos.nXY[1]< vLayerTopo[j].nCenPos[2] && oInsPos.nXY[1] > vLayerTopo[i].nCenPos[2]))
 						{
-							nAdjCol[0] = vLayerTopo[i].nTopoIdx, nAdjCol[1] = vLayerTopo[j].nTopoIdx;
-							break;
+							if (abs(oInsPos.nXY[0] - vLayerTopo[i].nCenPos[0]) < (vTable[vLayerTopo[i].nCenUnitIdx].oShape.nShapeRange[2] - vTable[vLayerTopo[i].nCenUnitIdx].oShape.nShapeRange[0]))
+							{
+								nAdjCol[0] = vLayerTopo[i].nTopoIdx, nAdjCol[1] = vLayerTopo[j].nTopoIdx;
+								break;
+							}
+							
 						}
 					}
 				}
@@ -786,12 +799,15 @@ int GetColAdjWall(int nSelWallIdx, VTOPOTABLE const& vLayerTopo, VVINT& vvAdjWal
 	return 0;
 }
 // 移动柱子 由PreMoveWall带动的移动(以及移动相连同角度的墙的柱子)
-int MovCol(int nMoveUnitIdx, int moveWallId, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo)
+int MovCol(int nMoveUnitIdx, int moveWallId, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VSHAPE& vPlaneDraw)
 {
 	//水平墙
 	// 只移动柱子
 	vLayerTopo[nMoveUnitIdx].nCenPos[0] += nMoveX;
 	vLayerTopo[nMoveUnitIdx].nCenPos[2] += nMoveY;
+
+	vPlaneDraw[nMoveUnitIdx].nCen[0] += nMoveX;
+	vPlaneDraw[nMoveUnitIdx].nCen[1] += nMoveY;
 
 	if (vLayerTopo[moveWallId].nUnitAngle == 0)
 	{
@@ -827,7 +843,7 @@ int MovCol(int nMoveUnitIdx, int moveWallId, int nMoveX, int nMoveY, VTOPOTABLE&
 			return 0;
 		}
 		//
-		MovCol(otherColId, wallId, 0, nMoveY, vLayerTopo);
+		MovCol(otherColId, wallId, 0, nMoveY, vLayerTopo, vPlaneDraw);
 	}
 	//垂直墙
 	// 只移动柱子
@@ -865,7 +881,7 @@ int MovCol(int nMoveUnitIdx, int moveWallId, int nMoveX, int nMoveY, VTOPOTABLE&
 			return 0;
 		}
 		//
-		MovCol(otherColId, wallId, nMoveX, 0, vLayerTopo);
+		MovCol(otherColId, wallId, nMoveX, 0, vLayerTopo, vPlaneDraw);
 	}
 	return 0;
 }
@@ -985,6 +1001,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 	int nCurAdj;
 	int nAdjColIdx[2];
 	int nColIdx = 0;
+	int nWall = 0;
 	TopoUnit oUnit = vLayerTopo[nMoveUnitIdx];
 	for (j = 0; j < nAdjNum; j++)
 	{
@@ -1003,25 +1020,25 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 	// 得到两个柱子的范围
 	//for (int j = 0; j < 12; j++)
 	//{
-	//	if (vLayerTopo[nColIdx].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nUnitType /*== 4 && vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nUnitAngle == 0*/)
+	//	if (vLayerTopo[nWall].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[nWall].nAdjUnitIdx[j]].nUnitType == 1 && vLayerTopo[vLayerTopo[nWall].nAdjUnitIdx[j]].nUnitAngle == 0)
 	//	{
-	//		int walUnitId = vLayerTopo[vLayerTopo[nColIdx].nAdjUnitIdx[j]].nCenUnitIdx;
-	//		int thickness = table[walUnitId].oShape.nThickNess;
+	//		int nColIdx = vLayerTopo[vLayerTopo[nWall].nAdjUnitIdx[j]].nCenUnitIdx;
+	//		int thickness = table[nColIdx].oShape.nThickNess;
+
 
 	//	}
 
 	//}
-	SimpleShape oColShape0 = vPlaneDraw[nAdjColIdx[0]];
-	SimpleShape oColShape1 = vPlaneDraw[nAdjColIdx[1]];
-	int nXDis = abs(oColShape0.nCen[0] - oColShape1.nCen[0] - (oColShape0.nWH[0] + oColShape1.nWH[0]) / 2);
-	int nYDis = abs(oColShape0.nCen[1] - oColShape1.nCen[1] - (oColShape0.nWH[1] + oColShape1.nWH[1]) / 2);
 
 
 
 
 
 
-
+	//SimpleShape oColShape0 = vPlaneDraw[nAdjColIdx[0]];
+	//SimpleShape oColShape1 = vPlaneDraw[nAdjColIdx[1]];
+	//int nXDis = oColShape0.nCen[0] - oColShape1.nCen[0] - (oColShape0.nWH[0] + oColShape1.nWH[0]) / 2;
+	//int nYDis = oColShape0.nCen[1] - oColShape1.nCen[1] - (oColShape0.nWH[1] + oColShape1.nWH[1]) / 2;
 
 
 
@@ -1030,7 +1047,8 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 
 	// 根据墙的两个柱子得到另外两个需要判定的墙
 	int finalXminDis, finalYminDis;
-
+	int nXDis=0;
+	int nYDis=0;
 	if (vLayerTopo[nMoveUnitIdx].nUnitAngle == 0)
 	{
 		VINT allWalls;				//找到所有与此墙同一水平的柱子	
@@ -1081,7 +1099,18 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 							int col2 = vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nAdjUnitIdx[1];
 							newWallY = (vLayerTopo[col1].nCenPos[2] + vLayerTopo[col2].nCenPos[2]) / 2;
 
-						}
+							//int thickness = table[vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nCenUnitIdx].oShape.nThickNess;
+							//int colH = vPlaneDraw[col1].nWH[1];
+							//int Dis = (colH - thickness)/2;
+							//if (vLayerTopo[col1].nCenPos[2] > vLayerTopo[col2].nCenPos[2])
+							//{
+							//	nYDis = vLayerTopo[col1].nCenPos[2] - vLayerTopo[col2].nCenPos[2]/*-Dis*/ - colH;//新增
+							//}
+							//else
+							//{
+							//	nYDis = vLayerTopo[col2].nCenPos[2] - vLayerTopo[col2].nCenPos[1]/*-Dis*/ - colH;//新增
+							//}
+							}
 
 						if (newWallY < moveWallY)
 						{
@@ -1114,6 +1143,34 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 						}
 					}
 				}
+
+				for (int i = 0; i < nUpWalls.size(); i++)		//原墙以上的墙
+				{
+					for (int j = 0; j < 12; j++)
+					{
+						if (vLayerTopo[nUpWalls[i]].nAdjUnitIdx[j] != -1)
+						{
+							int col1 = vLayerTopo[nUpWalls[i]].nAdjUnitIdx[0];
+							int col2 = vLayerTopo[nUpWalls[i]].nAdjUnitIdx[1];
+							int colH = vPlaneDraw[col1].nWH[1];
+							int thickness = table[vLayerTopo[nDownWalls[i]].nCenUnitIdx].oShape.nThickNess;
+							int addY = (colH - thickness) / 2;
+							if (vLayerTopo[col1].nCenPos[2] > vLayerTopo[col2].nCenPos[2])
+							{
+								nYDis = vLayerTopo[col1].nCenPos[2] - vLayerTopo[col2].nCenPos[2] - colH- addY;//新增
+							}
+							else
+							{
+								nYDis = vLayerTopo[col2].nCenPos[2] - vLayerTopo[col2].nCenPos[1] - colH- addY;//新增
+							}
+						}
+						break;
+					}
+					break;
+				}
+
+
+
 				if (nDoorAndWinIds.size() != 0)
 				{
 					int maxDisY = 0;
@@ -1144,7 +1201,6 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 							if (vLayerTopo[colId].nAdjUnitIdx[j] != -1 && vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nUnitType == 4 && vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nUnitAngle == 0)
 							{
 								int walUnitId = vLayerTopo[vLayerTopo[colId].nAdjUnitIdx[j]].nCenUnitIdx;
-								int thickness = table[walUnitId].oShape.nThickNess;
 								maxDisY += thickness;
 
 								//柱子与墙厚度有一点差异
@@ -1181,6 +1237,33 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 						}
 					}
 				}
+
+
+				for (int i = 0; i < nDownWalls.size(); i++)		//原墙以下的墙
+				{
+					for (int j = 0; j < 12; j++)
+					{
+						if (vLayerTopo[nDownWalls[i]].nAdjUnitIdx[j] != -1)
+						{
+							int col1 = vLayerTopo[nDownWalls[i]].nAdjUnitIdx[0];
+							int col2 = vLayerTopo[nDownWalls[i]].nAdjUnitIdx[1];
+							int colH = vPlaneDraw[col1].nWH[1];
+							if (vLayerTopo[col1].nCenPos[2] > vLayerTopo[col2].nCenPos[2])
+							{
+								nYDis = vLayerTopo[col1].nCenPos[2] - vLayerTopo[col2].nCenPos[2] - colH;//新增
+							}
+							else
+							{
+								nYDis = vLayerTopo[col2].nCenPos[2] - vLayerTopo[col2].nCenPos[1] - colH;//新增
+							}
+						}
+						break;
+					}
+					break;
+				}
+
+
+
 				if (nDoorAndWinIds.size() != 0)
 				{
 					int maxDisY = 0;
@@ -1278,6 +1361,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 			}
 		}
 
+
 		VINT nLeftWalls;				//找到这些柱子所连接的竖直墙(左边与右边，基于最初移动的墙)
 		VINT nRightWalls;
 		for (int k = 0; k < allCols.size(); k++)
@@ -1295,6 +1379,12 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 							int col2 = vLayerTopo[vLayerTopo[allCols[k]].nAdjUnitIdx[i]].nAdjUnitIdx[1];
 							newWallX = (vLayerTopo[col1].nCenPos[0] + vLayerTopo[col2].nCenPos[0]) / 2;
 
+
+							//int colH = vPlaneDraw[col1].nWH[0];
+							//nXDis = abs(vLayerTopo[col1].nCenPos[0] - vLayerTopo[col2].nCenPos[0])/*-Dis*/ - colH;//新增
+						
+
+
 						}
 
 						if (newWallX < moveWallX)
@@ -1308,6 +1398,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 				}
 			}
 		}
+
 
 
 		//找到能移动的最大距离
@@ -1328,6 +1419,36 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 						}
 					}
 				}
+
+
+				for (int i = 0; i < nLeftWalls.size(); i++)		//原墙以左的墙
+				{
+					for (int j = 0; j < 12; j++)
+					{
+						if (vLayerTopo[nLeftWalls[i]].nAdjUnitIdx[j] != -1)
+						{
+							int col1 = vLayerTopo[nLeftWalls[i]].nAdjUnitIdx[0];
+							int col2 = vLayerTopo[nLeftWalls[i]].nAdjUnitIdx[1];
+							int colH = vPlaneDraw[col1].nWH[0];
+							int thickness = table[vLayerTopo[nLeftWalls[i]].nCenUnitIdx].oShape.nThickNess;
+							int addX = (colH - thickness) / 2;
+
+							if (vLayerTopo[col1].nCenPos[0] > vLayerTopo[col2].nCenPos[0])
+							{
+								nXDis = vLayerTopo[col1].nCenPos[0] - vLayerTopo[col2].nCenPos[0] - colH- addX;//新增
+							}
+							else
+							{
+								nXDis = vLayerTopo[col2].nCenPos[0] - vLayerTopo[col1].nCenPos[0] - colH- addX;//新增
+							}
+						}
+						break;
+					}
+					break;
+				}
+
+
+
 				if (nDoorAndWinIds.size() != 0)
 				{
 					int maxDisX = 0;
@@ -1362,8 +1483,8 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 								maxDisX += thickness;
 
 								//柱子与墙厚度有一点差异
-								int colH = vPlaneDraw[colId].nWH[0];
-								maxDisX += (colH - thickness) / 2;
+								int colH = vPlaneDraw[colId].nWH[1];
+								maxDisX += (colH - thickness)/* / 2*/;
 
 								break;
 							}
@@ -1395,6 +1516,33 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 						}
 					}
 				}
+
+				for (int i = 0; i < nRightWalls.size(); i++)		//原墙以右的墙
+				{
+					for (int j = 0; j < 12; j++)
+					{
+						if (vLayerTopo[nRightWalls[i]].nAdjUnitIdx[j] != -1)
+						{
+							int col1 = vLayerTopo[nRightWalls[i]].nAdjUnitIdx[0];
+							int col2 = vLayerTopo[nRightWalls[i]].nAdjUnitIdx[1];
+							int colH = vPlaneDraw[col1].nWH[0];
+							if (vLayerTopo[col1].nCenPos[0] > vLayerTopo[col2].nCenPos[0])
+							{
+								nXDis = vLayerTopo[col1].nCenPos[0] - vLayerTopo[col2].nCenPos[0] - colH;//新增
+							}
+							else
+							{
+								nXDis = vLayerTopo[col2].nCenPos[0] - vLayerTopo[col1].nCenPos[0] - colH;//新增
+							}
+						}
+						break;
+					}
+					break;
+				}
+
+
+
+
 				if (nDoorAndWinIds.size() != 0)
 				{
 					int maxDisX = 0;
@@ -1427,8 +1575,8 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 								maxDisX += thickness;
 
 								//柱子与墙厚度有一点差异
-								int colH = vPlaneDraw[colId].nWH[0];
-								maxDisX += (colH - thickness) / 2;
+								int colH = vPlaneDraw[colId].nWH[1];
+								maxDisX += (colH - thickness)/* / 2*/;
 
 								break;
 							}
@@ -1462,24 +1610,51 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 
 
 
-	// 按墙垂直方向计算移动距离
+	//// 按墙垂直方向计算移动距离
+
+	//if (nMoveX <= nXYMoveRange[0][0] || nMoveX >= nXYMoveRange[0][1])
+	//{
+
+	//	if (abs(nMoveX) < nYDis)
+	//	{
+	//		nMoveX = 0;
+	//	}
+	//}
+
+	//if (nMoveY <= nXYMoveRange[1][0] || nMoveY >= nXYMoveRange[1][1])
+	//{
+	//	if (abs(nMoveY) < nXDis)
+	//	{
+	//		nMoveY = 0;
+	//	}
+	//}
+
+
+
+
+		// 按墙垂直方向计算移动距离
 
 	if (nMoveX <= nXYMoveRange[0][0] || nMoveX >= nXYMoveRange[0][1])
 	{
+		nMoveX = 0;
 
-		if (abs(nMoveX) > nYDis)
-		{
-			nMoveX = 0;
-		}
+	}
+	if (nMoveX > nXDis)
+	{
+		nMoveX = 0;
 	}
 
 	if (nMoveY <= nXYMoveRange[1][0] || nMoveY >= nXYMoveRange[1][1])
 	{
-		if (abs(nMoveY) > nXDis)
-		{
-			nMoveY = 0;
-		}
+		nMoveY = 0;
 	}
+
+	if (nMoveY > nYDis)
+	{
+		nMoveY = 0;
+	}
+
+
 
 
 
@@ -1492,7 +1667,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 
 	for (i = 0; i < nColNum; i++)
 	{
-		MovCol(nAdjCol[i], nMoveUnitIdx, nMoveX, nMoveY, vLayerTopo);
+		MovCol(nAdjCol[i], nMoveUnitIdx, nMoveX, nMoveY, vLayerTopo, vPlaneDraw);
 	}
 	// 重新计算几何数值
 
