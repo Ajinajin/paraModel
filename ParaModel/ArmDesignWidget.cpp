@@ -455,8 +455,18 @@ void ArmDesignWidget::DrawFrag(QPainter * pPaint)
 	int nFragNum = lstDrawFragCen.size(); 
 	int i = 0; 
 	float fabc[3]; 
-	//int nGesIdx = vFragGesture[0]; 
-	int nGesIdx = 0;
+	
+	int nGesIdx; 
+	if (!vFragGesture.empty())
+	{
+		nGesIdx = vFragGesture[0];
+	}
+	else
+	{
+		nGesIdx = 0;
+	}
+
+	//int nGesIdx = 0;
 	for ( i = 0 ; i < nFragNum ; i++ )
 	{
 		switch (oFrag.nFragType)
