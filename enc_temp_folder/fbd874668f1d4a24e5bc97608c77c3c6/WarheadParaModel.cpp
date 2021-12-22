@@ -476,7 +476,7 @@ void WarheadParaModel::CloseFileAction()
 /// </summary>
 void WarheadParaModel::SetingUnitColorAction(int UnitIndex, QString UnitName)
 {
-	//QColor color = QColorDialog::getColor(Qt::gray, this, "选择你要的颜色"); 
+	//QColor color = QColorDialog::getColor(Qt::gray, this, "选择你要的颜色");
 	QColor color = QColorDialog::getColor(Qt::white, NULL, "选择你要的颜色", QColorDialog::ShowAlphaChannel);
 
 	//修改颜色
