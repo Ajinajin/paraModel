@@ -42,6 +42,7 @@
 
 #include "ArmHeadDesign.h"
 #include "ArmDesignWidget.h"
+#include <QColorDialog>
 
 #define FREEPTR(p) if(p!=NULL)\
 	{ \
@@ -75,7 +76,7 @@ void WarheadParaModel::InitSysUnitWidget(QDockWidget* from)
 		rootItem->setData(0, Qt::UserRole, iter->nArmHeadIdx);
 	}
 	//树按钮响应
-	connect(pWarheadModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, &WarheadParaModel::NewArmHeadTmpl); 
+	connect(pWarheadModelTreeWidget, &QTreeWidget::itemDoubleClicked, this, &WarheadParaModel::NewArmHeadTmpl);
 
 	from->setWidget(pWarheadModelTreeWidget);
 	pWarheadModelTreeWidget->expandAll();
@@ -87,6 +88,9 @@ void WarheadParaModel::NewArmHeadTmpl(QTreeWidgetItem* item, int column)
 	QVariant variant = item->data(0, Qt::UserRole);
 	int nArmHeadIdx = variant.value<int>();
 	vLoadWarhead = vWarhead[nArmHeadIdx];
+	//清空变成默认颜色
+	defColor.clear();
+
 	ReLoadModelTree();
 	ReLoadModelProperty();
 	AddSceneData();
@@ -121,28 +125,28 @@ void WarheadParaModel::InitLogWidget(QDockWidget* from)
 void WarheadParaModel::InitCurveWidget(QDockWidget* from)
 {
 	from->setMaximumHeight(1200);
-// 	from->setFixedHeight(600);
+	// 	from->setFixedHeight(600);
 	from->setWindowTitle("参数化设计");
-	pArmHeadWnd = NULL; 
+	pArmHeadWnd = NULL;
 	if (pArmHeadWnd == NULL)
 		pArmHeadWnd = new ArmDesignWidget();
 	connect(pArmHeadWnd, &ArmDesignWidget::OutLog, this, &WarheadParaModel::MyLogOutput);
 	from->setWidget(pArmHeadWnd);
-// 	from->setMaximumHeight(1200);
-// // 	from->setFixedHeight(600);
-// 	from->setWindowTitle("参数化设计");
-// 	pCurveWnd = NULL; 
-// 	if (pCurveWnd == NULL)
-// 		pCurveWnd = new BezierWidget();
-// 	connect(pCurveWnd, &BezierWidget::OutLog, this, &WarheadParaModel::MyLogOutput); 
-// 	pCurveWnd->lstUpCtrlPts.clear();
-// 	int nPt = listUpCurveCtrlPt.size();
-// 	for (int i = 0; i < nPt; i++)
-// 	{
-// 		QPoint oPt(listUpCurveCtrlPt[i].x(), listUpCurveCtrlPt[i].y()); 
-// 		pCurveWnd->lstUpCtrlPts.push_back(oPt);
-// 	}
-// 	from->setWidget(pCurveWnd);
+	// 	from->setMaximumHeight(1200);
+	// // 	from->setFixedHeight(600);
+	// 	from->setWindowTitle("参数化设计");
+	// 	pCurveWnd = NULL; 
+	// 	if (pCurveWnd == NULL)
+	// 		pCurveWnd = new BezierWidget();
+	// 	connect(pCurveWnd, &BezierWidget::OutLog, this, &WarheadParaModel::MyLogOutput); 
+	// 	pCurveWnd->lstUpCtrlPts.clear();
+	// 	int nPt = listUpCurveCtrlPt.size();
+	// 	for (int i = 0; i < nPt; i++)
+	// 	{
+	// 		QPoint oPt(listUpCurveCtrlPt[i].x(), listUpCurveCtrlPt[i].y()); 
+	// 		pCurveWnd->lstUpCtrlPts.push_back(oPt);
+	// 	}
+	// 	from->setWidget(pCurveWnd);
 }
 
 //初始化编辑视图
@@ -152,7 +156,7 @@ void WarheadParaModel::InitEditManagerWidget(QDockWidget* from)
 
 	graphicsViewMain = new BQGraphicsView();
 	graphicsViewMain->setScene(&pSceneMain);
-	pSceneMain.setBackgroundBrush(Qt::darkGray); 
+	pSceneMain.setBackgroundBrush(Qt::darkGray);
 	MainDockWidget->setMinimumWidth(1310);
 	MainDockWidget->setWindowTitle("编辑视图 （二维X）");
 	MainDockWidget->setWidget(graphicsViewMain);
@@ -185,7 +189,7 @@ void WarheadParaModel::updateOGL()
 	}
 
 }
-	
+
 
 //初始化内容区域
 void WarheadParaModel::InitCentralWidget()
@@ -366,7 +370,7 @@ void WarheadParaModel::InitTipWindow()
 WarheadParaModel::WarheadParaModel(QWidget* parent)
 	: SARibbonMainWindow(parent)
 {
-	DataConvert.bFirst = true; 
+	DataConvert.bFirst = true;
 	//初始化系统变量
 	InitSysData();
 	//初始化系统路径
@@ -468,15 +472,29 @@ void WarheadParaModel::CloseFileAction()
 }
 
 /// <summary>
+/// 设置构件颜色属性
+/// </summary>
+void WarheadParaModel::SetingUnitColorAction(int UnitIndex, QString UnitName)
+{
+	QColor color = QColorDialog::getColor(Qt::gray, this, "选择你要的颜色");
+
+	//修改颜色
+	defColor[UnitIndex] = color;
+	//修改右侧菜单
+	ReLoadModelTree();
+	//刷新画布
+	AddSceneData();
+}
+/// <summary>
 /// 保存战斗部信息
 /// </summary>
 void WarheadParaModel::ApplyDataAction()
 {
 	if (pArmHeadEdit.size() == 0)
 		return;
-	for (size_t i = 0; i < pArmHeadEdit.size()-1; i++)
+	for (size_t i = 0; i < pArmHeadEdit.size() - 1; i++)
 	{
-		vLoadWarhead.mapArmHead[i].nUnitPropty= pArmHeadEdit[i]->text().toFloat();
+		vLoadWarhead.mapArmHead[i].nUnitPropty = pArmHeadEdit[i]->text().toFloat();
 	}
 	AddSceneData();
 	return;
@@ -605,6 +623,7 @@ int WarheadParaModel::InitWarheadLib()
 		QTextStream readStream(&file);
 		QString versionStr = "";
 		vector<PARADES> plist;
+		int unitindex = 0;
 		while (!readStream.atEnd()) {
 			QString content = readStream.readLine();
 			QStringList list = content.split(' ');
@@ -619,10 +638,10 @@ int WarheadParaModel::InitWarheadLib()
 			if (!verify)
 				continue;
 			PARADES p;
+			p.nUnitIndex = unitindex;
 			p.sUnitName = QString(list[1]);
 			p.nUnitPropty = list[2].toFloat();
 			plist.push_back(p);
-
 			if (list[1] == "外壳Shell")
 			{
 				for (size_t j = 0; j < list.size() - 3; j = j + 2)
@@ -630,6 +649,7 @@ int WarheadParaModel::InitWarheadLib()
 					turnPoint.push_back(QPointF(list[j + 3].toFloat(), list[j + 4].toFloat()));
 				}
 			}
+			unitindex++;
 		}
 		ArmHeadTopo t;
 		t.nArmHeadIdx = i;
@@ -681,15 +701,15 @@ void WarheadParaModel::ReleaseSysModel()
 
 int TransPixelToPt(VPIXELPOS const& vPix, QList<QPointF>& lstPt)
 {
-	int nPtNum = vPix.size(); 
-	int i = 0; 
-	lstPt.clear(); 
-	for ( i = 0 ; i < nPtNum ; i++ )
+	int nPtNum = vPix.size();
+	int i = 0;
+	lstPt.clear();
+	for (i = 0; i < nPtNum; i++)
 	{
-		QPointF oPt(vPix[i].nXY[0], vPix[i].nXY[1]); 
-		lstPt.push_back(oPt); 
+		QPointF oPt(vPix[i].nXY[0], vPix[i].nXY[1]);
+		lstPt.push_back(oPt);
 	}
-	return  0; 
+	return  0;
 }
 //画布增加数据
 void WarheadParaModel::AddSceneData()
@@ -698,16 +718,16 @@ void WarheadParaModel::AddSceneData()
 		return;*/
 		//清除画布
 	SceneMainClear();
-	pSceneMain.nArmHeadType = vLoadWarhead.nArmHeadIdx; 
+	pSceneMain.nArmHeadType = vLoadWarhead.nArmHeadIdx;
 	DataConvert.GetArmHeadPara(vLoadWarhead);
 	DataConvert.CaArmHeadData(vOriginShape);
-	QSize oSize(600, 300); 
-	DataConvert.CenterArmHeadData(vOriginShape, vDrawShape, oSize); 
+	QSize oSize(600, 300);
+	DataConvert.CenterArmHeadData(vOriginShape, vDrawShape, oSize);
 	// 转存画布上绘图坐标
-	TransPixelToPt(vDrawShape[2].vCorner, listUpCurveCtrlPt); 
+	TransPixelToPt(vDrawShape[2].vCorner, listUpCurveCtrlPt);
 	TransPixelToPt(vDrawShape[3].vCorner, listDnCurveCtrlPt);
-	pSceneMain.listDnCurveCtrlPt = listDnCurveCtrlPt; 
-	pSceneMain.listUpCurveCtrlPt = listUpCurveCtrlPt; 
+	pSceneMain.listDnCurveCtrlPt = listDnCurveCtrlPt;
+	pSceneMain.listUpCurveCtrlPt = listUpCurveCtrlPt;
 
 	//根据vDrawShape 绘制界面 
 	for (size_t i = 0; i < vDrawShape.size(); i++)
@@ -730,16 +750,16 @@ void WarheadParaModel::AddSceneData()
 		}
 		else if (vDrawShape[i].unitType == 3)//绘制曲线
 		{
-			BCurveLine * pCurveLine = new BCurveLine(BGraphicsItem::ItemType::Curve); 
+			BCurveLine* pCurveLine = new BCurveLine(BGraphicsItem::ItemType::Curve);
 			pCurveLine->isAuxiliary = false;
 			pCurveLine->nUnitType = vDrawShape[i].unitType;
 			pCurveLine->nUnitIdx = vDrawShape[i].unitIdx;
 			QPen pen = QPen(ColorHelper(2), 1);
 			pen.setStyle(Qt::SolidLine);
-			QList<QPointF> lstPt; 
-			TransPixelToPt(vDrawShape[i].vCorner, lstPt); 
+			QList<QPointF> lstPt;
+			TransPixelToPt(vDrawShape[i].vCorner, lstPt);
 			pCurveLine->setPen(pen);
-				pCurveLine->lstCtrlPt = lstPt; 
+			pCurveLine->lstCtrlPt = lstPt;
 
 			pSceneMain.addItem(pCurveLine);
 		}
@@ -752,11 +772,11 @@ void WarheadParaModel::AddSceneData()
 			pen.setStyle(Qt::SolidLine);
 			m_line->setPen(pen);
 			if (vDrawShape[i].unitIdx == 7 || vDrawShape[i].unitIdx == 4)
-			{ 
+			{
 				m_line->setBrush(ColorHelper(vDrawShape[i].unitIdx));
 			}
 			for (size_t j = 0; j < vDrawShape[i].vCorner.size(); j++)
-				{
+			{
 				m_line->point.push_back(QPointF(vDrawShape[i].vCorner[j].nXY[0], vDrawShape[i].vCorner[j].nXY[1]));
 			}
 			pSceneMain.addItem(m_line);
@@ -764,9 +784,9 @@ void WarheadParaModel::AddSceneData()
 	}
 
 	// 赋给独立的曲线窗口 完成曲线窗口相关变量赋值
-	oSize = pArmHeadWnd->size(); 
+	oSize = pArmHeadWnd->size();
 	pArmHeadWnd->oPreSize = oSize;
-	pArmHeadWnd->oArmHeadDesign.ReadArmHeadInfo(""); 
+	pArmHeadWnd->oArmHeadDesign.ReadArmHeadInfo("");
 	pArmHeadWnd->vDesignShape = vOriginShape;
 	pArmHeadWnd->lstUpCurveCtrlPts = DataConvert.vCtrlPts;
 	memcpy(pArmHeadWnd->fR, DataConvert.fR, 20 * sizeof(float));
@@ -775,16 +795,16 @@ void WarheadParaModel::AddSceneData()
 	// 需要计算初始曲线轮廓
 	pArmHeadWnd->bCalPartShape = true;
 	pArmHeadWnd->update();
-// 	oSize = pCurveWnd->size(); 
-// 	pCurveWnd->oPreSize = oSize; 
-// 	pCurveWnd->vDesignShape = vOriginShape;
-// 	pCurveWnd->lstUpCtrlPts = DataConvert.vCtrlPts; 
-// 	memcpy(pCurveWnd->fR, DataConvert.fR, 20 * sizeof(float)); 
-// 	memcpy(pCurveWnd->fT, DataConvert.fT, 10 * sizeof(float));
-// 	memcpy(pCurveWnd->fH, DataConvert.fH, 10 * sizeof(float));
-// 	// 需要计算初始曲线轮廓
-// 	pCurveWnd->bCalPartShape = true; 
-// 	pCurveWnd->update(); 
+	// 	oSize = pCurveWnd->size(); 
+	// 	pCurveWnd->oPreSize = oSize; 
+	// 	pCurveWnd->vDesignShape = vOriginShape;
+	// 	pCurveWnd->lstUpCtrlPts = DataConvert.vCtrlPts; 
+	// 	memcpy(pCurveWnd->fR, DataConvert.fR, 20 * sizeof(float)); 
+	// 	memcpy(pCurveWnd->fT, DataConvert.fT, 10 * sizeof(float));
+	// 	memcpy(pCurveWnd->fH, DataConvert.fH, 10 * sizeof(float));
+	// 	// 需要计算初始曲线轮廓
+	// 	pCurveWnd->bCalPartShape = true; 
+	// 	pCurveWnd->update(); 
 
 	graphicsViewMain->hide();
 	graphicsViewMain->show();
@@ -802,10 +822,68 @@ void WarheadParaModel::SceneMainClear()
 }
 #pragma endregion
 
+QString WarheadParaModel::QColorToString(const QColor& color, const QString type)
+{
+	if (type == "RGBA") {
+		return QString("rgba(%1, %2, %3, %4)")
+			.arg(color.red())
+			.arg(color.green())
+			.arg(color.blue())
+			.arg(color.alpha());
+	}
+	if (type == "RGB") {
+		return QString("rgba(%1, %2, %3)")
+			.arg(color.red())
+			.arg(color.green())
+			.arg(color.blue());
+	}
+	if (type == "HEX") {
+		return QString().sprintf("#%1%02X%02X%02X",
+			color.red(),
+			color.green(),
+			color.blue()).arg(color.alpha() != 255 ? QString().sprintf("%02X", color.alpha()) : QString());
+	}
+
+	return color.name();
+}
 
 QColor WarheadParaModel::ColorHelper(int unitIdx)
-{
-	if (unitIdx == 1)
+{ 
+	if (defColor.size() == 0)
+	{
+		defColor.push_back(QColor(72, 104, 146));
+		defColor.push_back(QColor(47, 65, 80));
+		defColor.push_back(QColor(69, 173, 206));
+		defColor.push_back(QColor(62, 179, 203));
+		defColor.push_back(QColor(255, 255, 255));
+		defColor.push_back(QColor(232, 220, 102));
+		defColor.push_back(QColor(170, 101, 96));
+		defColor.push_back(QColor(254, 235, 248));
+		defColor.push_back(QColor(204, 178, 102));
+		defColor.push_back(QColor(255, 127, 0));
+		defColor.push_back(QColor(255, 131, 158));
+		defColor.push_back(QColor(255, 255, 122));
+		defColor.push_back(QColor(190, 255, 255));
+		defColor.push_back(QColor(0, 0, 0));
+	}
+	if (unitIdx >= defColor.size())
+	{
+		defColor.push_back(QColor(72, 104, 146));
+		defColor.push_back(QColor(47, 65, 80));
+		defColor.push_back(QColor(69, 173, 206));
+		defColor.push_back(QColor(62, 179, 203));
+		defColor.push_back(QColor(255, 255, 255));
+		defColor.push_back(QColor(232, 220, 102));
+		defColor.push_back(QColor(170, 101, 96));
+		defColor.push_back(QColor(254, 235, 248));
+		defColor.push_back(QColor(204, 178, 102));
+		defColor.push_back(QColor(255, 127, 0));
+		defColor.push_back(QColor(255, 131, 158));
+		defColor.push_back(QColor(255, 255, 122));
+		defColor.push_back(QColor(190, 255, 255));
+		defColor.push_back(QColor(0, 0, 0));
+	}
+	/*if (unitIdx == 1)
 	{
 		return QColor(47, 65, 80);
 	}
@@ -852,8 +930,8 @@ QColor WarheadParaModel::ColorHelper(int unitIdx)
 	else if (unitIdx == 13)
 	{
 		return QColor(190, 255, 255);
-	}
-	return QColor(72, 104, 146);
+	}*/
+	return defColor[unitIdx];
 }
 //重新加载模型属性
 void WarheadParaModel::ReLoadModelProperty()
@@ -896,12 +974,24 @@ void WarheadParaModel::ReLoadModelTree()
 	QWidget* mytreewidget = new QWidget();
 	QTreeWidget* pLoadModelTreeWidget = new QTreeWidget(mytreewidget);
 	pLoadModelTreeWidget->setHeaderHidden(true);
+	pLoadModelTreeWidget->setColumnCount(2);
+	//第一行宽度 
+	pLoadModelTreeWidget->setColumnWidth(0, 150);
 	for (vector<PARADES>::const_iterator iter = vLoadWarhead.mapArmHead.begin(); iter != vLoadWarhead.mapArmHead.end(); iter++)
 	{
 		QTreeWidgetItem* rootItem = new QTreeWidgetItem(pLoadModelTreeWidget);
 		rootItem->setText(0, iter->sUnitName);
+		QPushButton* ptn = new QPushButton(this);
+		connect(ptn, &QPushButton::clicked, this, [=](bool checked) {
+			SetingUnitColorAction(iter->nUnitIndex, iter->sUnitName);
+			});
+		//根据加载名称的id获取颜色 并且去掉边框
+		//根据id获取颜色
+		QString colorStr = QColorToString(ColorHelper(iter->nUnitIndex),"RGBA");
+		ptn->setStyleSheet(QString("background-color:%1;border:none").arg(colorStr));
 		rootItem->setCheckState(0, Qt::Checked);
 		rootItem->setData(0, Qt::UserRole, iter->sUnitName);
+		pLoadModelTreeWidget->setItemWidget(rootItem, 1, ptn);
 	}
 	//复选选中
 	connect(pLoadModelTreeWidget, &QTreeWidget::itemChanged, this, [=](QTreeWidgetItem* item, int column)
@@ -940,20 +1030,21 @@ void WarheadParaModel::ReLoadModelTree()
 
 	LoadModeTreeWidget->setWidget(pLoadModelTreeWidget);
 	pLoadModelTreeWidget->expandAll();
+
 }
 
 
-void WarheadParaModel::mousePressEvent(QMouseEvent *event)
+void WarheadParaModel::mousePressEvent(QMouseEvent* event)
 {
 	// 画布上的点击点
-	QPointF oCurPos = pSceneMain.oScePt; 
-	QPointF oPos = event->pos(); 
-	nMoveXY[0] = oPos.x() - oCurPos.x(); 
-	nMoveXY[1] = oPos.y() - oCurPos.y(); 
+	QPointF oCurPos = pSceneMain.oScePt;
+	QPointF oPos = event->pos();
+	nMoveXY[0] = oPos.x() - oCurPos.x();
+	nMoveXY[1] = oPos.y() - oCurPos.y();
 
 	return;
 }
-void WarheadParaModel::mouseReleaseEvent(QMouseEvent *event)
+void WarheadParaModel::mouseReleaseEvent(QMouseEvent* event)
 {
 	if (event->button() == Qt::LeftButton)
 	{
@@ -964,33 +1055,33 @@ void WarheadParaModel::mouseReleaseEvent(QMouseEvent *event)
 
 	return;
 }
-void WarheadParaModel::mouseMoveEvent(QMouseEvent *event)
+void WarheadParaModel::mouseMoveEvent(QMouseEvent* event)
 {
-	if ((event->buttons() & Qt::LeftButton) == Qt::LeftButton )
+	if ((event->buttons() & Qt::LeftButton) == Qt::LeftButton)
 	{
 		// 屏幕坐标
-		QPointF oPos = event->pos(); 
+		QPointF oPos = event->pos();
 		// 画布坐标
-		QPointF oScePos(oPos.x() - nMoveXY[0],oPos.y() - nMoveXY[1]);
-// 		if( iUpSelected >= 0 )
-// 		{
-// 			listUpCurveCtrlPt[iUpSelected] = oScePos;
-// 			// 另一条控制线对称操作
-// 		}
-// 		else if (iDnSelected >= 0 )
-// 		{
-// 			listDnCurveCtrlPt[iDnSelected] = oScePos;
-// 		}
-		// 战斗部相对坐标系
-// 		QPointF oHeadCoorSysPos(oScePos.x()-600, oScePos.y()-300); 
-// 		vLoadWarhead.vTurnPoint[iSelected] = oHeadCoorSysPos; 
+		QPointF oScePos(oPos.x() - nMoveXY[0], oPos.y() - nMoveXY[1]);
+		// 		if( iUpSelected >= 0 )
+		// 		{
+		// 			listUpCurveCtrlPt[iUpSelected] = oScePos;
+		// 			// 另一条控制线对称操作
+		// 		}
+		// 		else if (iDnSelected >= 0 )
+		// 		{
+		// 			listDnCurveCtrlPt[iDnSelected] = oScePos;
+		// 		}
+				// 战斗部相对坐标系
+		// 		QPointF oHeadCoorSysPos(oScePos.x()-600, oScePos.y()-300); 
+		// 		vLoadWarhead.vTurnPoint[iSelected] = oHeadCoorSysPos; 
 
 		update();
 	}
 
 	return;
 }
-void WarheadParaModel::keyPressEvent(QKeyEvent *event)
+void WarheadParaModel::keyPressEvent(QKeyEvent* event)
 {
 	int iPoint;
 
@@ -1010,5 +1101,5 @@ void WarheadParaModel::keyPressEvent(QKeyEvent *event)
 	default:
 		break;
 	}
-	return; 
+	return;
 }
