@@ -515,6 +515,14 @@ void ParaModel::InitCategoryMain(SARibbonCategory* page)
 	connect(act, &QAction::triggered, this, &ParaModel::OpenLayerDataAction);
 
 	act = new QAction(this);
+	act->setObjectName(("导出建筑"));
+	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
+	act->setText(("导出建筑"));
+	pannel->addLargeAction(act);
+	connect(act, &QAction::triggered, this, &ParaModel::ExportLayerDataAction);
+
+
+	act = new QAction(this);
 	act->setObjectName(("载入楼层平面图"));
 	act->setIcon(QIcon(":/qss/res/qss/White/save.png"));
 	act->setText(("载入楼层平面图"));
@@ -1246,6 +1254,13 @@ void ParaModel::CloseFileAction()
 	paraOglmanagerMain->allSolids.resize(0);
 
 	ParaModel::RefreshLayerWidget();
+}
+
+/// <summary>
+/// 导出建筑
+/// </summary>
+void ParaModel::ExportLayerDataAction()
+{
 }
 /// <summary>
 /// 载入建筑

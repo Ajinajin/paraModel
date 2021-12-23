@@ -190,6 +190,7 @@ public slots:
 	void NewFileAction();			//新建楼层户型数据
 	void OpenFileAction();			//外部打开楼层户型数据
 	void OpenLayerDataAction();		//外部打开建筑数据
+	void ExportLayerDataAction();	//导出建筑数据
 	void CreateLayerAction();		//创建平面图
 	void CloseFileAction();			//清空所有数据
 	void SaveFileAction();			//保存当前数据

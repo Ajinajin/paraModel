@@ -15,6 +15,7 @@
 #include "camera.h"
 #include <ShaderProc.h>
 
+
 typedef vector<QImage> vQImage;
 
 struct Point		//点结构(二维)
@@ -67,8 +68,12 @@ public:
 
 public:
 
-	ArmHeadTopo oglWarhead;		//需要绘制的战斗部
+	ArmHeadTopo oglWarhead;			//需要绘制的战斗部
 	//VECLSTPT oglvlst3DCurvePt;	//战斗部外壳曲线数据
+	vector<GLboolean> showFlags;	//控制各个构件的显示
+	GLboolean initShowFlag;			//用于对showFlags的初始化
+
+	vector<QColor> oglDefColor;		//用于颜色显示的成员，通过构件ID索引得到
 
 	//相机、鼠标键入相关参数
 	Camera* camera;

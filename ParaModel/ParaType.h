@@ -164,6 +164,7 @@ typedef struct SysPath
 // 战斗部设计用数据结构 
 typedef struct PARADES
 {
+	int 	nUnitIndex;				// 构件idx
 	float 	nUnitPropty;			// 构件属性
 	QString sUnitName;				// 构件名称
 }PARADES;
