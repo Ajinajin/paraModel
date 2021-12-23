@@ -272,6 +272,10 @@ void ParaOGLManager::paintGL()
 	float transOfWindow = 0.25;
 
 	
+
+	allNodes.resize(0);
+	allSolids.resize(0);
+
 	//绘制三维模型
 	if (!oglUnitTable.empty() && !oglTopTable.empty())
 	{
@@ -724,9 +728,9 @@ void ParaOGLManager::paintGL()
 	//此时0 1 2是暂时的，1说明所有的点信息已存储，等于2说明所有的solid信息已存储(此时可输出到K文件了)
 
 	//数据已存储完毕
-	if (outFlag == 2)
+	//if (outFlag == 2)
 	{
-		outFlag = -1;
+		//outFlag = -1;
 
 
 		int Xmin = INT_MAX, Xmax = INT_MIN, Ymin = INT_MAX, Ymax = INT_MIN, Zmin = INT_MAX, Zmax = INT_MIN;
@@ -1008,7 +1012,7 @@ void ParaOGLManager::InitAndDrawCuboid(int x, int y, int z, int length, int thic
 
 
 	//存入到点集合中
-	if (outFlag == 0)
+	//if (outFlag == 0)
 	{
 		for (int i = 0; i < 8; i++)
 		{
@@ -1016,7 +1020,7 @@ void ParaOGLManager::InitAndDrawCuboid(int x, int y, int z, int length, int thic
 		}
 	}
 	//点已存入完毕，此时开始对每个solid里面的点索引 赋值
-	if (outFlag == 1)
+	//if (outFlag == 1)
 	{
 		Solid tmp;
 		findIndex(points,allNodes,tmp.idx);

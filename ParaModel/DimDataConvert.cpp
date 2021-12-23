@@ -461,12 +461,12 @@ int AddColInWall(BasicUnit oCol, int nInsWallIdx, PixelPos oInsPos, VUNITTABLE v
 	for (i = 0; i < 12; i++)
 	{
 		nAdjIdx = vLayerTopo[nInsWallIdx].nAdjUnitIdx[i];
+			if (vLayerTopo[nAdjIdx].nUnitType == 2)
+			{
+				nBeamIdx = nAdjIdx;
+				break;
+			}
 
-		if (vLayerTopo[nAdjIdx].nUnitType == 2)
-		{
-			nBeamIdx = nAdjIdx;
-			break;
-		}
 
 
 	}
@@ -550,6 +550,26 @@ int AddWallInCols(BasicUnit oAddUnit, int nAdjCol[2], VUNITTABLE vTable, VTOPOTA
 
 	// 更新拓扑结构
 	vLayerTopo.push_back(oInsUnit);
+
+	//更新柱子拓扑结构
+	for (int i = 0; i < 12; i++)
+	{
+		if (vLayerTopo[nAdjCol[0]].nAdjUnitIdx[i] == -1)
+		{
+			vLayerTopo[nAdjCol[0]].nAdjUnitIdx[i] = vLayerTopo.size() - 1;
+			break;
+		}
+	}
+	for (int i = 0; i < 12; i++)
+	{
+		if (vLayerTopo[nAdjCol[1]].nAdjUnitIdx[i] == -1)
+		{
+			vLayerTopo[nAdjCol[1]].nAdjUnitIdx[i] = vLayerTopo.size() - 1;
+			break;
+		}
+	}
+	
+
 	return 0;
 }
 
@@ -602,6 +622,8 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE
 	// 插入墙
 	else if (oAddUnit.nUnitType == 4 /*&& nAdjCol[0] >= 0*/)
 	{
+		//存储所有满足条件的一对柱子
+		vector<VINT> nAdjCols;
 		//获取两柱子ID
 		for (int i = 0; i < vLayerTopo.size(); i++)
 		{
@@ -610,6 +632,11 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE
 				//两个为柱子，则判断插入点是否在两个柱子之间
 				if (j != i && vLayerTopo[i].nUnitType == 1 && vLayerTopo[j].nUnitType == 1)
 				{
+
+
+
+					VINT allCols;				//找到这些墙的所有柱子	
+
 
 					//<10为允许鼠标点击误差
 					//0度
@@ -620,8 +647,13 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE
 						{
 							if (abs(oInsPos.nXY[1] - vLayerTopo[i].nCenPos[2]) < (vTable[vLayerTopo[i].nCenUnitIdx].oShape.nShapeRange[3] - vTable[vLayerTopo[i].nCenUnitIdx].oShape.nShapeRange[1]))
 							{
-								nAdjCol[0] = vLayerTopo[i].nTopoIdx, nAdjCol[1] = vLayerTopo[j].nTopoIdx;
-								break;
+								VINT tmp(2);
+								tmp[0] = i;
+								tmp[1] = j;
+
+									//nAdjCol[0] = vLayerTopo[i].nTopoIdx, nAdjCol[1] = vLayerTopo[j].nTopoIdx;
+									//break;
+								nAdjCols.push_back(tmp);
 							}
 						}
 
@@ -634,8 +666,13 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE
 						{
 							if (abs(oInsPos.nXY[0] - vLayerTopo[i].nCenPos[0]) < (vTable[vLayerTopo[i].nCenUnitIdx].oShape.nShapeRange[2] - vTable[vLayerTopo[i].nCenUnitIdx].oShape.nShapeRange[0]))
 							{
-								nAdjCol[0] = vLayerTopo[i].nTopoIdx, nAdjCol[1] = vLayerTopo[j].nTopoIdx;
-								break;
+									//nAdjCol[0] = vLayerTopo[i].nTopoIdx, nAdjCol[1] = vLayerTopo[j].nTopoIdx;
+									//break;
+								VINT tmp(2);
+								tmp[0] = i;
+								tmp[1] = j;
+
+								nAdjCols.push_back(tmp);
 							}
 							
 						}
@@ -644,8 +681,35 @@ int DimDataConvert::AddBaseUnit(BasicUnit oAddUnit, PixelPos oInsPos, VUNITTABLE
 			}
 		}
 
+		//找到距离最短的两个柱子
+		int minDis = INT_MAX;
+		for (int k = 0; k < nAdjCols.size(); k++)
+		{
+			int col1 = nAdjCols[k][0];
+			int col2 = nAdjCols[k][1];
+
+			float dis = 0;
+			dis += (vLayerTopo[col1].nCenPos[0] - vLayerTopo[col2].nCenPos[0]) * (vLayerTopo[col1].nCenPos[0] - vLayerTopo[col2].nCenPos[0]);
+			dis += (vLayerTopo[col1].nCenPos[1] - vLayerTopo[col2].nCenPos[1]) * (vLayerTopo[col1].nCenPos[1] - vLayerTopo[col2].nCenPos[1]);
+			dis += (vLayerTopo[col1].nCenPos[2] - vLayerTopo[col2].nCenPos[2]) * (vLayerTopo[col1].nCenPos[2] - vLayerTopo[col2].nCenPos[2]);
+			dis = sqrt(dis);
+
+			if (dis < minDis)
+			{
+				minDis = dis;
+				nAdjCol[0] = col1;
+				nAdjCol[1] = col2;
+			}
+		}
+
+
 		nRe = AddWallInCols(oAddUnit, nAdjCol, vTable, vLayerTopo);
+
+
+
 	}
+
+
 
 
 
@@ -1153,7 +1217,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 							int col1 = vLayerTopo[nUpWalls[i]].nAdjUnitIdx[0];
 							int col2 = vLayerTopo[nUpWalls[i]].nAdjUnitIdx[1];
 							int colH = vPlaneDraw[col1].nWH[1];
-							int thickness = table[vLayerTopo[nDownWalls[i]].nCenUnitIdx].oShape.nThickNess;
+							int thickness = table[vLayerTopo[nUpWalls[i]].nCenUnitIdx].oShape.nThickNess;
 							int addY = (colH - thickness) / 2;
 							if (vLayerTopo[col1].nCenPos[2] > vLayerTopo[col2].nCenPos[2])
 							{
