@@ -55,7 +55,7 @@ private:
 	BQGraphicsView* graphicsViewMain;				// 二维模型三维视图
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布 
 	WarheadOGLManager* warheadParaOglmanager;				// 战斗部三维显示
-
+	vector<QColor> defColor;
 
 	int if_data;									//0是未加载数据。1是有数据
 	SysPath oPath;									//系统路径
@@ -133,6 +133,7 @@ private:
 	//清除画布
 	void SceneMainClear();
 	QColor ColorHelper(int unitIdx);
+	QString QColorToString(const QColor& color, const QString type);
 	void ReLoadModelTree();			//重新加载模型树
 	void ReLoadModelProperty();		//重新加载模型属性
 protected:
@@ -154,5 +155,6 @@ public slots:
 	void SaveasFileAction();		//另存当前数据
 	void ExportFileAction();		//导出成k文件
 	void ApplyDataAction();			//保存战斗部信息
+	void SetingUnitColorAction(int UnitIndex, QString UnitName);			//设置构件颜色属性
 	void NewArmHeadTmpl(QTreeWidgetItem* item, int column); 
 };

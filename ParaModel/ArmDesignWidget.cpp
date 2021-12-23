@@ -183,43 +183,89 @@ void ArmDesignWidget::ReflectPos(VPIXELPOS & vPt, int nXY[2])
 
 QColor ArmDesignWidget::ColorHelper(int unitIdx)
 {
-	if (unitIdx == 0)
+	if (defColor.size() == 0)
 	{
-		return QColor(14,255,2);
+		defColor.push_back(QColor(72, 104, 146));
+		defColor.push_back(QColor(47, 65, 80));
+		defColor.push_back(QColor(69, 173, 206));
+		defColor.push_back(QColor(62, 179, 203));
+		defColor.push_back(QColor(255, 255, 255));
+		defColor.push_back(QColor(232, 220, 102));
+		defColor.push_back(QColor(170, 101, 96));
+		defColor.push_back(QColor(254, 235, 248));
+		defColor.push_back(QColor(204, 178, 102));
+		defColor.push_back(QColor(255, 127, 0));
+		defColor.push_back(QColor(255, 131, 158));
+		defColor.push_back(QColor(255, 255, 122));
+		defColor.push_back(QColor(190, 255, 255));
+		defColor.push_back(QColor(0, 0, 0));
 	}
-	else if (unitIdx == 1)
+	if (unitIdx >= defColor.size())
 	{
-		return QColor(204,178,102);
+		defColor.push_back(QColor(72, 104, 146));
+		defColor.push_back(QColor(47, 65, 80));
+		defColor.push_back(QColor(69, 173, 206));
+		defColor.push_back(QColor(62, 179, 203));
+		defColor.push_back(QColor(255, 255, 255));
+		defColor.push_back(QColor(232, 220, 102));
+		defColor.push_back(QColor(170, 101, 96));
+		defColor.push_back(QColor(254, 235, 248));
+		defColor.push_back(QColor(204, 178, 102));
+		defColor.push_back(QColor(255, 127, 0));
+		defColor.push_back(QColor(255, 131, 158));
+		defColor.push_back(QColor(255, 255, 122));
+		defColor.push_back(QColor(190, 255, 255));
+		defColor.push_back(QColor(0, 0, 0));
+	}
+	/*if (unitIdx == 1)
+	{
+		return QColor(47, 65, 80);
 	}
 	else if (unitIdx == 2)
 	{
-		return QColor(255, 127, 5);
+		return QColor(69, 173, 206);
 	}
 	else if (unitIdx == 3)
 	{
-		return QColor(131, 156, 255);
+		return QColor(62, 179, 203);
 	}
 	else if (unitIdx == 4)
 	{
-		return QColor(4, 31, 5);
+		return QColor(255, 255, 255);
 	}
 	else if (unitIdx == 5)
 	{
-		return QColor(2, 255, 255);
+		return QColor(232, 220, 102);
 	}
 	else if (unitIdx == 6)
 	{
-		return QColor(254, 235, 248);
+		return QColor(170, 101, 96);
 	}
 	else if (unitIdx == 7)
 	{
-		return QColor(255, 0, 255);
+		return QColor(254, 235, 248);
 	}
 	else if (unitIdx == 8)
 	{
-		return QColor(255, 255, 255);
+		return QColor(204, 178, 102);
 	}
-	return QColor(255, 255, 255);
+	else if (unitIdx == 9)
+	{
+		return QColor(255, 127, 0);
+	}
+	else if (unitIdx == 11)
+	{
+		return QColor(255, 131, 158);
+	}
+	else if (unitIdx == 12)
+	{
+		return QColor(255, 255, 122);
+	}
+	else if (unitIdx == 13)
+	{
+		return QColor(190, 255, 255);
+	}*/
+	return defColor[unitIdx];
 }
 
 // 初始化连接点
