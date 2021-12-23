@@ -49,6 +49,7 @@ public:
 	QSize oPreSize; 
 	VSHAPE vDrawShape;				// 整个战斗部外形绘制坐标尺寸  曲线计算完成
 	VSHAPE vDesignShape;			// 战斗部外形原始坐标尺寸  曲线为控制点表示
+	vector<QColor> defColor;		//默认颜色
 // 绘制数据 屏幕坐标
 public:
 	LSTEDGEDES lstUpEdgeCtrlPts;		// 上方外壳特征点/拐点 设计图纸坐标

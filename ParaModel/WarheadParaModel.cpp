@@ -90,7 +90,7 @@ void WarheadParaModel::NewArmHeadTmpl(QTreeWidgetItem* item, int column)
 	vLoadWarhead = vWarhead[nArmHeadIdx];
 	//清空变成默认颜色
 	defColor.clear();
-
+	pArmHeadWnd->defColor.clear();
 	ReLoadModelTree();
 	ReLoadModelProperty();
 	AddSceneData();
@@ -406,15 +406,8 @@ void WarheadParaModel::NewFileAction()
 /// </summary>
 void WarheadParaModel::SaveFileAction()
 {
-	if (if_data == 0)
-	{
-		QMessageBox::information(NULL, "信息提示", "当前并无数据可保存");
-	}
-	else
-	{
-
-		MyLogOutput("当前文件保存成功");
-	}
+	//将数据变成 输出成txt文件
+	//获取数据，将数据变成k文件
 	return;
 }
 /// <summary>
@@ -505,6 +498,7 @@ void WarheadParaModel::ApplyDataAction()
 /// </summary>
 void WarheadParaModel::OpenFileAction()
 {
+	//打开保存的数据文件
 	QFileDialog* f = new QFileDialog(this);
 	f->setWindowTitle("选择数据文件*.txt");
 	f->setNameFilter("*.txt");
