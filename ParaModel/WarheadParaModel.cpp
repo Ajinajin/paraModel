@@ -187,7 +187,10 @@ void WarheadParaModel::updateOGL()
 	{
 		warheadParaOglmanager->oglWarhead = vLoadWarhead;
 	}
-
+	if (defColor.size() != 0)
+	{
+		warheadParaOglmanager->oglDefColor = defColor;
+	}
 }
 
 
@@ -986,6 +989,7 @@ void WarheadParaModel::ReLoadModelTree()
 		ptn->setStyleSheet(QString("background-color:%1;border:none").arg(colorStr));
 		rootItem->setCheckState(0, Qt::Checked);
 		rootItem->setData(0, Qt::UserRole, iter->sUnitName);
+		rootItem->setData(1, Qt::UserRole, iter->nUnitIndex);
 		pLoadModelTreeWidget->setItemWidget(rootItem, 1, ptn);
 	}
 	//复选选中
@@ -998,15 +1002,19 @@ void WarheadParaModel::ReLoadModelTree()
 			}
 			QVariant variant = item->data(0, Qt::UserRole);
 			QString sUnitName = variant.value<QString>();
+
+			variant = item->data(1, Qt::UserRole);
+			qint32 sUnitIdx = variant.value<qint32>();
 			if (item->checkState(0) == Qt::Checked)
 			{
 				//选中
-				int x = 0;
+				warheadParaOglmanager->showFlags[sUnitIdx] = GL_TRUE;		//三维显示窗口对应的构件显示
 			}
 			else
 			{
 				//未选中
-				int x = 1;
+				warheadParaOglmanager->showFlags[sUnitIdx] = GL_FALSE;		//三维显示窗口对应的构件不显示
+				
 			}
 		});
 

@@ -54,7 +54,7 @@ private:
 
 	BQGraphicsView* graphicsViewMain;				// 二维模型三维视图
 	BQGraphicsScene pSceneMain;						// 二维模型Z视图大屏幕主画布 
-	WarheadOGLManager* warheadParaOglmanager;				// 战斗部三维显示
+	WarheadOGLManager* warheadParaOglmanager;		// 战斗部三维显示
 	vector<QColor> defColor;
 
 	int if_data;									//0是未加载数据。1是有数据

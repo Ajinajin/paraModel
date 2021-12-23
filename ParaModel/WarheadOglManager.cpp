@@ -13,7 +13,8 @@
 
 
 // 定义全局变量 后期修改
-const QVector3D CAMERA_POSITION(0.0f, 300.0f, 1000.0f);
+//(将相机Z轴置为0，能看到弹的剖面)
+const QVector3D CAMERA_POSITION(0.0f, 400.0, 500);
 //const QVector3D CAMERA_POSITION(0.0f, 5.0f, 10.0f);
 const QVector3D LIGHT_POSITION(0.0f, 1.0f, 0.0f);
 
@@ -26,11 +27,23 @@ int initFlag = 0;
 fstream outfile("D:/Study/Work/HS/Ajinajin/paraModel/x64/Debug/outtest.txt", fstream::out);
 
 
+
 //绘制外壳曲线的全局变量
 extern VECLSTPT oglCurveData;
 
 
 //*********************工具性函数***********************************
+
+//获取对应构件ID
+int getUnitIdx(ArmHeadTopo* oglWarhead, QString str)
+{
+	for (int i = 0; i < oglWarhead->mapArmHead.size(); i++)
+	{
+		if (oglWarhead->mapArmHead[i].sUnitName == str) { return oglWarhead->mapArmHead[i].nUnitIndex; }
+	}
+	return -1;
+}
+
 
 //参数 圆心	圆环大圆半径	圆环小圆半径	球半径	圆柱高度
 
@@ -663,8 +676,8 @@ void WarheadOGLManager::initializeGL()
 
 
 	//
-	//allNodes.resize(0);
-
+	initShowFlag = GL_FALSE;
+	
 
 	/************ 载入shader ***********/
 
@@ -740,23 +753,21 @@ void WarheadOGLManager::paintGL()
 
 	Ver3D center;
 	center.fXYZ[0] = 0.0f, center.fXYZ[1] = 0.0f, center.fXYZ[2] = 0.0f;
-	//InitAndDrawColumn(center,1,2);
-	//DrawRing(center,4,2);
-	//DrawFuse(center,2,2,1,2);
-	//DrawRoundPConeSide(center,5,2,3);
+	
 
-	if (oglWarhead.mapArmHead.size() != 0)			//绘制战斗部
+	if (oglWarhead.mapArmHead.size() != 0 && oglDefColor.size()!=0)			//绘制战斗部
 	{
-		//float CirBottomR = 5.0;		//弹壳最底面圆柱半径
-		//float CirBottomH = 0.3;		//弹壳最底面圆柱高度
+		if (initShowFlag == GL_FALSE)
+		{
+			showFlags.resize(oglWarhead.mapArmHead.size());
+			for (int k = 0; k < oglWarhead.mapArmHead.size(); k++)
+			{
+				showFlags[k] = GL_TRUE;
+			}
+			initShowFlag = GL_TRUE;
+		}
 
-		//float CirTopR = 4.5;		//弹壳最上面圆柱半径
-		//float CirTopH = 0.3;		//弹壳最上面圆柱高度
 
-		//float sideR1 = 4.2, sideR2 = 3.8, sideR3 = 3.5, sideH = 10.0;			//弹壳侧面三层圆柱半径与高度
-
-		//float fragR = 0.09;			//球状弹丸半径
-		//float fuseR1=1.5, fuseH1=2, fuseR2=0.5, fuseH2=1;
 		//战斗部绘制数据
 		float CirBottomR;		//弹壳最底面圆柱半径
 		float CirBottomH;		//弹壳最底面圆柱厚度
@@ -789,29 +800,41 @@ void WarheadOGLManager::paintGL()
 
 		}
 
-
+		
 
 		//弹柱体底面壳
+		if(showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("前盖半径R8"))])
 		{
-			ResourceManager::getShader("warhead").use().setFloat("R", 227);
+			QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("前盖半径R8"))];
+			/*ResourceManager::getShader("warhead").use().setFloat("R", 227);
 			ResourceManager::getShader("warhead").use().setFloat("G", 168);
-			ResourceManager::getShader("warhead").use().setFloat("B", 105);
+			ResourceManager::getShader("warhead").use().setFloat("B", 105);*/
+			ResourceManager::getShader("warhead").use().setFloat("R", color.red());
+			ResourceManager::getShader("warhead").use().setFloat("G", color.green());
+			ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
 
 
 			center.fXYZ[0] = 0.0f, center.fXYZ[1] = 0.0f, center.fXYZ[2] = 0.0f;
 			InitAndDrawColumn(center, CirBottomR, CirBottomH);
 		}
 		//弹柱体顶面壳
+		if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("后盖半径R9"))])
 		{
-			ResourceManager::getShader("warhead").use().setFloat("R", 255);
+			QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("后盖半径R9"))];
+
+			/*ResourceManager::getShader("warhead").use().setFloat("R", 255);
 			ResourceManager::getShader("warhead").use().setFloat("G", 128);
-			ResourceManager::getShader("warhead").use().setFloat("B", 0);
+			ResourceManager::getShader("warhead").use().setFloat("B", 0);*/
+			ResourceManager::getShader("warhead").use().setFloat("R", color.red());
+			ResourceManager::getShader("warhead").use().setFloat("G", color.green());
+			ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
 
 			center.fXYZ[1] = CirBottomH + sideH;
 			InitAndDrawColumn(center, CirTopR, CirTopH);
 		}
 
 		//引信
+		if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("引信半径R4"))])
 		{
 			ResourceManager::getShader("warhead").use().setFloat("R", 255);
 			ResourceManager::getShader("warhead").use().setFloat("G", 0);
@@ -829,29 +852,64 @@ void WarheadOGLManager::paintGL()
 			//壳为多个折线组成
 			if (oglCurveData.size() != 0)
 			{
-				ResourceManager::getShader("warhead").use().setFloat("R", 124);
+				/*ResourceManager::getShader("warhead").use().setFloat("R", 124);
 				ResourceManager::getShader("warhead").use().setFloat("G", 252);
-				ResourceManager::getShader("warhead").use().setFloat("B", 0);
+				ResourceManager::getShader("warhead").use().setFloat("B", 0);*/
 
-
-				for (int i = 0; i < oglCurveData.size() / 2; i++)
+				//外壳
+				if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("外壳半径R1"))])
 				{
-					for (int j = 0; j < oglCurveData[i].size() - 1; j++)
+					QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("外壳半径R1"))];
+					ResourceManager::getShader("warhead").use().setFloat("R", color.red());
+					ResourceManager::getShader("warhead").use().setFloat("G", color.green());
+					ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
+					for (int i = 0; i < 2; i++)
 					{
-						//此线段形成圆台
-						//圆台底圆R
-						int downR = abs(oglCurveData[i][j].y());
-						//圆台上圆R
-						int upR = abs(oglCurveData[i][j + 1].y());
+						for (int j = 0; j < oglCurveData[i].size() - 1; j++)
+						{
+							//此线段形成圆台
+							//圆台底圆R
+							int downR = abs(oglCurveData[i][j].y());
+							//圆台上圆R
+							int upR = abs(oglCurveData[i][j + 1].y());
 
-						int H = oglCurveData[i][j].x() - oglCurveData[i][j + 1].x();
+							int H = oglCurveData[i][j].x() - oglCurveData[i][j + 1].x();
 
-						//圆台底面中心高度
-						center.fXYZ[1] = abs(oglCurveData[i][j].x());
+							//圆台底面中心高度
+							center.fXYZ[1] = abs(oglCurveData[i][j].x());
 
-						DrawRoundPConeSide(center, downR, H, upR, GL_TRUE);
+							DrawRoundPConeSide(center, downR, H, upR, GL_TRUE);
+						}
 					}
 				}
+				//内壳
+				if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("内壳半径R2"))])
+				{
+					QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("内壳半径R2"))];
+					ResourceManager::getShader("warhead").use().setFloat("R", color.red());
+					ResourceManager::getShader("warhead").use().setFloat("G", color.green());
+					ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
+
+					for (int i = 2; i < 4; i++)
+					{
+						for (int j = 0; j < oglCurveData[i].size() - 1; j++)
+						{
+							//此线段形成圆台
+							//圆台底圆R
+							int downR = abs(oglCurveData[i][j].y());
+							//圆台上圆R
+							int upR = abs(oglCurveData[i][j + 1].y());
+
+							int H = oglCurveData[i][j].x() - oglCurveData[i][j + 1].x();
+
+							//圆台底面中心高度
+							center.fXYZ[1] = abs(oglCurveData[i][j].x());
+
+							DrawRoundPConeSide(center, downR, H, upR, GL_TRUE);
+						}
+					}
+				}
+				
 
 
 
@@ -869,20 +927,7 @@ void WarheadOGLManager::paintGL()
 
 
 
-			ResourceManager::getShader("warhead").use().setFloat("R", 255);
-			ResourceManager::getShader("warhead").use().setFloat("G", 255);
-			ResourceManager::getShader("warhead").use().setFloat("B", 0);
-			//DrawColumnSide(center, sideR1, sideH, GL_TRUE);
-
-			ResourceManager::getShader("warhead").use().setFloat("R", 176);
-			ResourceManager::getShader("warhead").use().setFloat("G", 224);
-			ResourceManager::getShader("warhead").use().setFloat("B", 230);
-			//DrawColumnSide(center, sideR2, sideH,GL_FALSE);
-
-			/*ResourceManager::getShader("warhead").use().setFloat("R", 255);
-			ResourceManager::getShader("warhead").use().setFloat("G", 192);
-			ResourceManager::getShader("warhead").use().setFloat("B", 203);
-			DrawColumnSide(center, sideR3, sideH, GL_FALSE);*/
+			
 		}
 
 
@@ -894,8 +939,12 @@ void WarheadOGLManager::paintGL()
 
 
 		//绘制球状破片
+		if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("弹芯半径R5"))])
 		{
-
+			/*QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("弹芯半径R5"))];
+			ResourceManager::getShader("warhead").use().setFloat("R", color.red());
+			ResourceManager::getShader("warhead").use().setFloat("G", color.green());
+			ResourceManager::getShader("warhead").use().setFloat("B", color.blue());*/
 			ResourceManager::getShader("WarheadSphere").use();
 
 
@@ -928,8 +977,9 @@ void WarheadOGLManager::updateGL()
 	QMatrix4x4 projection;
 	GLfloat a = width();
 	GLfloat b = height();
-	projection.perspective(camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 2000.f);
-	//projection.ortho(1000,1000,1000,1000,0.1,1000);
+	//projection.perspective(camera->zoom, (GLfloat)width() / (GLfloat)height(), 0.1f, 2000.f);
+	projection.ortho(-500, 500,-500, 500, 1,4000);
+	pCore->glViewport(0, 0, 1200, 1200);
 	//projection.frustum(1000, 1000, 1000, 1000, 1, 1000);
 	view = camera->getViewMatrix();
 
@@ -1932,6 +1982,5 @@ void WarheadOGLManager::DrawColumnRing(Ver3D center, float radius, float height,
 	DrawColumnSide(center, radius, height, GL_FALSE);
 	DrawColumnSide(center, radius2, height, GL_FALSE);
 }
-
 
 
