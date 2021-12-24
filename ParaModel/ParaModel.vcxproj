@@ -55,7 +55,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>D:\Study\Work\paraModel1\paraModel1\ParaModel\SARibbon\src\SARibbonBar;$(IncludePath)</IncludePath>
+    <IncludePath>D:\gongzuo\paraModel\paraModel\ParaModel\SARibbon\src\SARibbonBar;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>

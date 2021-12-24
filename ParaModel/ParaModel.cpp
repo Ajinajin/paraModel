@@ -1126,52 +1126,60 @@ void ParaModel::ExportFileAction()
 	}
 	else
 	{
-		paraOglmanagerMain->outFlag = 0;
-		paraOglmanagerMain->allNodes.resize(0);
-		paraOglmanagerMain->allSolids.resize(0);
+		//paraOglmanagerMain->outFlag = 0;
+		//paraOglmanagerMain->allNodes.resize(0);
+		//paraOglmanagerMain->allSolids.resize(0);
 
+
+	
+		
 		//=-1则代表已计算完模型所有点信息以及所有solid信息
-		if (paraOglmanagerMain->outFlag == -1)
-		{
-			//让用户选择文件夹，在选择的文件夹中导出k文件,可以指定名字
-
-			QString curPath = QCoreApplication::applicationDirPath();
-			QString dlgTitle = "保存文件";
-			QString filter = "h文件(*.h);;c++文件(*.cpp);;k文件(*.k);;所有文件(*.*)";
-
-			QString dirpath = QFileDialog::getSaveFileName(this, dlgTitle, curPath, filter);
-
-
-			fstream outfile;
-			outfile.open(dirpath.toStdString(), fstream::out);
-
-			outfile << "*KEYWORD" << "\n";
-			outfile << "*NODE" << "\n";
-
-			for (int index = 0; index < paraOglmanagerMain->allNodes.size(); index++)
+		//for (int i = 0;; i++)
+		//{
+			if (paraOglmanagerMain->allNodes.size()!=0 && paraOglmanagerMain->allSolids.size()!=0)
 			{
-				outfile << std::setw(8) << (index + 1) << std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(paraOglmanagerMain->allNodes[index].x / 100.0)
-					<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(paraOglmanagerMain->allNodes[index].y / 100.0)
-					<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(paraOglmanagerMain->allNodes[index].z / 100.0) << std::setw(8) << "0" << std::setw(8) << "0" << std::endl;
-			}
+				//让用户选择文件夹，在选择的文件夹中导出k文件,可以指定名字
 
-			outfile << "*ELEMENT_SOLID" << "\n";
+				QString curPath = QCoreApplication::applicationDirPath();
+				QString dlgTitle = "保存文件";
+				QString filter = "h文件(*.h);;c++文件(*.cpp);;k文件(*.k);;所有文件(*.*)";
 
-			for (int i = 0; i < paraOglmanagerMain->allSolids.size(); i++)
-			{
-				outfile << std::setw(8) << i + 1 << std::setw(8) << "1";
-				for (int j = 0; j < 8; j++)
+				QString dirpath = QFileDialog::getSaveFileName(this, dlgTitle, curPath, filter);
+
+
+				fstream outfile;
+				outfile.open(dirpath.toStdString(), fstream::out);
+
+				outfile << "*KEYWORD" << "\n";
+				outfile << "*NODE" << "\n";
+
+				for (int index = 0; index < paraOglmanagerMain->allNodes.size(); index++)
 				{
-					outfile << std::setw(8) << paraOglmanagerMain->allSolids[i].idx[j / 4][j % 4];
+					outfile << std::setw(8) << (index + 1) << std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(paraOglmanagerMain->allNodes[index].x / 100.0)
+						<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(paraOglmanagerMain->allNodes[index].y / 100.0)
+						<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(paraOglmanagerMain->allNodes[index].z / 100.0) << std::setw(8) << "0" << std::setw(8) << "0" << std::endl;
 				}
-				outfile << "\n";
+
+				outfile << "*ELEMENT_SOLID" << "\n";
+
+				for (int i = 0; i < paraOglmanagerMain->allSolids.size(); i++)
+				{
+					outfile << std::setw(8) << i + 1 << std::setw(8) << "1";
+					for (int j = 0; j < 8; j++)
+					{
+						outfile << std::setw(8) << paraOglmanagerMain->allSolids[i].idx[j / 4][j % 4];
+					}
+					outfile << "\n";
+				}
+
+				MyLogOutput("K文件导出成功");
+
+
+				getStandardPic(paraOglmanagerMain);
+
 			}
-
-			MyLogOutput("K文件导出成功");
-
-
-			getStandardPic(paraOglmanagerMain);
-		}
+		//}
+		
 		
 	}
 
