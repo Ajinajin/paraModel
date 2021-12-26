@@ -752,7 +752,7 @@ void ParaOGLManager::paintGL()
 		pCen.fXYZ[1] = (Ymin + Ymax) / 2;
 		pCen.fXYZ[2] = (Zmin + Zmax) / 2;
 
-		//将相机的位置调整
+		//将相机的位置调整//***
 		if (CAMERA_LAST_POSITION != QVector3D(pCen.fXYZ[1], pCen.fXYZ[1], pCen.fXYZ[2] * 2.5))
 		{
 			CAMERA_LAST_POSITION = QVector3D(pCen.fXYZ[1], pCen.fXYZ[1], pCen.fXYZ[2] * 2.5);
