@@ -441,7 +441,42 @@ void WarheadParaModel::ExportFileAction()
 	}
 	else
 	{
-		MyLogOutput("K文件导出成功");
+		if (warheadParaOglmanager->allNodes.size() != 0)
+		{
+			//让用户选择文件夹，在选择的文件夹中导出k文件,可以指定名字
+
+			QString curPath = QCoreApplication::applicationDirPath();
+			QString dlgTitle = "保存文件";
+			QString filter = "h文件(*.h);;c++文件(*.cpp);;k文件(*.k);;所有文件(*.*)";
+
+			QString dirpath = QFileDialog::getSaveFileName(this, dlgTitle, curPath, filter);
+
+
+			fstream outfile;
+			outfile.open(dirpath.toStdString(), fstream::out);
+
+			outfile << "*KEYWORD" << "\n";
+			outfile << "*NODE" << "\n";
+
+			for (int index = 0; index < warheadParaOglmanager->allNodes.size(); index++)
+			{
+				outfile << std::setw(8) << (index + 1) << std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(warheadParaOglmanager->allNodes[index].fXYZ[0] / 100.0)
+					<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(warheadParaOglmanager->allNodes[index].fXYZ[1] / 100.0)
+					<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(warheadParaOglmanager->allNodes[index].fXYZ[2] / 100.0) << std::setw(8) << "0" << std::setw(8) << "0" << std::endl;
+			}
+
+			outfile << "*FRAGMENTS-POSITION" << "\n";
+			for (int index = 0; index < warheadParaOglmanager->allFragPos.size(); index++)
+			{
+				outfile << /*std::setw(8) << (index + 1) << */std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(warheadParaOglmanager->allFragPos[index].fXYZ[0] / 100.0)
+					<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(warheadParaOglmanager->allFragPos[index].fXYZ[1] / 100.0)
+					<< std::setw(16) << std::scientific << std::uppercase << std::setprecision(8) << float(warheadParaOglmanager->allFragPos[index].fXYZ[2] / 100.0) /*<< std::setw(8) << "0" << std::setw(8) << "0" */<< std::endl;
+			}
+			MyLogOutput("K文件导出成功");
+
+		}
+
+
 	}
 
 	return;

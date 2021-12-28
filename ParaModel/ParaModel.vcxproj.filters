@@ -202,10 +202,10 @@
     <None Include="res\shaders\window.vert">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\shaders\WarheadColumn.frag">
+    <None Include="res\shaders\Warhead.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\shaders\WarheadColumn.vert">
+    <None Include="res\shaders\Warhead.vert">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\shaders\WarheadSphere.frag">

@@ -645,17 +645,18 @@ void WarheadOGLManager::initializeGL()
 	camera = new Camera(CAMERA_POSITION);
 
 
-	
-
+	allNodes.resize(0);
+	allFragPos.resize(0);
 
 	//
 	initShowFlag = GL_FALSE;
-	
+	if_sectionalMode = 0;
 
 	/************ 载入shader ***********/
 
-	ResourceManager::loadShader("warhead", ":/shaders/res/shaders/WarheadColumn.vert", ":/shaders/res/shaders/WarheadColumn.frag");
+	ResourceManager::loadShader("warhead", ":/shaders/res/shaders/Warhead.vert", ":/shaders/res/shaders/Warhead.frag");
 	ResourceManager::loadShader("WarheadSphere", ":/shaders/res/shaders/WarheadSphere.vert", ":/shaders/res/shaders/WarheadSphere.frag");
+	ResourceManager::loadShader("sectionalWarhead", ":/shaders/res/shaders/sectionalWarhead.vert", ":/shaders/res/shaders/sectionalWarhead.frag");
 
 	/************ 载入Texture ***********/
 	//ResourceManager::loadTexture("brickwall", ":/textures/res/textures/brickwall.jpg");
@@ -684,10 +685,12 @@ void WarheadOGLManager::initializeGL()
 
 	targetModel.translate(midH, -midH, 0);
 
+
 	ResourceManager::getShader("warhead").use().setMatrix4f("model", targetModel);
 
 	ResourceManager::getShader("WarheadSphere").use().setMatrix4f("model", targetModel);
 
+	ResourceManager::getShader("sectionalWarhead").use().setMatrix4f("model", targetModel);
 	/***********  处理Uniform Buffer相关参数 **************/
 	/*
 	 * 在version 420以上版本 直接在着色器中进行uniform Block indices与Binding Points绑定，更方便一些
@@ -748,12 +751,19 @@ void WarheadOGLManager::paintGL()
 	//update
 	this->updateGL();
 
+
+
+	//剖面模式
+	if_sectionalMode = 1;
+
+
 	ResourceManager::getShader("warhead").use();
-	ResourceManager::getShader("warhead").use().setFloat("tranS", 0.25);
+	ResourceManager::getShader("warhead").use().setFloat("tranS",0.25);
+	ResourceManager::getShader("warhead").use().setInteger("if_sectionalMode", if_sectionalMode);
 
 
 
-
+	
 
 	Ver3D center;
 	center.fXYZ[0] = 0.0f, center.fXYZ[1] = 0.0f, center.fXYZ[2] = 0.0f;
@@ -804,153 +814,155 @@ void WarheadOGLManager::paintGL()
 
 		}
 
-		
-
-		//弹柱体底面壳
-		if(showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("前盖半径R8"))])
-		{
-			QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("前盖半径R8"))];
-			/*ResourceManager::getShader("warhead").use().setFloat("R", 227);
-			ResourceManager::getShader("warhead").use().setFloat("G", 168);
-			ResourceManager::getShader("warhead").use().setFloat("B", 105);*/
-			ResourceManager::getShader("warhead").use().setFloat("R", color.red());
-			ResourceManager::getShader("warhead").use().setFloat("G", color.green());
-			ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
-
-
-			center.fXYZ[0] = 0.0f, center.fXYZ[1] = 0.0f, center.fXYZ[2] = 0.0f;
-			InitAndDrawColumn(center, CirBottomR, CirBottomH);
-		}
 		//弹柱体顶面壳
 		if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("后盖半径R9"))])
 		{
 			QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("后盖半径R9"))];
-
-			/*ResourceManager::getShader("warhead").use().setFloat("R", 255);
-			ResourceManager::getShader("warhead").use().setFloat("G", 128);
-			ResourceManager::getShader("warhead").use().setFloat("B", 0);*/
 			ResourceManager::getShader("warhead").use().setFloat("R", color.red());
 			ResourceManager::getShader("warhead").use().setFloat("G", color.green());
 			ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
+
 
 			center.fXYZ[1] = CirBottomH + sideH;
 			InitAndDrawColumn(center, CirTopR, CirTopH);
 		}
 
+
+		//弹柱体底面壳
+		if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("前盖半径R8"))])
+		{
+			QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("前盖半径R8"))];
+			ResourceManager::getShader("warhead").use().setFloat("R", color.red());
+			ResourceManager::getShader("warhead").use().setFloat("G", color.green());
+			ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
+
+			center.fXYZ[0] = 0.0f, center.fXYZ[1] = 0.0f, center.fXYZ[2] = 0.0f;
+			InitAndDrawColumn(center, CirBottomR, CirBottomH);
+		}
+
+
 		//引信
 		if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("引信半径R4"))])
 		{
-			ResourceManager::getShader("warhead").use().setFloat("R", 255);
-			ResourceManager::getShader("warhead").use().setFloat("G", 0);
-			ResourceManager::getShader("warhead").use().setFloat("B", 255);
 
-			center.fXYZ[1] = CirBottomH + 0.001f;
+			QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("引信半径R4"))];
+			ResourceManager::getShader("warhead").use().setFloat("R", color.red());
+			ResourceManager::getShader("warhead").use().setFloat("G", color.green());
+			ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
+
+
+			center.fXYZ[1] = CirBottomH + 0.005f;
 			DrawFuse(center, fuseR1, fuseH1, fuseR2, fuseH2, GL_FALSE);
 		}
 
 
+
 		//圆柱侧面外壳
 		//第一层壳与第二层壳之间要装破片，所以先将第一层壳设置为透明
+		//壳为多个折线组成
+		if (oglCurveData.size() != 0)
 		{
 
-			//壳为多个折线组成
-			if (oglCurveData.size() != 0)
+			//外壳
+			if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("外壳半径R1"))])
 			{
-				/*ResourceManager::getShader("warhead").use().setFloat("R", 124);
-				ResourceManager::getShader("warhead").use().setFloat("G", 252);
-				ResourceManager::getShader("warhead").use().setFloat("B", 0);*/
+				QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("外壳半径R1"))];
+				ResourceManager::getShader("warhead").use().setFloat("R", color.red());
+				ResourceManager::getShader("warhead").use().setFloat("G", color.green());
+				ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
 
-				//外壳
-				if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("外壳半径R1"))])
+				for (int i = 0; i < 2; i++)
 				{
-					QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("外壳半径R1"))];
-					ResourceManager::getShader("warhead").use().setFloat("R", color.red());
-					ResourceManager::getShader("warhead").use().setFloat("G", color.green());
-					ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
-					for (int i = 0; i < 2; i++)
+					for (int j = 0; j < oglCurveData[i].size() - 1; j++)
 					{
-						for (int j = 0; j < oglCurveData[i].size() - 1; j++)
-						{
-							//此线段形成圆台
-							//圆台底圆R
-							int downR = abs(oglCurveData[i][j].y());
-							//圆台上圆R
-							int upR = abs(oglCurveData[i][j + 1].y());
+						//此线段形成圆台
+						//圆台底圆R
+						int downR = abs(oglCurveData[i][j].y());
+						//圆台上圆R
+						int upR = abs(oglCurveData[i][j + 1].y());
 
-							int H = oglCurveData[i][j].x() - oglCurveData[i][j + 1].x();
+						int H = oglCurveData[i][j].x() - oglCurveData[i][j + 1].x();
 
-							//圆台底面中心高度
-							center.fXYZ[1] = abs(oglCurveData[i][j].x());
+						//圆台底面中心高度
+						center.fXYZ[1] = abs(oglCurveData[i][j].x());
 
-							DrawRoundPConeSide(center, downR, H, upR, GL_TRUE);
-						}
+						DrawRoundPConeSide(center, downR, H, upR, GL_FALSE);
 					}
 				}
-				//内壳
-				if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("内壳半径R2"))])
+			}
+
+
+		
+
+
+			//内壳
+			if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("内壳半径R2"))])
+			{
+				QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("内壳半径R2"))];
+				ResourceManager::getShader("warhead").use().setFloat("R", color.red());
+				ResourceManager::getShader("warhead").use().setFloat("G", color.green());
+				ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
+
+
+				for (int i = 2; i < 4; i++)
 				{
-					QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("内壳半径R2"))];
-					ResourceManager::getShader("warhead").use().setFloat("R", color.red());
-					ResourceManager::getShader("warhead").use().setFloat("G", color.green());
-					ResourceManager::getShader("warhead").use().setFloat("B", color.blue());
-
-					for (int i = 2; i < 4; i++)
+					for (int j = 0; j < oglCurveData[i].size() - 1; j++)
 					{
-						for (int j = 0; j < oglCurveData[i].size() - 1; j++)
-						{
-							//此线段形成圆台
-							//圆台底圆R
-							int downR = abs(oglCurveData[i][j].y());
-							//圆台上圆R
-							int upR = abs(oglCurveData[i][j + 1].y());
+						//此线段形成圆台
+						//圆台底圆R
+						int downR = abs(oglCurveData[i][j].y());
+						//圆台上圆R
+						int upR = abs(oglCurveData[i][j + 1].y());
 
-							int H = oglCurveData[i][j].x() - oglCurveData[i][j + 1].x();
+						int H = oglCurveData[i][j].x() - oglCurveData[i][j + 1].x();
 
-							//圆台底面中心高度
-							center.fXYZ[1] = abs(oglCurveData[i][j].x());
+						//圆台底面中心高度
+						center.fXYZ[1] = abs(oglCurveData[i][j].x());
 
-							DrawRoundPConeSide(center, downR, H, upR, GL_TRUE);
-						}
+						DrawRoundPConeSide(center, downR, H, upR, GL_FALSE);
 					}
 				}
-				
-
-
-
-
-				//根据外壳折线计算得到所有破片球的坐标
-
-				center.fXYZ[1] = CirBottomH;
-				//if (initFlag == 0)
-				//{
-					//res = getFragSphere(center, sideR1, sideR2, fragR, sideH);
-				res = getFragSphere2(center, &oglCurveData, fragR);
-				//	initFlag++;
-				//}
 			}
 
 
 
-			
+
+
+			//根据外壳折线计算得到所有破片球的坐标
+
+			center.fXYZ[1] = CirBottomH;
+
+			res = getFragSphere2(center, &oglCurveData, fragR);
+
+
+			//存储
+			if (bOutputK == 0)
+			{
+				for (int k = 0; k < res.size(); k++)
+				{
+					for (int m = 0; m < res[k].size(); m += 3)
+					{
+						Ver3D tmp;
+						tmp.fXYZ[0] = res[k][m];
+						tmp.fXYZ[1] = res[k][m + 1];
+						tmp.fXYZ[2] = res[k][m + 2];
+
+						allFragPos.push_back(tmp);
+					}
+				}
+			}
 		}
+		
 
 
-
-
-
-
-
-
+		
 
 		//绘制球状破片
 		if (showFlags[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("弹芯半径R5"))])
 		{
-			/*QColor color = oglDefColor[getUnitIdx(&oglWarhead, QString::fromLocal8Bit("弹芯半径R5"))];
-			ResourceManager::getShader("warhead").use().setFloat("R", color.red());
-			ResourceManager::getShader("warhead").use().setFloat("G", color.green());
-			ResourceManager::getShader("warhead").use().setFloat("B", color.blue());*/
-			ResourceManager::getShader("WarheadSphere").use();
 
+			ResourceManager::getShader("WarheadSphere").use();
+			ResourceManager::getShader("WarheadSphere").use().setInteger("if_sectionalMode", if_sectionalMode);
 
 
 			//每层破片要不同颜色
@@ -960,6 +972,7 @@ void WarheadOGLManager::paintGL()
 					if (res[i].size() != 0)
 					{
 						ResourceManager::getShader("WarheadSphere").use().setInteger("layer", i);
+
 						DrawSphere(res[i], fragR);
 					}
 
@@ -968,7 +981,15 @@ void WarheadOGLManager::paintGL()
 
 
 		}
+		
 
+
+	}
+
+
+	if (bOutputK == 0 && oglWarhead.mapArmHead.size() != 0 && oglCurveData.size() != 0)
+	{
+		bOutputK++;
 	}
 
 }
@@ -995,6 +1016,13 @@ void WarheadOGLManager::updateGL()
 	int nSx = (a - nMin) / 2;
 	int nSy = (b - nMin) / 2;
 	pCore->glViewport(nSx, nSy, nMin, nMin);
+
+	
+
+	ResourceManager::getShader("sectionalWarhead").use().setMatrix4f("model", targetModel);
+	ResourceManager::getShader("sectionalWarhead").use().setMatrix4f("projection", projection);
+	ResourceManager::getShader("sectionalWarhead").use().setMatrix4f("view", view);
+
 
 	ResourceManager::getShader("warhead").use().setMatrix4f("model", targetModel);
 	ResourceManager::getShader("warhead").use().setMatrix4f("projection", projection);
@@ -1097,8 +1125,23 @@ void WarheadOGLManager::wheelEvent(QWheelEvent* event)
 	camera->processMouseScroll(offset.y() / 20.0f);
 }
 
+
+
+//draw
+
 void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float height)
 {
+	//pCore->glDisable(GL_DEPTH_TEST);
+	//pCore->glDepthMask(GL_FALSE);
+	//pCore->glEnable(GL_BLEND);//开启颜色混合
+	//pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+	//pCore->glEnable(GL_ALPHA_TEST);
+	//pCore->glEnable(GL_SCISSOR_TEST);
+
+
+	
+
+
 
 	int pointsNum = 50;//一个圈上面的点个数
 	vector<Ver3D> points;
@@ -1112,12 +1155,18 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		points.push_back(tmp);
 	}
 
-	//pCore->glEnable(GL_DEPTH_TEST);
-	//pCore->glDepthMask(GL_FALSE);
-	//pCore->glEnable(GL_BLEND);//开启颜色混合
-	//pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
-	//侧面
+	//存储
+	if (bOutputK == 0)
 	{
+		for (int k = 0; k < points.size(); k++)
+		{
+			allNodes.push_back(points[k]);
+		}
+	}
+
+
+	//侧面
+	
 		float* vertices = new float[pointsNum * 12];
 		for (int i = 0; i < pointsNum - 1; i++)
 		{
@@ -1166,6 +1215,10 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 
 
 
+
+
+
+		
 		pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
 
 
@@ -1173,7 +1226,7 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		pCore->glDeleteBuffers(1, &VBO);
 		delete[] vertices;
 
-	}
+	
 
 
 
@@ -1182,7 +1235,7 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 	//画两个底面圆(按照gl_triangles_fan的方式)
 
 	//circle 1
-	{
+	
 		float* verticesBottom = new float[(pointsNum + 1) * 3 + 9];
 		//第一个点是圆心
 		verticesBottom[0] = center.fXYZ[0];
@@ -1219,21 +1272,25 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		pCore->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 
+
+
 		pCore->glDrawArrays(GL_TRIANGLE_FAN, 0, (pointsNum + 1));
 		pCore->glDrawArrays(GL_TRIANGLES, (pointsNum + 1), 3);
+
+
 
 
 		//delete 
 		pCore->glDeleteBuffers(1, &VBO);
 		delete[] verticesBottom;
 
-	}
+	
 
 
 
 
 	//circle 2
-	{
+	
 		float* verticesTop = new float[(pointsNum + 1) * 3 + 9];
 		//第一个点是圆心
 		verticesTop[0] = center.fXYZ[0];
@@ -1271,6 +1328,7 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 
 
 
+
 		pCore->glDrawArrays(GL_TRIANGLE_FAN, 0, (pointsNum + 1));
 		pCore->glDrawArrays(GL_TRIANGLES, (pointsNum + 1), 3);
 
@@ -1280,17 +1338,22 @@ void WarheadOGLManager::InitAndDrawColumn(Ver3D center, float radius, float heig
 		delete[] verticesTop;
 
 
-	}
-	//pCore->glDisable(GL_BLEND);
-	//pCore->glDepthMask(GL_TRUE);
-	//pCore->glDisable(GL_DEPTH_TEST);
+	//pCore->glDisable(GL_ALPHA_TEST);
+	/*pCore->glDisable(GL_BLEND);
+	pCore->glDepthMask(GL_TRUE);*/
+	//pCore->glEnable(GL_DEPTH_TEST);
+	//pCore->glDisable(GL_SCISSOR_TEST);
 	// 
-
-
+	//pCore->glDisable(GL_BLEND);//开启颜色混合
+	//pCore->glDepthMask(GL_TRUE);
 }
 
 void WarheadOGLManager::DrawRing(Ver3D center, float r1, float r2)
 {
+
+	//pCore->glDepthMask(GL_FALSE);
+	//pCore->glEnable(GL_BLEND);//开启颜色混合
+	//pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 
 
 
@@ -1318,6 +1381,22 @@ void WarheadOGLManager::DrawRing(Ver3D center, float r1, float r2)
 
 		Cir2Points.push_back(tmp);
 	}
+
+
+	//存储
+	if (bOutputK == 0)
+	{
+		for (int k = 0; k < Cir1Points.size(); k++)
+		{
+			allNodes.push_back(Cir1Points[k]);
+		}
+		for (int k = 0; k < Cir2Points.size(); k++)
+		{
+			allNodes.push_back(Cir2Points[k]);
+		}
+	}
+
+
 
 	float* vertices = new float[pointsNum * 12];
 	for (int i = 0; i < pointsNum - 1; i++)
@@ -1370,6 +1449,12 @@ void WarheadOGLManager::DrawRing(Ver3D center, float r1, float r2)
 	pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
 
 
+
+
+	/*pCore->glDisable(GL_BLEND);
+	pCore->glDepthMask(GL_TRUE);*/
+	
+
 	//delete
 	pCore->glDeleteBuffers(1, &VBO);
 	delete[] vertices;
@@ -1377,12 +1462,12 @@ void WarheadOGLManager::DrawRing(Ver3D center, float r1, float r2)
 
 void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float smallR, float height2, GLboolean ifTrans)
 {
-	if (ifTrans == GL_TRUE)
-	{
-		pCore->glDepthMask(GL_FALSE);
-		pCore->glEnable(GL_BLEND);//开启颜色混合
-		pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
-	}
+	//if (ifTrans == GL_TRUE)
+	//{
+	//	pCore->glDepthMask(GL_FALSE);
+	//	pCore->glEnable(GL_BLEND);//开启颜色混合
+	//	pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+	//}
 
 
 
@@ -1390,13 +1475,16 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 	int pointsNum = 50;//一个圈上面的点个数
 
 
-	//pCore->glEnable(GL_DEPTH_TEST);
-	//pCore->glDepthMask(GL_FALSE);
-	//pCore->glEnable(GL_BLEND);//开启颜色混合
-	//pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 
 	//绘制下面较大柱
 	{
+		if (ifTrans == GL_TRUE)
+		{
+			pCore->glDisable(GL_DEPTH_TEST);
+			//pCore->glDepthMask(GL_FALSE);
+			pCore->glEnable(GL_BLEND);//开启颜色混合
+			pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+		}
 		vector<Ver3D> points;
 		for (int i = 0; i < pointsNum; i++)
 		{
@@ -1407,8 +1495,17 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 
 			points.push_back(tmp);
 		}
-		//侧面
+		//存储
+		if (bOutputK == 0)
 		{
+			for (int k = 0; k < points.size(); k++)
+			{
+				allNodes.push_back(points[k]);
+			}
+		}
+
+		//侧面
+		
 			float* vertices = new float[pointsNum * 12];
 			for (int i = 0; i < pointsNum - 1; i++)
 			{
@@ -1461,11 +1558,11 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 			//delete
 			pCore->glDeleteBuffers(1, &VBO);
 			delete[] vertices;
-		}
+		
 
 
 		//画下底面圆(按照gl_triangles_fan的方式)   ps:上底面不画
-		{
+		
 			float* verticesBottom = new float[(pointsNum + 1) * 3 + 9];
 			//第一个点是圆心
 			verticesBottom[0] = center.fXYZ[0];
@@ -1505,13 +1602,19 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 			pCore->glDrawArrays(GL_TRIANGLE_FAN, 0, (pointsNum + 1));
 			pCore->glDrawArrays(GL_TRIANGLES, (pointsNum + 1), 3);
 
-
+			if (ifTrans == GL_TRUE)
+			{
+				pCore->glDisable(GL_BLEND);
+				//pCore->glDepthMask(GL_TRUE);
+				pCore->glEnable(GL_DEPTH_TEST);
+				
+			}
 			//delete
 			pCore->glDeleteBuffers(1, &VBO);
 			delete[] verticesBottom;
-		}
-	}
+		
 
+	}
 
 	//绘制中间圆环
 	Ver3D ringCen;
@@ -1520,11 +1623,14 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 
 	//绘制上面较小柱
 	{
-		//pCore->glEnable(GL_DEPTH_TEST);
-		//pCore->glDepthMask(GL_FALSE);
-		//pCore->glEnable(GL_BLEND);//开启颜色混合
-		//pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 
+		if (ifTrans == GL_TRUE)
+		{
+			pCore->glDisable(GL_DEPTH_TEST);
+			//pCore->glDepthMask(GL_FALSE);
+			pCore->glEnable(GL_BLEND);//开启颜色混合
+			pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+		}
 
 		Ver3D sColCen;
 		sColCen.fXYZ[0] = center.fXYZ[0], sColCen.fXYZ[1] = center.fXYZ[1] + height1, sColCen.fXYZ[2] = center.fXYZ[2];
@@ -1539,8 +1645,20 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 
 			points.push_back(tmp);
 		}
-		//侧面
+
+		//存储
+		if (bOutputK == 0)
 		{
+			for (int k = 0; k < points.size(); k++)
+			{
+				allNodes.push_back(points[k]);
+			}
+		}
+
+
+
+		//侧面
+		
 			float* vertices = new float[pointsNum * 12];
 			for (int i = 0; i < pointsNum - 1; i++)
 			{
@@ -1589,15 +1707,15 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 
 			pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
 
-
+			
 			//delete
 			pCore->glDeleteBuffers(1, &VBO);
 			delete[] vertices;
-		}
+		
 
 
 		//画上底面圆(按照gl_triangles_fan的方式)   ps:下底面不画
-		{
+		
 			float* verticesTop = new float[(pointsNum + 1) * 3 + 9];
 			//第一个点是圆心
 			verticesTop[0] = sColCen.fXYZ[0];
@@ -1638,21 +1756,22 @@ void WarheadOGLManager::DrawFuse(Ver3D center, float bigR, float height1, float 
 			pCore->glDrawArrays(GL_TRIANGLE_FAN, 0, (pointsNum + 1));
 			pCore->glDrawArrays(GL_TRIANGLES, (pointsNum + 1), 3);
 
-
+			if (ifTrans == GL_TRUE)
+			{
+				pCore->glDisable(GL_BLEND);
+				//pCore->glDepthMask(GL_TRUE);
+				pCore->glEnable(GL_DEPTH_TEST);
+				
+			}
 			//delete
 			pCore->glDeleteBuffers(1, &VBO);
 			delete[] verticesTop;
-		}
+		
+
 	}
 
+	
 
-	if (ifTrans == GL_TRUE)
-	{
-		pCore->glDisable(GL_BLEND);
-		pCore->glDepthMask(GL_TRUE);
-	}
-	//pCore->glDisable(GL_BLEND);//开启颜色混合
-	//pCore->glDepthMask(GL_TRUE);
 
 
 }
@@ -1678,11 +1797,18 @@ void WarheadOGLManager::DrawColumnSide(Ver3D center, float radius, float height,
 
 		points.push_back(tmp);
 	}
-
+	//存储
+	if (bOutputK == 0)
+	{
+		for (int k = 0; k < points.size(); k++)
+		{
+			allNodes.push_back(points[k]);
+		}
+	}
 
 
 	//侧面
-	{
+	
 		float* vertices = new float[pointsNum * 12];
 		for (int i = 0; i < pointsNum - 1; i++)
 		{
@@ -1737,7 +1863,7 @@ void WarheadOGLManager::DrawColumnSide(Ver3D center, float radius, float height,
 		//delete
 		pCore->glDeleteBuffers(1, &VBO);
 		delete[] vertices;
-	}
+	
 
 
 	if (ifTrans == GL_TRUE)
@@ -1748,18 +1874,13 @@ void WarheadOGLManager::DrawColumnSide(Ver3D center, float radius, float height,
 
 
 	//delete
-	pCore->glDeleteBuffers(1, &VBO);
+	//pCore->glDeleteBuffers(1, &VBO);
 }
 
 
 void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float height, float radius2, GLboolean ifTrans)
 {
-	if (ifTrans == GL_TRUE)//透明度
-	{
-		pCore->glDepthMask(GL_FALSE);
-		pCore->glEnable(GL_BLEND);//开启颜色混合
-		pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
-	}
+	
 
 
 
@@ -1784,6 +1905,20 @@ void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float hei
 		tmp.fXYZ[2] = radius2 * sin(2 * 3.14 * i / pointsNum) + center.fXYZ[2];
 		uppoints.push_back(tmp);
 	}
+
+	//存储
+	if (bOutputK == 0)
+	{
+		for (int k = 0; k < points.size(); k++)
+		{
+			allNodes.push_back(points[k]);
+		}
+		for (int k = 0; k < uppoints.size(); k++)
+		{
+			allNodes.push_back(uppoints[k]);
+		}
+	}
+
 
 
 	//侧面
@@ -1836,8 +1971,19 @@ void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float hei
 
 
 
-		pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
+		if (ifTrans == GL_TRUE)//透明度
+		{
+			pCore->glDepthMask(GL_FALSE);
+			pCore->glEnable(GL_BLEND);//开启颜色混合
+			pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
+		}
 
+		pCore->glDrawArrays(GL_QUADS, 0, pointsNum * 4);
+		if (ifTrans == GL_TRUE)
+		{
+			pCore->glDisable(GL_BLEND);
+			pCore->glDepthMask(GL_TRUE);
+		}
 
 		//delete
 		pCore->glDeleteBuffers(1, &VBO);
@@ -1847,11 +1993,7 @@ void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float hei
 
 
 
-	if (ifTrans == GL_TRUE)
-	{
-		pCore->glDisable(GL_BLEND);
-		pCore->glDepthMask(GL_TRUE);
-	}
+	
 
 
 }
@@ -1859,7 +2001,10 @@ void WarheadOGLManager::DrawRoundPConeSide(Ver3D center, float radius, float hei
 
 void WarheadOGLManager::DrawSphere(VFLOAT centers, float radius)
 {
-
+	//pCore->glDisable(GL_DEPTH_TEST);
+	//pCore->glDepthMask(GL_FALSE);
+	//pCore->glEnable(GL_BLEND);//开启颜色混合
+	//pCore->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//alpha值运算
 
 	//球由很多层半径不同的圆圈组成,球面由三角面组成
 	int pointsNum = 10;		//每一层圆圈点的个数
@@ -1976,7 +2121,14 @@ void WarheadOGLManager::DrawSphere(VFLOAT centers, float radius)
 	//draw
 	//pCore->glBindVertexArray(0);
 	pCore->glDrawArraysInstanced(GL_QUADS, 0, ptNum, centers.size() / 3);//实例化绘制球
-	//pCore->glDrawArrays(GL_QUADS, 0, ptNum);//实例化绘制球
+	//pCore->glDrawArrays(GL_QUADS, 0, ptNum);
+
+
+
+	//pCore->glDisable(GL_BLEND);
+	//pCore->glDepthMask(GL_TRUE);
+	//pCore->glEnable(GL_DEPTH_TEST);
+
 
 	//delete
 	pCore->glDeleteBuffers(1, &VBO);

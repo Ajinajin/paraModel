@@ -14,10 +14,10 @@
         <file>res/shaders/wall.vert</file>
         <file>res/shaders/window.frag</file>
         <file>res/shaders/window.vert</file>
-        <file>res/shaders/WarheadColumn.frag</file>
-        <file>res/shaders/WarheadColumn.vert</file>
         <file>res/shaders/WarheadSphere.frag</file>
         <file>res/shaders/WarheadSphere.vert</file>
+        <file>res/shaders/Warhead.frag</file>
+        <file>res/shaders/Warhead.vert</file>
     </qresource>
     <qresource prefix="/qss">
         <file>res/qss/black.css</file>

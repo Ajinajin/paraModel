@@ -155,8 +155,8 @@
     <None Include="res\shaders\GLSL_YELLOW.vert" />
     <None Include="res\shaders\wall.frag" />
     <None Include="res\shaders\wall.vert" />
-    <None Include="res\shaders\WarheadColumn.frag" />
-    <None Include="res\shaders\WarheadColumn.vert" />
+    <None Include="res\shaders\Warhead.frag" />
+    <None Include="res\shaders\Warhead.vert" />
     <None Include="res\shaders\WarheadSphere.frag" />
     <None Include="res\shaders\WarheadSphere.vert" />
     <None Include="res\shaders\window.frag" />
