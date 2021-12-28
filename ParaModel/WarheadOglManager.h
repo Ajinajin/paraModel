@@ -18,13 +18,7 @@
 
 typedef vector<QImage> vQImage;
 
-struct Point		//点结构(二维)
-{
-	int x;
-	int y;
-	int z;
-};
-typedef vector<Point> vPoint;
+
 
 
 class WarheadOGLManager : public QOpenGLWidget
@@ -63,8 +57,11 @@ public:
 	void DrawSphere(VFLOAT centers, float radius);
 
 
-	//vPoint allNodes;			//存储三维模型的所有节点信息
+	V3DPT allNodes;			//存储三维模型的所有节点信息
+	V3DPT allFragPos;		//存储所有预制破片的位置
+	int bOutputK = 0;			//用于存储所有节点来输出K文件的标志
 
+	int if_sectionalMode;		//是否为剖面图模式
 
 public:
 
