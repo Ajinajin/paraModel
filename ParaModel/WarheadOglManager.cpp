@@ -403,8 +403,10 @@ vector<VFLOAT> getFragSphere2(Ver3D center, VECLSTPT* oC, float r)
 		//初始缩进值
 		float indentation0 = r / tan((Pi / 2 - alpha) / 2) - r;
 		//实现小球的坐标
+		//每上升一层的缩进值
+		float indentation = 2 * r * tan(alpha);
 		//展示三层
-		if ((R1 - R2) > 6 * r)
+		if ((R1 - R2) > (6 * r + indentation))
 		{
 			int floor = 0;//层数
 			//float floorheight = pow(3, 0.5) * r * cos(alpha);//层高
@@ -413,7 +415,7 @@ vector<VFLOAT> getFragSphere2(Ver3D center, VECLSTPT* oC, float r)
 			floor = h / floorheight;
 			//每上升一层的缩进值
 			//float indentation = pow(3, 0.5) * r * sin(alpha);
-			float indentation = 2 * r * tan(alpha);
+			//float indentation = 2 * r * tan(alpha);
 			//C是一个中间变量
 			//小球偏移值
 			float Left = 0;
@@ -435,8 +437,8 @@ vector<VFLOAT> getFragSphere2(Ver3D center, VECLSTPT* oC, float r)
 					//该小球与圆心夹角（弧度）
 					float angle = i * (Beta1 + OffsetBeta);
 					//第3层
-					resX = center.fXYZ[0] + (R1 - r * 4 - indentation0) * cos(angle);
-					resZ = center.fXYZ[2] + (R1 - r * 4 - indentation0) * sin(angle);
+					resX = center.fXYZ[0] + (R1 - r * 5 - indentation0) * cos(angle);
+					resZ = center.fXYZ[2] + (R1 - r * 5 - indentation0) * sin(angle);
 					resY = r + center.fXYZ[1] + f * floorheight - oC->at(0)[Lnum].x() + oC->at(0)[0].x();
 					finalRes[0].push_back(resX);
 					finalRes[0].push_back(resY);
@@ -455,8 +457,8 @@ vector<VFLOAT> getFragSphere2(Ver3D center, VECLSTPT* oC, float r)
 					//该小球与圆心夹角（弧度）
 					float angle = i * (Beta2 + OffsetBeta);
 					//第3层
-					resX = center.fXYZ[0] + (R1 - r * 2 - indentation0) * cos(angle);
-					resZ = center.fXYZ[2] + (R1 - r * 2 - indentation0) * sin(angle);
+					resX = center.fXYZ[0] + (R1 - r * 3 - indentation0) * cos(angle);
+					resZ = center.fXYZ[2] + (R1 - r * 3 - indentation0) * sin(angle);
 					resY = r + center.fXYZ[1] + f * floorheight - oC->at(0)[Lnum].x() + oC->at(0)[0].x();
 					finalRes[1].push_back(resX);
 					finalRes[1].push_back(resY);
@@ -489,7 +491,7 @@ vector<VFLOAT> getFragSphere2(Ver3D center, VECLSTPT* oC, float r)
 		}
 
 		//展示两层
-		else if ((R1 - R2) > 4 * r)
+		else if ((R1 - R2) > (4 * r + indentation))
 		{
 			int floor = 0;//层数
 			//float floorheight = pow(3, 0.5) * r * cos(alpha);//层高
@@ -498,7 +500,7 @@ vector<VFLOAT> getFragSphere2(Ver3D center, VECLSTPT* oC, float r)
 			floor = h / floorheight;
 			//每上升一层的缩进值
 			//float indentation = pow(3, 0.5) * r * sin(alpha);
-			float indentation = 2 * r * tan(alpha);
+			//float indentation = 2 * r * tan(alpha);
 			//C是一个中间变量
 			//小球偏移值
 			float Left = 0;
@@ -520,8 +522,8 @@ vector<VFLOAT> getFragSphere2(Ver3D center, VECLSTPT* oC, float r)
 					//该小球与圆心夹角（弧度）
 					float angle = i * (Beta1 + OffsetBeta);
 					//第3层
-					resX = center.fXYZ[0] + (R1 - r * 4 - indentation0) * cos(angle);
-					resZ = center.fXYZ[2] + (R1 - r * 4 - indentation0) * sin(angle);
+					resX = center.fXYZ[0] + (R1 - r * 3 - indentation0) * cos(angle);
+					resZ = center.fXYZ[2] + (R1 - r * 3 - indentation0) * sin(angle);
 					resY = r + center.fXYZ[1] + f * floorheight - oC->at(0)[Lnum].x() + oC->at(0)[0].x();
 					finalRes[0].push_back(resX);
 					finalRes[0].push_back(resY);
@@ -540,8 +542,8 @@ vector<VFLOAT> getFragSphere2(Ver3D center, VECLSTPT* oC, float r)
 					//该小球与圆心夹角（弧度）
 					float angle = i * (Beta2 + OffsetBeta);
 					//第3层
-					resX = center.fXYZ[0] + (R1 - r * 2 - indentation0) * cos(angle);
-					resZ = center.fXYZ[2] + (R1 - r * 2 - indentation0) * sin(angle);
+					resX = center.fXYZ[0] + (R1 - r - indentation0) * cos(angle);
+					resZ = center.fXYZ[2] + (R1 - r - indentation0) * sin(angle);
 					resY = r + center.fXYZ[1] + f * floorheight - oC->at(0)[Lnum].x() + oC->at(0)[0].x();
 					finalRes[1].push_back(resX);
 					finalRes[1].push_back(resY);
@@ -562,7 +564,7 @@ vector<VFLOAT> getFragSphere2(Ver3D center, VECLSTPT* oC, float r)
 			floor = h / floorheight;
 			//每上升一层的缩进值
 			//float indentation = pow(3, 0.5) * r * sin(alpha);
-			float indentation = 2 * r * tan(alpha);
+			//float indentation = 2 * r * tan(alpha);
 			//C是一个中间变量
 			//小球偏移值
 			float Left = 0;
@@ -584,8 +586,8 @@ vector<VFLOAT> getFragSphere2(Ver3D center, VECLSTPT* oC, float r)
 					//该小球与圆心夹角（弧度）
 					float angle = i * (Beta1 + OffsetBeta);
 					//第3层
-					resX = center.fXYZ[0] + (R1 - r * 4 - indentation0) * cos(angle);
-					resZ = center.fXYZ[2] + (R1 - r * 4 - indentation0) * sin(angle);
+					resX = center.fXYZ[0] + (R1 - r - indentation0) * cos(angle);
+					resZ = center.fXYZ[2] + (R1 - r - indentation0) * sin(angle);
 					resY = r + center.fXYZ[1] + f * floorheight - oC->at(0)[Lnum].x() + oC->at(0)[0].x();
 					finalRes[0].push_back(resX);
 					finalRes[0].push_back(resY);
@@ -601,6 +603,8 @@ vector<VFLOAT> getFragSphere2(Ver3D center, VECLSTPT* oC, float r)
 	return finalRes;
 
 }
+
+
 
 
 
