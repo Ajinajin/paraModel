@@ -2,7 +2,7 @@
 #include <ParaType.h>
 #include <DimDataConvert.h>
 #include <math.h>
-#include <vector>
+#include <vector> 
 //通过墙的构建序号来得到与其连接的两个柱子索引
 
 void calColumnsIdxFromWallIdx(int wallIdx, int* columnArrayIdx, VTOPOTABLE oglTopTable)
@@ -1129,7 +1129,6 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 				{
 					allWalls.push_back(i);
 				}
-
 			}
 		}
 
@@ -1189,6 +1188,29 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 		}
 
 
+		if (vLayerTopo[nMoveUnitIdx].nUnitAngle == 0)
+		{
+			for (int i = 0; i < vLayerTopo.size(); i++)//找寻所有墙
+			{
+				if (vLayerTopo[i].nUnitType == 4&& vLayerTopo[i].nUnitAngle == 0)
+				{
+					int moveWallY = vLayerTopo[vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0]].nCenPos[2];
+					int newWallY = vLayerTopo[vLayerTopo[i].nAdjUnitIdx[0]].nCenPos[2];
+					if (moveWallY > newWallY)
+					{
+
+						if (moveWallY >=0)
+						{
+
+							nYDis = 99999;
+						}
+					}
+				}
+			}
+		}
+
+
+
 		//找到能移动的最大距离
 		{
 			if (nMoveY < 0)	//如果墙是往上挪的
@@ -1225,7 +1247,7 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 							}
 							else
 							{
-								nYDis = vLayerTopo[col2].nCenPos[2] - vLayerTopo[col2].nCenPos[1] - colH- addY;//新增
+								nYDis = vLayerTopo[col2].nCenPos[2] - vLayerTopo[col2].nCenPos[2] - colH- addY;//新增
 							}
 						}
 						break;
@@ -1328,6 +1350,11 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 
 
 
+
+
+
+
+
 				if (nDoorAndWinIds.size() != 0)
 				{
 					int maxDisY = 0;
@@ -1411,6 +1438,30 @@ int MovWall(int nMoveUnitIdx, int nMoveX, int nMoveY, VTOPOTABLE& vLayerTopo, VS
 
 			}
 		}
+
+
+		if (vLayerTopo[nMoveUnitIdx].nUnitAngle == 90)
+		{
+			for (int i = 0; i < vLayerTopo.size(); i++)//找寻所有墙
+			{
+
+				if (vLayerTopo[i].nUnitType == 4 && vLayerTopo[i].nUnitAngle == 90)
+				{
+					int moveWallX = vLayerTopo[vLayerTopo[nMoveUnitIdx].nAdjUnitIdx[0]].nCenPos[0];
+					int newWallX = vLayerTopo[vLayerTopo[i].nAdjUnitIdx[0]].nCenPos[0];
+					if (moveWallX > newWallX)
+					{
+						if(moveWallX>=0)
+
+						nXDis = 99999;
+
+					}
+				}
+			}
+		}
+
+
+
 
 		VINT allCols;				//找到这些墙的所有柱子	
 		for (int j = 0; j < allWalls.size(); j++)
