@@ -80,11 +80,16 @@ public:
 	void outputKFile();
 	//返回六个视图图片
 	
+	void addNodeAndSolidInfos(int x, int y, int z, int length, int thickness, int height, int type);
+
 	VTOPOTABLE oglTopTable;		//绘制所需的拓扑结构表
 	VUNITTABLE oglUnitTable;	//绘制所需的结构单元表
 	
-	vPoint allNodes;			//存储三维模型的所有节点信息
-	vSolid allSolids;			//存储三维模型内的所有solid信息
+	VBUILDTOPO oglvLoadModelData;				// 当前绘制计算的模型数据 多层级
+
+
+	vPoint allNodes;			//存储三维模型的所有节点信息 多层级
+	vSolid allSolids;			//存储三维模型内的所有solid信息	多层级
 	int outFlag = 0;			//暂时变量，用于只输出一次K文件
 
 
@@ -102,6 +107,9 @@ public:
 	GLfloat deltaTime;
 	GLfloat lastFrame;											//上一帧
 
+
+
+
 	//模型旋转相关参数
 	QMatrix4x4 targetModel;										//模型的模型GLSL矩阵
 	QMatrix4x4 targetModelsave;
@@ -113,6 +121,8 @@ public:
 	GLfloat rotatePitch;										//每次对模型的pitch旋转
 
 	Ver3D pCen;													//记录建筑的中心点
+
+
 
 protected:
 	void mouseMoveEvent(QMouseEvent* event);

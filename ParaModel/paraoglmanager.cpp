@@ -275,10 +275,9 @@ void ParaOGLManager::paintGL()
 
 	
 
-	allNodes.resize(0);
-	allSolids.resize(0);
+	
 
-	//绘制三维模型
+	//绘制当前层三维模型
 	if (!oglUnitTable.empty() && !oglTopTable.empty())
 	{
 
@@ -723,7 +722,7 @@ void ParaOGLManager::paintGL()
 		}
 
 
-		if (outFlag != -1) { outFlag++; }
+		//if (outFlag != -1) { outFlag++; }
 	}
 	
 
@@ -760,6 +759,453 @@ void ParaOGLManager::paintGL()
 		}
 	}
 	
+
+
+
+	//将多层的数据曾入K文件所需数据变量中
+	if (!oglvLoadModelData.empty())
+	{
+		//if (outFlag == 0)
+		{
+			allNodes.resize(0);
+			allSolids.resize(0);
+
+
+			
+			for (int m = 0; m < oglvLoadModelData.size(); m++)
+			{
+				//先定一层是270cm高，柱250 + 板厚20
+				layerHeight = m * 270;		//目前层的层起点（Y值方向高度）
+
+				for (int i = 0; i < oglvLoadModelData[m].vLayerTopo.size(); i++)
+				{
+					//**判断此构件类型**
+
+
+					//柱
+					if (oglvLoadModelData[m].vLayerTopo.at(i).nUnitType == 1 && oglvLoadModelData[m].vLayerTopo.at(i).nStatusFlag != 1)
+					{
+						
+
+						//查找对应柱的相关信息
+						BasicUnit info = findUnit(oglvLoadModelData[m].vLayerTopo.at(i).nCenUnitIdx, oglUnitTable);
+
+						//方柱
+						if (info.oShape.nShapeType == 1)
+						{
+							float x, y, z, length, thickness, height;
+
+							height = columnHeight;
+							length = info.oShape.nShapeRange[2] - info.oShape.nShapeRange[0];
+							thickness = info.oShape.nShapeRange[3] - info.oShape.nShapeRange[1];
+
+							x = oglvLoadModelData[m].vLayerTopo.at(i).nCenPos[0];
+							y = columnHeight / 2 + layerHeight;
+							z = oglvLoadModelData[m].vLayerTopo.at(i).nCenPos[2];
+
+
+							addNodeAndSolidInfos(x, y, z, length, thickness, height, 1);
+
+						}
+
+						//圆柱
+						if (info.oShape.nShapeType == 2)
+						{
+							float x, y, z, radius, height;
+							x = oglvLoadModelData[m].vLayerTopo.at(i).nCenPos[0];
+							y = columnHeight / 2 + layerHeight;
+
+							z = oglvLoadModelData[m].vLayerTopo.at(i).nCenPos[2];
+							height = oglvLoadModelData[m].vLayerTopo.at(i).nCenPos[3];
+
+							radius = info.oShape.nNumOrRadius;
+							//radius = 1;
+
+						}
+
+						//多边形柱
+						if (info.oShape.nShapeType == 3)
+						{
+							float begin_y = 0;
+
+						}
+					}
+
+					//梁
+					if (oglvLoadModelData[m].vLayerTopo.at(i).nUnitType == 2 && oglvLoadModelData[m].vLayerTopo.at(i).nStatusFlag != 1)
+					{
+						
+
+						BasicUnit info = findUnit(oglvLoadModelData[m].vLayerTopo.at(i).nCenUnitIdx, oglUnitTable);
+
+						//矩形
+						if (info.oShape.nShapeType == 1)
+						{
+							BasicUnit info = findUnit(oglvLoadModelData[m].vLayerTopo.at(i).nCenUnitIdx, oglUnitTable);
+
+							float x, y, z, length, thickness, height;
+
+
+							//梁的厚度
+							thickness = info.oShape.nShapeRange[3] - info.oShape.nShapeRange[1];
+							//梁的高度
+							height = info.oShape.nShapeRange[2] - info.oShape.nShapeRange[0];
+
+							//查找梁连接的两个柱之间的距离
+							vPoint columnPoints;		//记录两个柱的中心点
+							vector<BasicUnit> Columns;	//墙连接的柱子
+							int j = 0;
+							while (oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j] != -1)
+							{
+								if (oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nUnitType == 1)
+								{
+
+									BasicUnit tmpinfo = findUnit(oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nCenUnitIdx, oglUnitTable);
+									Columns.push_back(tmpinfo);
+
+									Point info;
+									info.x = oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nCenPos[0];
+									info.y = 0;
+									info.z = oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nCenPos[2];
+									columnPoints.push_back(info);
+								}
+
+								j++;
+							}
+							//长度减去两个柱的宽度的一半
+							length = Distance(columnPoints[0].x, columnPoints[0].y, columnPoints[0].z, columnPoints[1].x, columnPoints[1].y, columnPoints[1].z);
+							length -= (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2;
+							length -= (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2;
+
+
+							//角度计算
+							if (columnPoints[0].z == columnPoints[1].z) { oglvLoadModelData[m].vLayerTopo.at(i).nUnitAngle = 0; }
+							if (columnPoints[0].x == columnPoints[1].x) { oglvLoadModelData[m].vLayerTopo.at(i).nUnitAngle = 90; }
+
+							if (oglvLoadModelData[m].vLayerTopo.at(i).nUnitAngle == 0)
+							{
+								//根据梁拓扑关系决定
+								if (columnPoints[0].x < columnPoints[1].x)
+								{
+									x = columnPoints[0].x + (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2 + length / 2;
+									y = columnHeight - height / 2 + layerHeight;
+									z = columnPoints[0].z;
+
+									addNodeAndSolidInfos(x, y, z, length, thickness, height, 2);
+								}
+								else
+								{
+									x = columnPoints[1].x + (Columns[1].oShape.nShapeRange[2] - Columns[1].oShape.nShapeRange[0]) / 2 + length / 2;
+									y = columnHeight - height / 2 + layerHeight;
+									z = columnPoints[1].z;
+									addNodeAndSolidInfos(x, y, z, length, thickness, height, 2);
+								}
+
+							}
+							if (oglvLoadModelData[m].vLayerTopo.at(i).nUnitAngle == 90)
+							{
+								if (columnPoints[0].z < columnPoints[1].z)
+								{
+									x = columnPoints[0].x;
+									y = columnHeight - height / 2 + layerHeight;
+									z = columnPoints[1].z - (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2 - length / 2;
+
+									addNodeAndSolidInfos(x, y, z, thickness, length, height, 2);
+								}
+								else
+								{
+									x = columnPoints[1].x;
+									y = columnHeight - height / 2 + layerHeight;
+									z = columnPoints[0].z - (Columns[0].oShape.nShapeRange[3] - Columns[0].oShape.nShapeRange[1]) / 2 - length / 2;
+
+									addNodeAndSolidInfos(x, y, z, thickness, length, height, 2);
+								}
+							}
+
+
+
+						}
+
+
+
+						//多边形
+						if (info.oShape.nShapeType == 3)
+						{
+							float height = oglvLoadModelData[m].vLayerTopo.at(i).nCenPos[3];
+							//InitAndDrawPolygonColumnHorizontal(info.oShape.vPolyPt, height);
+						}
+					}
+
+					//板  ps:目前板是以顺时针里取 柱的信息的
+					if (oglvLoadModelData[m].vLayerTopo.at(i).nUnitType == 3 && oglvLoadModelData[m].vLayerTopo.at(i).nStatusFlag != 1)
+					{
+						BasicUnit info = findUnit(oglvLoadModelData[m].vLayerTopo.at(i).nCenUnitIdx, oglUnitTable);
+
+						float x, y, z, length, width, thickness;
+						//板的厚度
+						thickness = info.oShape.nThickNess;
+
+						
+
+						//存储板连接的柱之间的信息
+						vPoint columnPoints;
+						vector<BasicUnit> columns;
+						int j = 0;
+						while (oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j] != -1)
+						{
+							if (oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nUnitType == 1)
+							{
+								BasicUnit tmpinfo = findUnit(oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nCenUnitIdx, oglUnitTable);
+								columns.push_back(tmpinfo);
+
+								Point info;
+								info.x = oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nCenPos[0];
+								info.y = 0;
+								info.z = oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nCenPos[2];
+								columnPoints.push_back(info);
+							}
+							j++;
+						}
+
+						//普通的四柱支撑矩形板
+						if (columns.size() == 4)
+						{
+							//长度减去两个柱的宽度的一半
+							length = Distance(columnPoints[0].x, columnPoints[0].y, columnPoints[0].z, columnPoints[1].x, columnPoints[1].y, columnPoints[1].z);
+							length += (columns[0].oShape.nShapeRange[2] - columns[0].oShape.nShapeRange[0]) / 2;
+							length += (columns[1].oShape.nShapeRange[2] - columns[1].oShape.nShapeRange[0]) / 2;
+							//宽度
+							width = Distance(columnPoints[1].x, columnPoints[1].y, columnPoints[1].z, columnPoints[2].x, columnPoints[2].y, columnPoints[2].z);
+							width += (columns[1].oShape.nShapeRange[3] - columns[1].oShape.nShapeRange[1]) / 2;
+							width += (columns[2].oShape.nShapeRange[3] - columns[2].oShape.nShapeRange[1]) / 2;
+
+							x = columnPoints[3].x - (columns[3].oShape.nShapeRange[2] - columns[3].oShape.nShapeRange[0]) / 2 + length / 2;
+							y = columnHeight + thickness / 2 + layerHeight;
+							z = columnPoints[3].z + (columns[3].oShape.nShapeRange[3] - columns[3].oShape.nShapeRange[1]) / 2 - width / 2;
+
+							addNodeAndSolidInfos(x, y, z, length, width, thickness, 3);
+						}
+						//多边形板
+						if (columns.size() > 4)
+						{
+							VINT polyData;
+							for (int i = 0; i < columnPoints.size(); i++)
+							{
+								polyData.push_back(columnPoints[i].x);
+								polyData.push_back(columnPoints[i].z);
+							}
+							InitAndDrawPolygonPortrait(polyData, columnHeight, thickness);
+						}
+
+					}
+
+					//墙
+					if (oglvLoadModelData[m].vLayerTopo.at(i).nUnitType == 4 && oglvLoadModelData[m].vLayerTopo.at(i).nStatusFlag != 1)
+					{
+						
+
+						BasicUnit info = findUnit(oglvLoadModelData[m].vLayerTopo.at(i).nCenUnitIdx, oglUnitTable);
+
+						float x, y, z, length, thickness, height;
+
+
+						//墙的厚度
+						thickness = info.oShape.nThickNess;
+
+						//墙的高度暂时与柱一致
+						height = columnHeight;
+
+						//查找墙连接的两个柱之间的距离
+						vPoint columnPoints;		//记录两个柱的中心点下点
+						vector<BasicUnit> Columns;	//墙连接的柱子
+						int j = 0;
+						while (oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j] != -1)
+						{
+							if (oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nUnitType == 1)
+							{
+
+								BasicUnit tmpinfo = findUnit(oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nCenUnitIdx, oglUnitTable);
+								Columns.push_back(tmpinfo);
+
+								Point info;
+								info.x = oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nCenPos[0];
+								info.y = 0;
+								info.z = oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nCenPos[2];
+								columnPoints.push_back(info);
+							}
+							//if (oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nUnitType == 2)//梁
+							//{
+							//	BasicUnit tmpinfo = findUnit(oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[j]).nCenUnitIdx, oglUnitTable);
+							//	//墙高度
+							//	//height = columnHeight - (tmpinfo.oShape.nShapeRange[2]- tmpinfo.oShape.nShapeRange[0]);//减去梁的高度
+							//	
+							//}
+							j++;
+						}
+						//长度减去两个柱的宽度的一半
+						length = Distance(columnPoints[0].x, columnPoints[0].y, columnPoints[0].z, columnPoints[1].x, columnPoints[1].y, columnPoints[1].z);
+						length -= (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2;
+						length -= (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2;
+
+
+						//根据墙的不同角度来绘制
+						if (oglvLoadModelData[m].vLayerTopo.at(i).nUnitAngle == 0)
+						{
+							//根据墙拓扑关系决定
+							if (columnPoints[0].x < columnPoints[1].x)
+							{
+								x = columnPoints[0].x + (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2 + length / 2;
+								y = columnHeight / 2 + layerHeight;
+								z = columnPoints[0].z;
+
+								addNodeAndSolidInfos(x, y, z, length, thickness, height, 4);
+							}
+							else
+							{
+								x = columnPoints[1].x + (Columns[1].oShape.nShapeRange[2] - Columns[1].oShape.nShapeRange[0]) / 2 + length / 2;
+								y = columnHeight / 2 + layerHeight;
+								z = columnPoints[1].z;
+
+								addNodeAndSolidInfos(x, y, z, length, thickness, height, 4);
+							}
+
+						}
+						if (oglvLoadModelData[m].vLayerTopo.at(i).nUnitAngle == 90)
+						{
+							if (columnPoints[0].z < columnPoints[1].z)
+							{
+								x = columnPoints[0].x;
+								y = columnHeight / 2 + layerHeight;
+								z = columnPoints[1].z - (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2 - length / 2;
+
+								addNodeAndSolidInfos(x, y, z, thickness, length, height, 4);
+							}
+							else
+							{
+								x = columnPoints[1].x;
+								y = columnHeight / 2 + layerHeight;
+								z = columnPoints[0].z - (Columns[0].oShape.nShapeRange[3] - Columns[0].oShape.nShapeRange[1]) / 2 - length / 2;
+
+								addNodeAndSolidInfos(x, y, z, thickness, length, height, 4);
+							}
+						}
+
+
+
+					}
+
+					//门与窗
+					if ((oglvLoadModelData[m].vLayerTopo.at(i).nUnitType == 5 || oglvLoadModelData[m].vLayerTopo.at(i).nUnitType == 6) && oglvLoadModelData[m].vLayerTopo.at(i).nStatusFlag != 1)
+					{
+						
+
+						BasicUnit info = findUnit(oglvLoadModelData[m].vLayerTopo.at(i).nCenUnitIdx, oglUnitTable);
+						float x, y, z, length, thickness, height;
+						length = info.oShape.nShapeRange[0];
+						height = info.oShape.nShapeRange[1];
+
+
+						//得到对应的墙id与墙信息  去计算出对应的门的坐标
+						{
+
+							int wallId = oglvLoadModelData[m].vLayerTopo.at(i).nAdjUnitIdx[0];
+							//查找墙连接的两个柱之间的距离
+							vPoint columnPoints;		//记录两个柱的中心点
+							vector<BasicUnit> Columns;	//墙连接的柱子
+							int j = 0;
+							while (oglvLoadModelData[m].vLayerTopo.at(wallId).nAdjUnitIdx[j] != -1)
+							{
+								if (oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(wallId).nAdjUnitIdx[j]).nUnitType == 1)
+								{
+
+									BasicUnit tmpinfo = findUnit(oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(wallId).nAdjUnitIdx[j]).nCenUnitIdx, oglUnitTable);
+									Columns.push_back(tmpinfo);
+
+									Point info;
+									info.x = oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(wallId).nAdjUnitIdx[j]).nCenPos[0];
+									info.y = 0;
+									info.z = oglvLoadModelData[m].vLayerTopo.at(oglvLoadModelData[m].vLayerTopo.at(wallId).nAdjUnitIdx[j]).nCenPos[2];
+									columnPoints.push_back(info);
+								}
+
+								j++;
+							}
+
+							//对应墙的信息
+							BasicUnit tmpWallInfo = findUnit(oglvLoadModelData[m].vLayerTopo.at(wallId).nCenUnitIdx, oglUnitTable);
+
+							thickness = tmpWallInfo.oShape.nThickNess;//门厚度与墙一致
+
+							//墙对应角度不同，对应不同情况
+							int wallX, wallY, wallZ;
+							if (oglvLoadModelData[m].vLayerTopo.at(wallId).nUnitAngle == 0)
+							{
+								//根据墙拓扑关系决定
+								if (columnPoints[0].x < columnPoints[1].x)
+								{
+									wallX = columnPoints[0].x + (Columns[0].oShape.nShapeRange[2] - Columns[0].oShape.nShapeRange[0]) / 2;
+									wallY = 0;
+									wallZ = columnPoints[0].z + thickness / 2;
+
+								}
+								else
+								{
+									wallX = columnPoints[1].x + (Columns[1].oShape.nShapeRange[2] - Columns[1].oShape.nShapeRange[0]) / 2;
+									wallY = 0;
+									wallZ = columnPoints[1].z + thickness / 2;
+
+								}
+
+								//门窗的坐标
+								x = wallX + oglvLoadModelData[m].vLayerTopo.at(i).nCenPos[0] + length / 2;
+								y = oglvLoadModelData[m].vLayerTopo.at(i).nCenPos[1] + height / 2 + layerHeight;
+								z = wallZ - thickness / 2;
+
+
+								addNodeAndSolidInfos(x, y, z, length, thickness, height, oglvLoadModelData[m].vLayerTopo.at(i).nUnitType);
+							}
+							if (oglvLoadModelData[m].vLayerTopo.at(wallId).nUnitAngle == 90)
+							{
+								if (columnPoints[0].z < columnPoints[1].z)
+								{
+									wallX = columnPoints[0].x - thickness / 2;
+									wallY = 0;
+									wallZ = columnPoints[1].z - (Columns[1].oShape.nShapeRange[3] - Columns[1].oShape.nShapeRange[1]) / 2;
+
+								}
+								else
+								{
+									wallX = columnPoints[1].x - thickness / 2;
+									wallY = 0;
+									wallZ = columnPoints[0].z - (Columns[0].oShape.nShapeRange[3] - Columns[0].oShape.nShapeRange[1]) / 2;
+
+								}
+
+								//门窗的坐标
+								x = wallX + thickness / 2;
+								y = oglvLoadModelData[m].vLayerTopo.at(i).nCenPos[1] + height / 2 + layerHeight;
+								z = wallZ - oglvLoadModelData[m].vLayerTopo.at(i).nCenPos[0] - length / 2;
+
+
+								addNodeAndSolidInfos(x, y, z, thickness, length, height, oglvLoadModelData[m].vLayerTopo.at(i).nUnitType);
+							}
+
+						}
+
+					}
+
+
+				}
+			}
+
+			//outFlag++;
+			int a = 0;
+		}
+		
+
+
+	}
+
 	
 }
 
@@ -1025,20 +1471,20 @@ void ParaOGLManager::InitAndDrawCuboid(int x, int y, int z, int length, int thic
 
 	//存入到点集合中
 	//if (outFlag == 0)
-	{
-		for (int i = 0; i < 8; i++)
-		{
-			allNodes.push_back(points[i]);
-		}
-	}
-	//点已存入完毕，此时开始对每个solid里面的点索引 赋值
-	//if (outFlag == 1)
-	{
-		Solid tmp;
-		findIndex(points,allNodes,tmp.idx);
+	//{
+	//	for (int i = 0; i < 8; i++)
+	//	{
+	//		allNodes.push_back(points[i]);
+	//	}
+	//}
+	////点已存入完毕，此时开始对每个solid里面的点索引 赋值
+	////if (outFlag == 1)
+	//{
+	//	Solid tmp;
+	//	findIndex(points,allNodes,tmp.idx);
 
-		allSolids.push_back(tmp);
-	}
+	//	allSolids.push_back(tmp);
+	//}
 
 
 	//6个矩形面片 24个点索引
@@ -1096,6 +1542,42 @@ BasicUnit findUnit(int idx, VUNITTABLE oglUnitTable)
 		}
 	}
 	//return;
+}
+
+//目前先只针对六面体情况
+void ParaOGLManager::addNodeAndSolidInfos(int x, int y, int z, int length, int thickness, int height, int type)
+{
+	//init
+
+	vPoint points;
+	Point tmp;
+	tmp.x = x - length / 2, tmp.y = y - height / 2, tmp.z = z - thickness / 2; points.push_back(tmp);
+	tmp.x = x + length / 2, tmp.y = y - height / 2, tmp.z = z - thickness / 2; points.push_back(tmp);
+	tmp.x = x + length / 2, tmp.y = y - height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
+	tmp.x = x - length / 2, tmp.y = y - height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
+	tmp.x = x - length / 2, tmp.y = y + height / 2, tmp.z = z - thickness / 2; points.push_back(tmp);
+	tmp.x = x + length / 2, tmp.y = y + height / 2, tmp.z = z - thickness / 2; points.push_back(tmp);
+	tmp.x = x + length / 2, tmp.y = y + height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
+	tmp.x = x - length / 2, tmp.y = y + height / 2, tmp.z = z + thickness / 2; points.push_back(tmp);
+
+
+	int solidToFaceOrder[] = { 0,1,2,3,0,1,5,4,1,2,6,5,3,2,6,7,0,3,7,4,4,5,6,7 };
+
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			allNodes.push_back(points[i]);
+		}
+	}
+	//点已存入完毕，此时开始对每个solid里面的点索引 赋值
+	
+	{
+		Solid tmp;
+		findIndex(points, allNodes, tmp.idx);
+
+		allSolids.push_back(tmp);
+	}
+
 }
 
 
